@@ -4,6 +4,7 @@
 local PANEL = {}
 
 AccessorFunc(PANEL, "title", "Title", FORCE_STRING)
+CCR:AccessorFunc(PANEL, "matBranding", "BrandingMaterial", "Material")
 
 function PANEL:Init()
 	self:SetTitle("No title")
@@ -14,7 +15,17 @@ function PANEL:Init()
 	self.header.Paint = function(s, w, h)
 		CCR:SetCacheTarget(s, "header")
 		CCR:RoundedBox(0, 0, w, h, s:GetThemeColors().Highlight, true, true, false, false)
-		CCR:DrawShadowText(1, self:GetTitle(), "CCR.24", 10, h / 2, color_white, "l", "c")
+
+		local xOff = 0
+		if (self:GetBrandingMaterial()) then
+			local size = 32
+			surface.SetDrawColor(color_white)
+			surface.SetMaterial(self:GetBrandingMaterial())
+			surface.DrawTexturedRect(h / 2 - size / 2, h / 2 - size / 2, size, size)
+
+			xOff = h / 2 + size / 2 - 4
+	end
+		CCR:DrawShadowText(1, self:GetTitle(), "CCR.24", xOff + 10, h / 2, color_white, "l", "c")
 	end
 
 		self.close = CCR:NewElement("DPanel", self.header)
