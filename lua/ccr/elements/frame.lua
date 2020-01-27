@@ -24,7 +24,7 @@ function PANEL:Init()
 			surface.DrawTexturedRect(h / 2 - size / 2, h / 2 - size / 2, size, size)
 
 			xOff = h / 2 + size / 2 - 4
-	end
+		end
 		CCR:DrawShadowText(1, self:GetTitle(), "CCR.24", xOff + 10, h / 2, color_white, "l", "c")
 	end
 
@@ -63,9 +63,6 @@ function PANEL:Init()
 end
 
 function PANEL:PerformLayout(w, h)
-	/*self.nav:SetSize(50, h)
-	self.target:SetSize(w - 50, h)
-	self.target:SetPos(50, 0)*/
 end
 
 function PANEL:Paint(w, h)
