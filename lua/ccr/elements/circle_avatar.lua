@@ -15,35 +15,13 @@ function PANEL:Init()
 end
 
 function PANEL:Paint(w, h)
-	render.ClearStencil()
-	render.SetStencilEnable(true)
-
-	render.SetStencilWriteMask(1)
-	render.SetStencilTestMask(1)
-
-	render.SetStencilFailOperation(STENCILOPERATION_REPLACE)
-	render.SetStencilPassOperation(STENCILOPERATION_ZERO)
-	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
-	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NEVER)
-	render.SetStencilReferenceValue(1)
-
-	draw.NoTexture()
-	surface.SetDrawColor(255, 255, 255, 255)
-
-	self:DrawMask(w, h)
-
-	render.SetStencilFailOperation(STENCILOPERATION_ZERO)
-	render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
-	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
-	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
-	render.SetStencilReferenceValue(1)
-
-	self.avatar:SetPaintedManually(false)
-	self.avatar:PaintManual()
-	self.avatar:SetPaintedManually(true)
-
-	render.SetStencilEnable(false)
-	render.ClearStencil()
+	CCR:Mask(function()
+		self:DrawMask(w, h)
+	end, function()
+		self.avatar:SetPaintedManually(false)
+		self.avatar:PaintManual()
+		self.avatar:SetPaintedManually(true)
+	end)
 end
 
 function PANEL:DrawMask(w, h)
