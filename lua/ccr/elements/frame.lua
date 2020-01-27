@@ -32,24 +32,24 @@ function PANEL:Init()
 		self.close:SetCursor("hand")
 		self.close:Dock(RIGHT)
 		self.close:DockMargin(4, 4, 4, 4)
-		self.close.color_bg = self:GetThemeColors().Highlight
-		self.close.color_x = self:GetThemeColors().Red
+		self.close.colorBackground = self:GetThemeColors().Highlight
+		self.close.colorMaterial = self:GetThemeColors().Red
 		self.close.Paint = function(s, w, h)
 			CCR:SetCacheTarget(s, "bg")
-			CCR:RoundedBox(0, 0, w, h, s.color_bg)
+			CCR:RoundedBox(0, 0, w, h, s.colorBackground)
 
 			local sub = 6
-			surface.SetDrawColor(s.color_x)
+			surface.SetDrawColor(s.colorMaterial)
 			surface.SetMaterial(s:GetThemeMaterials().close)
 			surface.DrawTexturedRect(sub / 2, sub / 2, h - sub, h - sub)
 		end
 		self.close.OnCursorEntered = function(s)
-			s:LerpColor("color_bg", self:GetThemeColors().Red)
-			s:LerpColor("color_x", color_white)
+			s:LerpColor("colorBackground", self:GetThemeColors().Red)
+			s:LerpColor("colorMaterial", color_white)
 		end
 		self.close.OnCursorExited = function(s)
-			s:LerpColor("color_bg", self:GetThemeColors().Highlight)
-			s:LerpColor("color_x", self:GetThemeColors().Red)
+			s:LerpColor("colorBackground", self:GetThemeColors().Highlight)
+			s:LerpColor("colorMaterial", self:GetThemeColors().Red)
 		end
 		self.close.OnMousePressed = function(s, key)
 			if key == MOUSE_LEFT then
