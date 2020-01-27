@@ -20,5 +20,5 @@ theme:SetColors({
 theme:SetMaterials({
 	close = Material("ccr_lib/close_x.png", "smooth")
 })
-theme:SetBoxRoundness(6)
+theme:SetBoxRoundness(7)
 theme:Register()
