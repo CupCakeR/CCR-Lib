@@ -43,5 +43,5 @@ function CCR:GetDrawCacheByKey()
 	local cur = CCR_CACHE_TARGET
 	if !cur then return end
 	local cached = cur.tbl.CCR_CACHE[cur.key]
-	return cached and !table.IsEmpty(cached) and cached
+	return cached && !table.IsEmpty(cached) && cached
 end
