@@ -1,4 +1,64 @@
 
+function CCR:Mask(funcCut, funcDraw)
+	render.ClearStencil()
+	render.SetStencilEnable(true)
+
+	render.SetStencilWriteMask(1)
+	render.SetStencilTestMask(1)
+
+	render.SetStencilFailOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilPassOperation(STENCILOPERATION_ZERO)
+	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
+	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NEVER)
+	render.SetStencilReferenceValue(1)
+
+	draw.NoTexture()
+	surface.SetDrawColor(255, 255, 255, 255)
+
+	funcCut()
+
+	render.SetStencilFailOperation(STENCILOPERATION_ZERO)
+	render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
+	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
+	render.SetStencilReferenceValue(1)
+
+	funcDraw()
+
+	render.SetStencilEnable(false)
+	render.ClearStencil()
+end
+
+function CCR:MaskInverse(funcCut, funcDraw)
+	render.ClearStencil()
+	render.SetStencilEnable(true)
+	render.DepthRange(0, 1)
+
+	render.SetStencilWriteMask(1)
+	render.SetStencilTestMask(1)
+
+	render.SetStencilFailOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
+	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NEVER)
+	render.SetStencilReferenceValue(1)
+
+	funcCut()
+
+	render.SetStencilFailOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
+	render.SetStencilZFailOperation(STENCILOPERATION_ZERO)
+	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
+	render.SetStencilReferenceValue(0)
+
+	funcDraw()
+
+	render.DepthRange(0, 1)
+	render.SetStencilEnable(false)
+	render.ClearStencil()
+
+end
+
 // TDLib https://github.com/Threebow/tdlib/blob/master/tdlib.lua
 function CCR:DrawCircle(x, y, r, col)
 	local poly = {}
