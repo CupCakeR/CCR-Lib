@@ -3,7 +3,7 @@
 
 local PANEL = {}
 
-AccessorFunc(PANEL, "title", "Title", FORCE_STRING)
+CCR:AccessorFunc(PANEL, "title", "Title", "String")
 CCR:AccessorFunc(PANEL, "matBranding", "BrandingMaterial", "Material")
 
 function PANEL:Init()
