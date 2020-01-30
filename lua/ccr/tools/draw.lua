@@ -187,7 +187,7 @@ function CCR:RoundedBox(x, y, w, h, clr, tl, tr, bl, br)
 	end
 end
 
-// TODO: Add xenin mat to our lib
+// TODO: Rename/Add Xenin mat to our lib, its mine anyway
 local matLoading = Material("xenin/loading.png", "smooth")
 function CCR:DrawLoading(x, y, size, col)
 	surface.SetMaterial(matLoading)
