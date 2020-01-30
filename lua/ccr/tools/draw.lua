@@ -196,7 +196,7 @@ function CCR:DrawLoading(x, y, size, col)
 end
 
 local blur = Material("pp/blurscreen")
-function CCR:DrawPanelBlur(pnl, amt, add)
+function CCR:DrawPanelBlur(pnl, amt)
 	local x, y = pnl:LocalToScreen(0, 0)
 	local w, h = ScrW(), ScrH()
 
