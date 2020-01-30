@@ -15,7 +15,7 @@ AccessorFunc(PANEL, "font", "Font")
 AccessorFunc(PANEL, "hover_alpha", "HoverAlpha")
 AccessorFunc(PANEL, "outline", "Outline")
 AccessorFunc(PANEL, "color", "Color")
-AccessorFunc(PANEL, "color_bg", "BackgroundColor")
+AccessorFunc(PANEL, "colorBackground", "BackgroundColor")
 
 function PANEL:Init()
 	self:SetCursor("hand")
