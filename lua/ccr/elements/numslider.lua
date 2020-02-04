@@ -1,5 +1,7 @@
 
 // TODO: Fully port to CCR
+// TODO: Make text fully optional to be able just to use the element itself (slider)
+// TODO: Use DrawArc instead of trash material
 
 local PANEL = {}
 
@@ -42,7 +44,7 @@ function PANEL:PostInit()
 	local mat = Material("nicksys/circle.png", "smooth")
 	self.slider = self:Add("DPanel")
 	self.slider:SetCursor("hand")
-	self.slider:SetSize(100, 24)
+	self.slider:SetSize(100, 20)
 	self.slider.min = self:GetMin()
 	self.slider.max = self:GetMax()
 	self.slider.decimals = self:GetDecimals()

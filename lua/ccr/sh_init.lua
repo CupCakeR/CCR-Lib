@@ -1,6 +1,9 @@
 
+// TODO: Clean this trash up ffs
+
 CCR.Resources:CL("cl_panelfuncs") // Load b4 tools
 CCR.Resources:SH("sh_classmerges")
+
 
 // Tools
 CCR.Resources:CL("tools/_BSHADOWS")
@@ -11,6 +14,7 @@ CCR.Resources:SH("tools/class_funcs_merge")
 CCR.Resources:SH("tools/color")
 CCR.Resources:SH("tools/misc")
 CCR.Resources:SH("tools/sh_playerfuncs")
+CCR.Resources:SH("tools/table")
 CCR.Resources:CL("tools/vgui")
 CCR.Resources:CL("tools/draw")
 CCR.Resources:CL("tools/anim")
@@ -18,8 +22,16 @@ CCR.Resources:CL("tools/text")
 CCR.Resources:CL("tools/hook")
 CCR.Resources:CL("tools/cache")
 
+// Config
+CCR.Resources:CLASS("config")
+
+// Theme
 CCR.Resources:CLASS("theme")
 CCR.Resources:CL("cl_themes")
+
+// Language
+CCR.Resources:CLASS("language")
+CCR.Resources:SH("sh_language")
 
 for k, v in pairs(file.Find("ccr/themes/*", "LUA")) do
 	v = string.StripExtension(v)
@@ -38,3 +50,5 @@ CCR.Resources:ELEMENT("scrollpanel")
 CCR.Resources:ELEMENT("textentry")
 CCR.Resources:ELEMENT("numslider")
 CCR.Resources:ELEMENT("image_label")
+
+hook.Run("CCR.OnLoaded")

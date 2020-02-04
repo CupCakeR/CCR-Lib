@@ -108,3 +108,7 @@ function CCR:LerpColor(frac, from, to)
 
 	return clr
 end
+
+function CCR:GetColorDistance(a, b)
+	return math.sqrt((b.r - a.r) ^ 2 + (b.g - a.g) ^ 2 + (b.b - a.b) ^ 2)
+end
