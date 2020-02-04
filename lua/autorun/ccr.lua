@@ -1,4 +1,6 @@
 
+-- TODO Our lib doesnt need this trash, find some other way
+
 --
 local addon = "CCR"
 local dir = "ccr"
