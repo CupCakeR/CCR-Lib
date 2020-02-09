@@ -1,3 +1,5 @@
-lua/out/*
-.history/*
-out/*
+.history/
+.vscode/
+.gitignore
+.vscode/settings.json
+.out/
