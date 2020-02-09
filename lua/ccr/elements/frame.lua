@@ -1,6 +1,4 @@
 
-//TODO Remove everything except header
-
 local PANEL = {}
 
 CCR:AccessorFunc(PANEL, "title", "Title", "String")
