@@ -56,7 +56,6 @@ function CCR:MaskInverse(funcCut, funcDraw)
 	render.DepthRange(0, 1)
 	render.SetStencilEnable(false)
 	render.ClearStencil()
-
 end
 
 // TDLib https://github.com/Threebow/tdlib/blob/master/tdlib.lua
