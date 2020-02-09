@@ -8,6 +8,7 @@ CCR.Resources:SH("sh_classmerges")
 // Tools
 CCR.Resources:CL("tools/_BSHADOWS")
 CCR.Resources:CL("tools/_GRADIENT")
+CCR.Resources:SV("tools/net")
 CCR.Resources:SH("tools/_PROMISES")
 CCR.Resources:SH("tools/accessor_funcs")
 CCR.Resources:SH("tools/class_funcs_merge")
