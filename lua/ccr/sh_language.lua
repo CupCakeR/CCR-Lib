@@ -1,3 +1,4 @@
+-- NOTE https://gitlab.com/sleeppyy/xeninui/blob/master/lua/xeninui/libs/languages.lua 
 
 CCR.AddonLanguages = CCR.AddonLanguages || {}
 
@@ -24,6 +25,3 @@ hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function()
 		hook.Run("CCR.DoInitializeLanguage")
 	end)
 end)
-
-// TODO: Allow addon to register here somehow
-// TODO: Write better fucking comments so I know what I fucking mean the next time I look at it
