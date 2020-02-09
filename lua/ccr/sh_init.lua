@@ -52,5 +52,6 @@ CCR.Resources:ELEMENT("scrollpanel")
 CCR.Resources:ELEMENT("textentry")
 CCR.Resources:ELEMENT("numslider")
 CCR.Resources:ELEMENT("image_label")
+CCR.Resources:ELEMENT("context_menu")
 
 hook.Run("CCR.OnLoaded")
