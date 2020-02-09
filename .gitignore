@@ -1,2 +1,4 @@
 lua/out/*
 .history/*
+out/linecount.json
+out/linecount.txt
