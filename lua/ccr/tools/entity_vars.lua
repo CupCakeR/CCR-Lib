@@ -33,6 +33,7 @@ function CCR:GetEntityVar(ent, key, fallback)
 	assert(key, "!key")
 
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
+
 	local var = self.EntityVars[ent][key]
 
 	if (var != nil) then
