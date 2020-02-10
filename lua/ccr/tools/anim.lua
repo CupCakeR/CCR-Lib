@@ -4,7 +4,7 @@ CCR:AddPanelFunction("Lerp", function(s, key, to, dur, cb)
 	anim.from = s[key]
 	anim.to = to
 	anim.Think = function(_s, pnl, frac)
-		s[key] = Lerp(Lerp(frac, 0, 1), _s.from, _s.to)
+		pnl[key] = Lerp(Lerp(frac, 0, 1), _s.from, _s.to)
 	end
 	anim.OnEnd = function(_s)
 		if (cb) then
@@ -18,7 +18,7 @@ CCR:AddPanelFunction("LerpColor", function(s, key, to, dur, callback)
 	anim.from = s[key]
 	anim.to = to
 	anim.Think = function(_s, pnl, frac)
-		s[key] = CCR:LerpColor(Lerp(frac, 0, 1), _s.from, _s.to)
+		pnl[key] = CCR:LerpColor(Lerp(frac, 0, 1), _s.from, _s.to)
 	end
 	anim.OnEnd = function(_s)
 		if (callback) then
@@ -37,6 +37,15 @@ CCR:AddPanelFunction("LerpSize", function(s, w, h, dur, callback)
 		local new_frac = Lerp(frac, 0, 1)
 		local _w = Lerp(new_frac, _s.from_w, _s.to_w)
 		local _h = Lerp(new_frac, _s.from_h, _s.to_h)
+
+		pnl:SetSize(_w, _h)
+	end
+	anim.OnEnd = function(_s)
+		if (callback) then
+			callback(s)
+		end
+	end
+end)
 
 CCR:AddPanelFunction("LerpPos", function(s, x, y, dur, callback)
 	local anim = s:NewAnimation(dur or .1)
