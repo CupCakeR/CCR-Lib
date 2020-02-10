@@ -19,6 +19,8 @@ function CCR:SetEntityVar(ent, key, var)
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
 	self.EntityVars[ent][key] = var
 
+	hook.Run("CCR.OnEntityVarSet", ent, key, var)
+
 	if (SERVER) then
 		net.Start("CCR.EntityVar")
 			net.WriteEntity(ent)
