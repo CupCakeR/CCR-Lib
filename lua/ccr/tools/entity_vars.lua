@@ -42,7 +42,6 @@ function CCR:GetEntityVar(ent, key, fallback)
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
 
 	local var = self.EntityVars[ent][key]
-
 	if (var != nil) then
 		return var
 	end
