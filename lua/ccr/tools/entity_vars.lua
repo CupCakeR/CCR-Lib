@@ -17,6 +17,11 @@ function CCR:SetEntityVar(ent, key, var)
 	assert(key, "!key")
 
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
+
+	if (self.EntityVars[ent][key] == var) then
+		return
+	end
+
 	self.EntityVars[ent][key] = var
 
 	hook.Run("CCR.OnEntityVarSet", ent, key, var)
