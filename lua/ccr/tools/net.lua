@@ -1,5 +1,5 @@
 
-function CCR:NetDebounceReceive(id, cb, dataFunc, debounceTime)
+function CCR:NetReceiveDebounced(id, cb, dataFunc, debounceTime)
 	assert(id, "No ID specified")
 	assert(isfunction(cb), "No callback specified")
 
