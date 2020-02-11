@@ -13,7 +13,7 @@ if (SERVER) then
 end
 
 function CCR:SetEntityVar(ent, key, var)
-	assert(IsValud(ent), "Entity is not valid")
+	assert(IsValid(ent), "Entity is not valid")
 	assert(key, "Invalid key (index)")
 
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
