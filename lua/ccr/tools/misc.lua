@@ -22,7 +22,7 @@ end
 function CCR:Debounce(id, sec, func)
 	id = "CCR.Debounce." .. id
 	if (timer.Exists(id)) then
-		timer.Remove(id)
+		//timer.Remove(id)
 	end
 
 	timer.Create(id, sec, 1, function()
