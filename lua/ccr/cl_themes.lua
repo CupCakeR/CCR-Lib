@@ -1,4 +1,6 @@
 
+// TODO: Store theme in global addon table instead of storing it on all panels ffs
+
 CCR.Themes = CCR.Themes or {}
 
 local current_id = "material_dark"
