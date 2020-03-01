@@ -34,7 +34,7 @@ function CCR:DrawText(str, font, x, y, clr, ax, ay)
 end
 
 function CCR:DrawShadowText(px, str, font, x, y, clr, ax, ay)
-	draw.SimpleText(str, font, x + px, y + px, color_black, aligns[ax or "l"], aligns[ay or "l"])
+	draw.SimpleText(str, font, x + px, y + px, ColorAlpha(color_black, clr.a), aligns[ax or "l"], aligns[ay or "l"])
 	draw.SimpleText(str, font, x, y, clr, aligns[ax or "l"], aligns[ay or "l"])
 end
 
