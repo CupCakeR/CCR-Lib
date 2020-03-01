@@ -335,3 +335,13 @@ CCR.Promises = M
 function CCR:NewPromise()
 	return CCR.Promises.new()
 end
+
+function CCR:NewTimedPromise(t) // TODO: Identifier
+	local p = self:NewPromise()
+
+	timer.Simple(t, function()
+		p:resolve()
+	end)
+
+	return p
+end
