@@ -345,3 +345,9 @@ function CCR:NewTimedPromise(t) // TODO: Identifier
 
 	return p
 end
+
+function CCR:PromiseError(msg)
+	MsgC("<CCR-Promise> Error: " .. (msg || "?"))
+	debug.Trace()
+	error()
+end
