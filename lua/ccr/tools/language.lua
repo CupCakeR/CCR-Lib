@@ -1,4 +1,6 @@
--- NOTE https://gitlab.com/sleeppyy/xeninui/blob/master/lua/xeninui/libs/languages.lua 
+-- NOTE https://gitlab.com/sleeppyy/xeninui/blob/master/lua/xeninui/libs/languages.lua
+
+CCR.Resources:CLASS("language")
 
 CCR.AddonLanguages = CCR.AddonLanguages || {}
 
