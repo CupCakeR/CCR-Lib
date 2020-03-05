@@ -138,6 +138,16 @@ else
 	end)
 end
 
+function CCR:GetFullyInitializedPlayers()
+	local players = {}
+	for i, p in ipairs(player.GetAll()) do
+		if (p.CCR_FullyLoaded) then
+			table.insert(players, p)
+		end
+	end
+
+	return players
+end
 /*local pmeta = FindMetaTable("Player")
 if !pmeta.CCR_old_SteamID64 then
 	pmeta.CCR_old_SteamID64 = pmeta.SteamID64
