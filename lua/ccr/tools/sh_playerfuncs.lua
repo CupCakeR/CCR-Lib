@@ -154,6 +154,18 @@ function CCR:PlayerHasFullyInitialized(p)
 	return p.CCR_FullyLoaded || false
 end
 
+local pmeta = FindMetaTable("Player")
+if !pmeta.CCR_old_SteamID64 then
+	pmeta.CCR_old_SteamID64 = pmeta.SteamID64
+	function pmeta:SteamID64()
+		if IsValid(self) and self:IsBot() then
+			return CCR:BotSteamID64(self.RealName and self:RealName() or self.RealNick and self:RealNick() or self:Nick())
+		end
+
+		return self.CCR_old_SteamID64(self)
+	end
+end
+
 /*local pmeta = FindMetaTable("Player")
 if !pmeta.CCR_old_SteamID64 then
 	pmeta.CCR_old_SteamID64 = pmeta.SteamID64
