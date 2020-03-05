@@ -81,6 +81,8 @@ else
 			return
 		end
 
+		p.CCR_FullyLoaded = true
+
 		hook.Run("CCR.OnPlayerFullyLoaded", p)
 
 		net.Start("CCR.FCI.Ready")
