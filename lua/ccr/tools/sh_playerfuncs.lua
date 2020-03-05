@@ -148,6 +148,12 @@ function CCR:GetFullyInitializedPlayers()
 
 	return players
 end
+
+function CCR:PlayerHasFullyInitialized(p)
+	assert(p, "Player is not valid")
+	return p.CCR_FullyLoaded || false
+end
+
 /*local pmeta = FindMetaTable("Player")
 if !pmeta.CCR_old_SteamID64 then
 	pmeta.CCR_old_SteamID64 = pmeta.SteamID64
