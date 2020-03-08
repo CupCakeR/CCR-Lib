@@ -13,6 +13,12 @@ end
 function CCR:GetTheme()
 	return self:GetThemeByID(current_id)
 end
+CCR.Theme = CCR.GetTheme
+
+function CCR:GetThemeColors()
+	return self:GetTheme():GetColors()
+end
+CCR.ThemeColors = CCR.GetThemeColors
 
 function CCR:GetThemeByID(id)
 	return self.Themes[id]
