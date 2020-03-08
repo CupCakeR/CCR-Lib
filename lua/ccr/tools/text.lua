@@ -15,7 +15,7 @@ function CCR:CreateFont(name, size, weight, add)
 	surface.CreateFont(name, tbl)
 end
 
-for i = 1, 50 do
+for i = 1, 100 do
 	CCR:CreateFont("CCR." .. i, i, 0)
 	CCR:CreateFont("CCR." .. i .. ".MEDIUM", i, 600)
 	CCR:CreateFont("CCR." .. i .. ".BOLD", i, 1000)
