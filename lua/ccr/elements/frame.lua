@@ -71,4 +71,4 @@ function PANEL:Paint(w, h)
 	BSHADOWS.EndShadow(1, 2, 2, 255, 0, 0)
 end
 
-CCR:RegisterElement("Frame", PANEL, "EditablePanel")
+CCR:RegisterElement("Frame", PANEL, "CCR.ScalablePanel")
