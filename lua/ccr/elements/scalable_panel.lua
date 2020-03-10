@@ -50,8 +50,9 @@ end
 	end
 end
 
+local cvar = GetConVar("ccr_panel_scale")
 function PANEL:CalculateScale()
-	return self:GetScale() * (self:GetUseClientScale() && GetConVar("ccr_panel_scale"):GetFloat() || 1)
+	return self:GetScale() * (self:GetUseClientScale() && cvar:GetFloat() || 1)
 end
 
 function PANEL:Paint(w, h)
