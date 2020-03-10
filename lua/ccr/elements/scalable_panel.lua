@@ -23,6 +23,7 @@ function PANEL:Init()
 		return self
 	end
 
+	// TODO: GetScaledPos instead
 	self.old_GetPos = self.GetPos
 	function self:GetPos()
 		return self.__target_pos_x, self.__target_pos_y
