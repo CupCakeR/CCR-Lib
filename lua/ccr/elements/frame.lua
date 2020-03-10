@@ -1,4 +1,6 @@
 
+// TODO: Remove? OUTDATED: Use ScalableFrame as base
+
 local PANEL = {}
 
 CCR:AccessorFunc(PANEL, "title", "Title", "String")
@@ -64,11 +66,14 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:Paint(w, h)
-	local x, y = self:LocalToScreen()
+	/*local x, y = self:LocalToScreen()
 	BSHADOWS.BeginShadow()
 		CCR:SetCacheTarget(self, "bg")
 		CCR:RoundedBox(x, y, w, h, self:GetThemeColors().Background)
-	BSHADOWS.EndShadow(1, 2, 2, 255, 0, 0)
+	BSHADOWS.EndShadow(1, 2, 2, 255, 0, 0)*/
+
+	CCR:SetCacheTarget(self, "bg")
+	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Background)
 end
 
-CCR:RegisterElement("Frame", PANEL, "CCR.ScalablePanel")
+CCR:RegisterElement("Frame", PANEL, "Panel")
