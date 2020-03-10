@@ -106,6 +106,54 @@ end
 
 CCR:RegisterElement("ScalablePanel", PANEL, "EditablePanel")
 
+function CCR:DetourHoverFunctionsForScalablePanel(pnl, parent)
+	if (!IsValid(pnl)) then return end
+
+	local old_OnCursorEntered = pnl.OnCursorEntered || function() end
+	local old_OnCursorExited = pnl.OnCursorExited || function() end
+	local old_Think = pnl.Think || function() end
+
+	local expect = false
+	function pnl:OnCursorEntered()
+		if (expect) then
+			old_OnCursorEntered(self)
+		end
+	end
+
+	function pnl:OnCursorExited()
+		if (expect) then
+			old_OnCursorExited(self)
+		end
+	end
+
+	local cur = 0
+	function pnl:Think()
+		if (self:IsHovered() && cur == 0) then
+			expect = true
+			self:OnCursorEntered()
+			expect = false
+			cur = 1
+		elseif (!self:IsHovered() && cur == 1) then
+			expect = true
+			self:OnCursorExited()
+			expect = false
+			cur = 0
+		end
+
+		return old_Think(self)
+	end
+end
+
+// TODO: Only detour if last parent is ScalablePanel?
+// Detours some panel functions to make it compatible with ScalablePanel
+hook.Add("CCR.OnElementCreated", "CCR.ScalablePanelCompatibility", function(pnl, parent)
+	timer.Simple(0, function()
+		CCR:DetourHoverFunctionsForScalablePanel(pnl, parent)
+	end)
+
+	return s
+end)
+
 function CCR:ScalablePanelTest()
 	if (self.ScalablePanel) then
 		self.ScalablePanel:Remove()
