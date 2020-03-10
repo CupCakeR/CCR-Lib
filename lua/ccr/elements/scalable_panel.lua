@@ -79,9 +79,10 @@ function PANEL:Register()
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 			cam.PushModelMatrix(mat)
-				/*BSHADOWS.BeginShadow()
-					CCR:CustomRoundedBox(12 * (1 + scale), x, y, width, height, color_white, true, true, true, true)
-				BSHADOWS.EndShadow(2, 2, 2, 255, 0, 0, true)*/
+				// TODO: Make shadow meme optional
+				BSHADOWS.BeginShadow()
+					CCR:CustomRoundedBox(CCR:GetTheme():GetBoxRoundness(), x, y, width, height, color_white, true, true, true, true)
+				BSHADOWS.EndShadow(2, 2, 2, 255, 0, 0, true)
 				s:PaintAt(0, 0)
 			cam.PopModelMatrix()
 		render.PopFilterMag()
