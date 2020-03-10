@@ -1,4 +1,6 @@
 
+// TODO: Add BSHADOWS support
+
 CreateClientConVar("ccr_panel_scale", .5, true, false, "Base scale for all scalable panels")
 
 local PANEL = {}
