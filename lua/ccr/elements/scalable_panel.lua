@@ -87,7 +87,7 @@ function PANEL:Register()
 		render.PopFilterMin()
 
 		local cx, cy = input.GetCursorPos()
-		if (cx >= x && cx <= (x + width) && cy >= y && cy <= (y + height)) then
+		if (!gui.IsGameUIVisible() && cx >= x && cx <= (x + width) && cy >= y && cy <= (y + height)) then
 			local x_pct = (cx - x) / width
 			local y_pct = (cy - y) / height
 
