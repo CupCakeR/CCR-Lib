@@ -69,8 +69,6 @@ function PANEL:Register()
 		local width = s:GetWide() * scale
 		local height = s:GetTall() * scale
 
-		print(x, y)
-
 		local mat = Matrix()
 		mat:Translate(Vector(x, y))
 		mat:Scale(Vector(scale, scale))
