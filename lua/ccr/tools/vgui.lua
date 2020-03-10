@@ -10,6 +10,9 @@ function CCR:NewElement(class, parent, name)
 
 	local pnl = vgui.Create(class, parent, name)
 	CCR:AddPanelID(pnl)
+
+	hook.Run("CCR.OnElementCreated", pnl, parent, class, name)
+
 	return pnl
 end
 
