@@ -2,6 +2,9 @@
 // TODO: Add BSHADOWS support
 
 CreateClientConVar("ccr_panel_scale", .5, true, false, "Base scale for all scalable panels")
+cvars.AddChangeCallback("ccr_panel_scale", function(name, old, new)
+	hook.Run("CCR.OnClientScaleChanged", new, old)
+end)
 
 local PANEL = {}
 
