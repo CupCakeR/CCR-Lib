@@ -159,16 +159,16 @@ function CCR:ScalablePanelTest()
 		self.ScalablePanel:Remove()
 	end
 
-	local pnl = self:NewElement("ScalablePanel")
-
-	timer.Simple(1, function()
-		if IsValid(pnl) then pnl:Remove() end
-	end)
-
-	pnl:SetSize(1000, 700)
-	pnl:SetScale(1.5)
-	pnl:Center()
+	local pnl = self:NewElement("ScalableFrame")
+	pnl:SetSize(1500, 900 + 64)
+	pnl:SetScale(1)
 	pnl:Register()
+	pnl:Center()
+	pnl:MakePopup()
+
+	pnl:AddHook("CCR.OnClientScaleChanged", "CCR.ScalableFrame", function(s)
+		s:Center()
+	end)
 
 	self.ScalablePanel = pnl
 end
