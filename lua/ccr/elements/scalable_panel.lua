@@ -40,6 +40,14 @@ function PANEL:Init()
 		local scale = self:CalculateScale()
 		return self:GetWide() * scale, self:GetTall() * scale
 	end
+
+	function self:GetScaledWidth()
+		return select(1, self:GetScaledSize())
+end
+
+	function self:GetScaledHeight()
+		return select(2, self:GetScaledSize())
+	end
 end
 
 function PANEL:CalculateScale()
