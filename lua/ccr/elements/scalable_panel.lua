@@ -36,7 +36,6 @@ function PANEL:Init()
 	function self:Center()
 		local w, h = self:GetScaledSize()
 		self:SetPos(ScrW() / 2 - w / 2, ScrH() / 2 - h / 2)
-		print(self:GetPos())
 	end
 
 	function self:GetScaledSize()
