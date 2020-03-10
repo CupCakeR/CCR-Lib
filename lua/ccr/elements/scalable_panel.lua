@@ -92,8 +92,8 @@ function PANEL:Register()
 			local y_pct = (cy - y) / height
 
 			local wPct, hPct = s:GetWide() * x_pct, s:GetTall() * y_pct
-			wPct = math.ceil(wPct)
-			hPct = math.ceil(hPct)
+			wPct = math.floor(wPct)
+			hPct = math.floor(hPct)
 
 			s:old_SetPos(cx - wPct, cy - hPct)
 		else
