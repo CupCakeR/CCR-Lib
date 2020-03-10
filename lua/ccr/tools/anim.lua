@@ -11,6 +11,8 @@ CCR:AddPanelFunction("Lerp", function(s, key, to, dur, cb)
 			cb(s)
 		end
 	end
+
+	return anim
 end)
 
 CCR:AddPanelFunction("LerpColor", function(s, key, to, dur, callback)
@@ -25,6 +27,8 @@ CCR:AddPanelFunction("LerpColor", function(s, key, to, dur, callback)
 			callback(s)
 		end
 	end
+
+	return anim
 end)
 
 CCR:AddPanelFunction("LerpSize", function(s, w, h, dur, callback)
@@ -45,6 +49,8 @@ CCR:AddPanelFunction("LerpSize", function(s, w, h, dur, callback)
 			callback(s)
 		end
 	end
+
+	return anim
 end)
 
 CCR:AddPanelFunction("LerpPos", function(s, x, y, dur, callback)
@@ -64,6 +70,8 @@ CCR:AddPanelFunction("LerpPos", function(s, x, y, dur, callback)
 			callback(s)
 		end
 	end
+
+	return anim
 end)
 
 /*CCR:AddPanelFunction("LerpAlpha", function(s, to, dur, callback)
