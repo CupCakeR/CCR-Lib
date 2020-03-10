@@ -173,6 +173,7 @@ function CCR:CustomRoundedBox(rad, x, y, w, h, clr, tl, tr, bl, br)
 	self:ClearCacheTarget()
 end
 
+// FIXME wtf??
 hook.Add("CCR.NewTheme", "AddOption:BoxRoundness", function(theme)
 	AccessorFunc(theme, "box_roundness", "BoxRoundness", FORCE_NUMBER)
 	theme:SetBoxRoundness(6)
