@@ -1,23 +1,22 @@
-
 CCR.PanelFuncs = {}
 CCR_PANEL_ID = CCR_PANEL_ID or 1
 
 function CCR:AddPanelID(pnl)
-	pnl["panel_id"] = CCR_PANEL_ID
-	CCR_PANEL_ID = CCR_PANEL_ID + 1
+  pnl["panel_id"] = CCR_PANEL_ID
+  CCR_PANEL_ID = CCR_PANEL_ID + 1
 end
 
 function CCR:AddPanelFunction(name, func)
-	self.PanelFuncs[name] = func
+  self.PanelFuncs[name] = func
 end
 
 function CCR:PreparePanelFunctions(pnl)
-	for name, func in pairs(self.PanelFuncs) do
-		local old = FindMetaTable("Panel")[name] or pnl[name]
-		if old then
-			pnl["old_" .. name] = old // save to allow detour
-		end
+  for name, func in pairs(self.PanelFuncs) do
+    local old = FindMetaTable("Panel")[name] or pnl[name]
+    if old then
+      pnl["old_" .. name] = old
+    end
 
-		pnl[name] = func
-	end
+    pnl[name] = func
+  end
 end

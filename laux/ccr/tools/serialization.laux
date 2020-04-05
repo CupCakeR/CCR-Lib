@@ -1,0 +1,74 @@
+
+-- TODO: Add max depth
+
+local function removeNonNetworkableRecursive(tbl)
+	for k, v in pairs(tbl) do
+		if (!net.WriteVars[TypeID(v)]) then
+			tbl[k] = nil
+			continue
+		end
+
+		if (istable(v)) then
+			removeNonNetworkableRecursive(v)
+		end
+	end
+
+	return tbl
+end
+
+-- NOTE: This is not actual serialization, it just makes object networkable
+function CCR:Serialize(obj)
+	assert(obj)
+
+	local new = {}
+
+	if (!obj._accessors) then
+		return new
+	end
+
+	if (obj.PreSerialize) then
+		obj:PreSerialize()
+	end
+
+	obj = table.Copy(obj)
+
+	for key, data in pairs(obj._accessors) do
+		if (!data.serializable) then continue end
+
+		local f = obj[`Get${data.name}`]
+		if (f) then
+			new[key] = f(obj)
+		else
+			new[key] = obj[key]
+		end
+
+		new[key] = new[key] == nil && data.default || new[key]
+
+		if (istable(new[key])) then
+			for k, v in pairs(new[key]) do
+				if (istable(v)) then
+					new[key][k] = self:Serialize(v)
+				end
+
+				if (istable(new[key][k])) then
+					new[key][k] = removeNonNetworkableRecursive(new[key][k])
+				end
+			end
+		end
+	end
+
+	if (obj.PostSerialize) then
+		obj:PostSerialize(new) -- NOTE: Add userdata manually here? Vectors & Angles (https://wiki.facepunch.com/gmod/table.Copy)
+	end
+
+	return new
+end
+
+function CCR:Deserialize(obj, data)
+	if (obj.Deserialize) then
+		obj:Deserialize(data)
+		return obj
+	end
+
+	return table.Merge(obj, data)
+end

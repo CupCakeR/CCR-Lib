@@ -1,6 +1,3 @@
-
-// Just a simple class which is meant to hold values and verify their type on input
-
 local CLASS = {}
 CLASS.__index = CLASS
 
@@ -12,76 +9,92 @@ CCR:AccessorFunc(CLASS, "initialized", "Initialized", "Boolean")
 CLASS.Conn = CLASS.GetConnection
 
 function CLASS.new()
-	local _self = setmetatable({}, CLASS)
-	_self.initialized = false
+  local _self = setmetatable({}, CLASS)
+  _self.initialized = false
 
-	_self.CCR_CLASSNAME = "CCR.MySQLite"
-	CCR:AddClassFunctions(_self)
+  _self.CCR_CLASSNAME = "CCR.MySQLite"
+  CCR:AddClassFunctions(_self)
 
-	return _self
+  return _self
 end
 
 function CLASS:__tostring()
-	return "CCR.MySQLite[" .. (self:GetName() or "Undefined") .. "]"
+  return "CCR.MySQLite[" .. (self:GetName() or "Undefined") .. "]"
 end
 
 function CLASS:Initialize()
-	assert(SERVER, "This is not supposed to be called clientside!")
-	assert(self:GetName(), "No name set")
-	assert(self:GetConfig(), "No config set")
-	assert(!self:GetInitialized(), "Already initialized")
+  assert(SERVER, "This is not supposed to be called clientside!")
+  assert(self:GetName(), "No name set")
+  assert(self:GetConfig(), "No config set")
+  assert(!self:GetInitialized(), "Already initialized")
 
-	local p = CCR:NewPromise()
+  local p = CCR:NewPromise()
 
-	// Set global table which gets used in the module
-	CCR_MYSQLITE_SETTINGS = {
-		moduleName = "MySQLite_" .. self:GetName(),
-		config = self:GetConfig()
-	}
 
-	CCR.Resources:SV("tools/_MYSQLITE")
-	_G[CCR_MYSQLITE_SETTINGS.moduleName].initialize()
+  CCR_MYSQLITE_SETTINGS = {
+    moduleName = "MySQLite_" .. self:GetName(),
+    config = self:GetConfig()
+  }
 
-	self:AddHook(CCR_MYSQLITE_SETTINGS.moduleName .. ".DatabaseInitialized", function(s)
-		local conn = _G["MySQLite_" .. self:GetName()]
-		self:ExtendMySQLiteObject(conn)
-		s:SetConnection(conn)
-		p:resolve(s:GetConnection())
-	end)
+  CCR.Resources:SV("tools/_MYSQLITE")
+  _G[CCR_MYSQLITE_SETTINGS.moduleName].initialize()
 
-	// Clear
-	CCR_MYSQLITE_SETTINGS = nil
-	self.initialized = true
+  self:AddHook(CCR_MYSQLITE_SETTINGS.moduleName .. ".DatabaseInitialized", function(s)
+    local conn = _G["MySQLite_" .. self:GetName()]
+    self:ExtendMySQLiteObject(conn)
+    s:SetConnection(conn)
+    p:resolve(s:GetConnection())
+  end)
 
-	return p
+
+  CCR_MYSQLITE_SETTINGS = nil
+  self.initialized = true
+
+  return p
 end
 
 function CLASS:ExtendMySQLiteObject(obj)
-	obj.pQuery = function(query)
-		local p = CCR:NewPromise()
+  obj.pQuery = function(query)
+    local p = CCR:NewPromise()
 
-		obj.query(query, function(data)
-			p:resolve(data)
-		end, function(err)
-			p:reject(err)
-		end)
+    obj.query(query, function(data)
+      p:resolve(data)
+    end, CCR.PromiseError)
 
-		return p
-	end
+    return p
+  end
 
-	obj.pQueryValue = function(query)
-		local p = CCR:NewPromise()
+  obj.pQueryValue = function(query)
+    local p = CCR:NewPromise()
 
-		obj.queryValue(query, function(data)
-			p:resolve(data)
-		end, function(err)
-			p:reject(err)
-		end)
+    obj.queryValue(query, function(data)
+      p:resolve(data)
+    end, CCR.PromiseError)
 
-		return p
-	end
+    return p
+  end
+
+  obj.pQueueQuery = function(query)
+    local p = CCR:NewPromise()
+
+    obj.queueQuery(query, function(data)
+      p:resolve(data)
+    end, CCR.PromiseError)
+
+    return p
+  end
+
+  obj.pCommit = function()
+    local p = CCR:NewPromise()
+
+    obj.commit(query, function()
+      p:resolve()
+    end, CCR.PromiseError)
+
+    return p
+  end
 end
 
 function CCR:NewMySQLite()
-	return CLASS.new()
+  return CLASS.new()
 end

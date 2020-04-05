@@ -1,0 +1,93 @@
+
+-- TODO: Move to /classes?
+
+CCR.Timers ||= {}
+
+public class CCR.Timer
+	constructor()
+		CCR:AccessorFunc(self, "identifier", "Identifier")
+		CCR:AccessorFunc(self, "delay", "Delay", "Number")
+		CCR:AccessorFunc(self, "repetitions", "Repetitions", "Number")
+		CCR:AccessorFunc(self, "func", "Function", "Function")
+
+		CCR:AccessorFunc(self, "last_executed", "LastExecuted", "Number")
+		CCR:AccessorFunc(self, "total_repetitions", "TotalRepetitions", "Number")
+
+		self.delay = 0
+		self.repetitions = 1
+		self.func = () => end
+		self.last_executed = CurTime()
+		self.total_repetitions = 0
+		
+		return self
+	end
+
+	__tostring()
+		return `CCR.Timer[${self.identifier}]`
+	end
+
+	IsValid()
+		return self.identifier != nil && CCR.Timers[self.identifier] == self
+	end
+
+	Perform()
+		if (self.last_executed + self.delay <= CurTime()) then
+			self:Trigger()
+		end
+
+		return self
+	end
+
+	Trigger(reset = true)
+		assert(self:IsValid())
+
+		if (reset) then
+			self.last_executed = CurTime()
+		end
+
+		self.total_repetitions++
+		self.func()
+
+		if (self.repetitions > 0 && self.total_repetitions >= self.repetitions) then
+			self:Remove()
+		end
+
+		return self
+	end
+
+	Register()
+		CCR.Timers[self.identifier] = self
+		return self
+	end
+
+	Remove()
+		CCR.Timers[self.identifier] = nil
+	end
+end
+
+function CCR:CreateTimer(identifier, delay, repetitions, func = () => end)
+	assert(identifier)
+	assert(tonumber(delay))
+	assert(tonumber(repetitions))
+	assert(isfunction(func))
+
+	local obj = CCR.Timer()
+	obj:SetIdentifier(identifier)
+	obj:SetDelay(delay)
+	obj:SetRepetitions(repetitions)
+	obj:SetFunction(func)
+	obj:Register()
+
+	return obj
+end
+
+function CCR:RunNextFrame(identifier, func = () => end)
+	return self:CreateTimer(identifier, 0, 1, func)
+end
+
+-- TODO: Lookup table with numeric keys
+hook.Add("Tick", "CCR.Timer", () =>
+	for identifier, timer in pairs(CCR.Timers) do
+		timer:Perform()
+	end
+end)

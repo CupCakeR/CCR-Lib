@@ -1,21 +1,18 @@
-
-// Just a simple class which is meant to hold values and verify their type on input
-
 local CLASS = {}
 CLASS.__index = CLASS
 
 CCR:AccessorFunc(CLASS, "id", "ID", "String")
 
 function CLASS.new(id)
-	local _self = setmetatable({}, CLASS)
-	_self.id = id
-	return _self
+  local _self = setmetatable({}, CLASS)
+  _self.id = id
+  return _self
 end
 
 function CLASS:__tostring()
-	return "CCR.Config[" .. (self:GetID() or "Undefined") .. "]"
+  return "CCR.Config[" .. (self:GetID() or "Undefined") .. "]"
 end
 
 function CCR:NewConfig(id)
-	return CLASS.new(id)
+  return CLASS.new(id)
 end

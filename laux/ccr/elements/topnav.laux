@@ -1,0 +1,112 @@
+
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "canvas", "Canvas", "Panel")
+CCR:AccessorFunc(PANEL, "tabs", "Tabs", "Table")
+CCR:AccessorFunc(PANEL, "font", "Font", "String")
+CCR:AccessorFunc(PANEL, "x_gap", "GapX", "Integer")
+
+function PANEL:Init()
+	self.tabs = {}
+	self.font = "CCR.29"
+	self.x_gap = 32
+
+	self:SetTall(64)
+end
+
+function PANEL:AddTab(id, name, pnlClass = "Panel", btnDock = LEFT)
+	assert(self:GetCanvas(), "Canvas is not valid")
+	assert(self.tabs[id] == nil, "Tab already exists")
+
+	local btn = CCR:NewElement("Panel", self)
+	btn:Dock(btnDock)
+	btn:SetCursor("hand")
+
+	CCR:AccessorFunc(btn, "selected", "Selected", "Boolean", nil, false)
+	btn.lerpVal = 0
+	btn.SetSelected = (s, b) =>
+		s.selected = b
+		s:Lerp("lerpVal", b && 1 || 0)
+
+		self:GetCanvas():Clear()
+
+		if (b) then
+			local target = CCR:NewElement(pnlClass, self:GetCanvas())
+			target:Dock(FILL)
+
+			if (target.PostInit) then
+				target:PostInit()
+			end
+		end
+	end
+
+	btn.OnMousePressed = (s, key) =>
+		if (key == MOUSE_LEFT) then
+			self:DoSelect(id)
+		end
+	end
+
+	btn.OnCursorEntered = (s) =>
+		if (!s.selected) then
+			s:Lerp("lerpVal", .333)
+		end
+	end
+	btn.OnCursorExited = (s) =>
+		if (!s.selected) then
+			s:Lerp("lerpVal", 0)
+		end
+	end
+
+	btn.CalculateWidth = (s) =>
+		return CCR:GetTextSize(name, self:GetFont()) + self:GetGapX() * 2
+	end
+	btn.PerformLayout = (s, w, h) =>
+		s:SetWide(s:CalculateWidth())
+	end
+	btn.Paint = (s, w, h) =>
+		local clr = CCR:LerpColor(s.lerpVal, grey(150), grey(220))
+		CCR:DrawText(name, self:GetFont(), w / 2, h / 2, clr, "c", "c")
+		
+		local _w = w * s.lerpVal
+		surface.SetDrawColor(CCR:ThemeColors().Orange)
+		surface.DrawRect(w / 2 - _w / 2, h - 2, _w, 2)
+	end
+
+	btn:InvalidateLayout(true)
+
+	self.tabs[id] = btn
+
+	return self
+end
+
+function PANEL:GetSelected()
+	for id, pnl in pairs(self.tabs) do
+		if (pnl.selected) then
+			return id
+		end
+	end
+end
+
+local pnl
+function PANEL:DoSelect(id)
+	local selected = self:GetSelected()
+	if (selected) then
+		if (selected == id) then
+			return false
+		end
+
+		pnl = self.tabs[selected]
+		pnl:SetSelected(false)
+	end
+
+	pnl = self.tabs[id]
+	pnl:SetSelected(true)
+
+	return true
+end
+
+function PANEL:Paint(w, h)
+	CCR:CustomRoundedBox(0, 0, 0, w, h, CCR:ThemeColors().Primary)
+end
+
+CCR:RegisterElement("TopNav", PANEL, "Panel")

@@ -1,34 +1,42 @@
+function CCR:NewElement(_class, parent, name)
 
-function CCR:NewElement(class, parent, name)
-	//class = string.StartWith(class, "!") and (class) or ("CCR." .. class)
 
-	if string.StartWith(class, "!") then
-		class = class:Right(#class - 1)
-	else
-		class = "CCR." .. class
-	end
+  if string.StartWith(_class, "!") then
+    _class = _class:Right(#_class - 1)
+  else
+    _class = "CCR." .. _class
+  end
 
-	local pnl = vgui.Create(class, parent, name)
-	CCR:AddPanelID(pnl)
+  local pnl = vgui.Create(_class, parent, name)
+  CCR:AddPanelID(pnl)
 
-	hook.Run("CCR.OnElementCreated", pnl, parent, class, name)
+  hook.Run("CCR.OnElementCreated", pnl, parent, _class, name)
 
-	return pnl
+  return pnl
 end
 
-function CCR:RegisterElement(class, tbl, base)
-	self:Debug("Registered element \"" .. "CCR." .. class .. "\"" )
+function CCR:RegisterElement(_class, tbl, base)
+  self:Debug("Registered element \"" .. "CCR." .. _class .. "\"")
 
-	CCR:PreparePanelTheme(tbl)
-	CCR:PreparePanelFunctions(tbl)
+  CCR:PreparePanelTheme(tbl)
+  CCR:PreparePanelFunctions(tbl)
 
-	return vgui.Register("CCR." .. class, tbl, base)
+  return vgui.Register("CCR." .. _class, tbl, base)
 end
 
-function CCR:GetFullElementName(class)
-	return "CCR." .. class
+function CCR:GetFullElementName(_class)
+  return "CCR." .. _class
 end
 
-function CCR:CopyAndPrepareDefaultElement(class)
-	self:RegisterElement(class, {}, class)
+function CCR:CopyAndPrepareDefaultElement(_class)
+  self:RegisterElement(_class, {}, _class)
 end
+
+local lastW, lastH = ScrW(), ScrH()
+hook.Add("Think", "CCR.Resolution", function()
+  if (lastW != ScrW() || lastH != ScrH()) then
+    hook.Run("CCR.OnResolutionChanged", {
+      lastW, lastH})
+    lastW, lastH = ScrW(), ScrH()
+  end
+end)

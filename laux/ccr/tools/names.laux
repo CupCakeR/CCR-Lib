@@ -1,0 +1,74 @@
+
+-- TODO: Name invalidation?
+
+if (SERVER) then return end -- clientside only :(
+
+CCR.NameCache = CCR.NameCache || {}
+
+local function getAsync(sid64)
+	assert(sid64, "Invalid sid64")
+
+	local p = CCR:NewPromise()
+
+	if (!isstring(sid64) && isentity(sid64) && sid64:IsPlayer()) then
+		CCR.NameCache[sid64] = sid64:Nick()
+	end
+
+	if (CCR.NameCache[sid64]) then
+		p:resolve({
+			name = CCR.NameCache[sid64],
+			sid64 = sid64
+		})
+
+		return p
+	end
+
+	steamworks.RequestPlayerInfo(sid64, function(name)
+		if (!name || name == "") then
+			p:reject()
+		else
+			CCR.NameCache[sid64] = name
+
+			p:resolve({
+				sid64 = sid64,
+				name = name
+			})
+		end
+	end)
+
+	return p
+end
+
+function CCR:GetPlayerName(tbl)
+	assert(tbl, "Invalid argument")
+
+	local p = self:NewPromise()
+
+	if (!istable(tbl)) then
+		tbl = {tbl}
+	end
+
+	local new = {}
+	for i, sid64 in ipairs(tbl) do
+		if (sid64 >= "90071996842377216" || util.SteamIDFrom64(sid64) == "STEAM_0:0:0") then
+			continue
+		end
+
+		table.insert(new, sid64)
+	end
+
+	local promises = {}
+	for i, sid64 in ipairs(new) do
+		table.insert(promises, getAsync(sid64))
+	end
+
+	if (#promises == 0) then
+		return CCR:NewPromise():resolve({})
+	end
+
+	return CCR.Promises.all(promises)
+end
+
+-- /*CCR:GetPlayerName("76561198106129502"):next(function(tbl)
+-- 	PrintTable(tbl)
+-- end)*/

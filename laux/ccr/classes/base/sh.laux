@@ -1,0 +1,34 @@
+
+public class CCR.Base
+	IsValid()
+		return self != nil
+	end
+
+	AddHook(name, func = function() end)
+		hook.Add(name, self, (...) -> return func(self, ...) end)
+		return self
+	end
+
+	RemoveHook(name)
+		hook.Remove(name, self)
+		return self
+	end
+
+	AddTimer(id = "", delay = 0, reps = 1, func = function() end)
+		id = `ClassTimer.${self}[id]`
+		timer.Create(id, delay, reps, () =>
+			if (!self) then
+				return timer.Remove(id)
+			end
+
+			return func(self)
+		end)
+
+		return self
+	end
+
+	RemoveTimer(id = "")
+		timer.Remove(`ClassTimer.${self}[id]`)
+		return self
+	end
+end

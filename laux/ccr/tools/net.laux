@@ -1,0 +1,80 @@
+
+CCR.NetSpam = CCR.NetSpam || {}
+
+function CCR:NetSafeReceive(id, cb, dataFunc, options)
+	assert(id, "No ID specified")
+	assert(isfunction(cb), "No callback specified")
+
+	options = options || {}
+	options.debounceTime = options.debounceTime || 0
+	options.debounceAt = options.debounceAt == nil && 1 || tonumber(options.debounceAt)
+	options.doError = options.doError == nil && true || options.doError
+	options.limitPerTick = options.limitPerTick == nil && 10 || tonumber(options.limitPerTick)
+
+	dataFunc = dataFunc || function() end
+
+	net.Receive(id, function(len, p)
+		self.NetSpam[p] = self.NetSpam[p] || {}
+		self.NetSpam[p][id] = self.NetSpam[p][id] || {
+			count = 0,
+			pcallError = false,
+			spamError = false
+		}
+
+		self.NetSpam[p][id].count = self.NetSpam[p][id].count + 1
+
+		if (options.limitPerTick && self.NetSpam[p][id].count > options.limitPerTick) then
+			return
+		end
+
+		local data = {}
+		local pcallSuccess, _error = pcall(function()
+			dataFunc(data)
+		end)
+
+		if (!pcallSuccess && !self.NetSpam[p][id].pcallError && isstring(_error) && _error != "") then
+			local str = "<CCR> WARNING: Following net error was caused by :nick (:sid)! Message: \":id\", error: \n\t:error"
+			str = str:Replace(":nick", p:Nick())
+			str = str:Replace(":sid", p:SteamID())
+			str = str:Replace(":id", id)
+			str = str:Replace(":error", _error)
+
+			ErrorNoHalt(str .. "\n")
+			self.NetSpam[p][id].pcallError = true
+		end
+
+		if (options.debounceAt && options.debounceAt <= (self.NetSpam[p][id].count - 1)) then
+			if (pcallSuccess) then
+				CCR:Debounce("CCR.Net[" .. id .. "][" .. p:SteamID() .. "]", options.debounceTime, function()
+					if (!IsValid(p)) then
+						return
+					end
+
+					cb(p, data, len)
+				end)
+			end
+
+			if (options.doError && options.debounceAt < self.NetSpam[p][id].count && !self.NetSpam[p][id].spamError) then
+				local str = "<CCR> WARNING: :nick (:sid) exceeded the spam limit (:limit/tick) of net message \":id\". This could be an ongoing attempt to crash the server.\n"
+				str = str:Replace(":nick", p:Nick())
+				str = str:Replace(":sid", p:SteamID())
+				str = str:Replace(":id", id)
+				str = str:Replace(":limit", options.debounceAt)
+
+				self.NetSpam[p][id].spamError = true
+
+				Error(str)
+			end
+
+			return
+		end
+
+		if (pcallSuccess) then
+			cb(p, data, len)
+		end
+	end)
+end
+
+hook.Add("Tick", "CCR.NetSafeReceive", function()
+	CCR.NetSpam = {}
+end)

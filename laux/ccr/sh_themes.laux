@@ -1,5 +1,5 @@
 
-// TODO: Store theme in global addon table instead of storing it on all panels ffs
+-- TODO: Store theme in global addon table instead of storing it on all panels ffs
 
 CCR.Themes = CCR.Themes or {}
 
@@ -7,7 +7,10 @@ local current_id = "material_dark"
 
 function CCR:RegisterTheme(obj)
 	self.Themes[obj:GetID()] = obj
-	self:Debug("Registered theme \"" .. obj:GetName() .. "\"")
+
+	if (CLIENT) then -- dont debug print serverside, theme is only available serverside to prevent shit errors in configs
+		self:Debug("Registered theme \"" .. obj:GetName() .. "\"")
+	end
 end
 
 function CCR:GetTheme()
