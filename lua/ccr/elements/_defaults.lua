@@ -1,6 +1,0 @@
-CCR:CopyAndPrepareDefaultElement("DPanel")
-CCR:CopyAndPrepareDefaultElement("Panel")
-CCR:CopyAndPrepareDefaultElement("EditablePanel")
-CCR:CopyAndPrepareDefaultElement("DLabel")
-CCR:CopyAndPrepareDefaultElement("DHTML")
-CCR:CopyAndPrepareDefaultElement("DIconLayout")
