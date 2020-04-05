@@ -3,4 +3,4 @@
 .gitignore
 .vscode/settings.json
 .out/
-.lua/
+lua/
