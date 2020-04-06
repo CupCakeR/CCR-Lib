@@ -10,7 +10,9 @@ CCR:AddPanelFunction("AddHook", function(s, name, func)
 end)
 
 CCR:AddPanelFunction("AddTimer", function(s, delay, rep, func)
-	return CCR:CreateTimer(s, delay, rep, func)
+	return CCR:CreateTimer(s, delay, rep, (...) =>
+		return func(s, ...)
+	end)
 end)
 
 CCR:AddPanelFunction("NextFrame", function(s, func)
