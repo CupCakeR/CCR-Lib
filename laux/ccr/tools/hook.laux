@@ -15,6 +15,6 @@ CCR:AddPanelFunction("AddTimer", function(s, delay, rep, func)
 	end)
 end)
 
-CCR:AddPanelFunction("NextFrame", function(s, func)
+CCR:AddPanelFunction("RunNextFrame", function(s, func)
 	return CCR:RunNextFrame(s, func)
 end)
