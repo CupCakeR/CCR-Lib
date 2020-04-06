@@ -5,6 +5,7 @@ CCR.Timers ||= {}
 
 public class CCR.Timer
 	constructor()
+		CCR:AccessorFunc(self, "index", "Index", "Number")
 		CCR:AccessorFunc(self, "identifier", "Identifier")
 		CCR:AccessorFunc(self, "delay", "Delay", "Number")
 		CCR:AccessorFunc(self, "repetitions", "Repetitions", "Number")
@@ -27,7 +28,7 @@ public class CCR.Timer
 	end
 
 	IsValid()
-		return self.identifier != nil && CCR.Timers[self.identifier] == self
+			CCR.Timers[self.index] == self
 	end
 
 	Perform()
@@ -56,12 +57,18 @@ public class CCR.Timer
 	end
 
 	Register()
-		CCR.Timers[self.identifier] = self
+		local index = table.insert(CCR.Timers, self)
+		self:SetIndex(index)
+
 		return self
 	end
 
 	Remove()
-		CCR.Timers[self.identifier] = nil
+		table.remove(CCR.Timers, self:GetIndex())
+
+		for i, timer in ipairs(CCR.Timers) do
+			timer:SetIndex(i)
+		end
 	end
 end
 
@@ -86,5 +93,7 @@ function CCR:RunNextFrame(identifier, func = () => end)
 end
 
 hook.Add("Tick", "CCR.Timers", () =>
+	for i, timer in ipairs(CCR.Timers) do
+		pcall(() => timer:Perform() end)
 	end
 end)
