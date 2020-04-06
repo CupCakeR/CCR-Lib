@@ -1,4 +1,6 @@
 
+-- NOTE: Deprecated, DO NOT USE
+
 local CLASS = {}
 
 CLASS._hooks = {}
