@@ -7,22 +7,8 @@ CCR:AddPanelFunction("AddHook", function(s, name, func)
 	hook.Add(name, s, func)
 end)
 
-CCR:AddPanelFunction("AddHook", function(s, name, id, func)
-	id = "[" .. s.panel_id .. "]" .. id
-
-	s._hooks = s._hooks or {}
-	s._hooks[id] = {
-		name = name,
-		func = function(...)
-			if IsValid(s) then
-				return func(s, ...)
-			end
-		end
-	}
-
-	hook.Add(name, id, s._hooks[id].func)
-
-	return s
+CCR:AddPanelFunction("AddTimer", function(s, delay, rep, func)
+	return CCR:CreateTimer(s, delay, rep, func)
 end)
 
 CCR:AddPanelFunction("NextFrame", function(s, func)
