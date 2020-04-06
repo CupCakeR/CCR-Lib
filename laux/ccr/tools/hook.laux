@@ -1,20 +1,10 @@
 
--- FIXME CLASS FUNC MERGES???????????
+CCR:AddPanelFunction("AddHook", function(s, name, func)
+	assert(s, "Invalid panel")
+	assert(name, "Invalid hook name")
+	assert(func, "Invalid hook func")
 
-CCR:AddPanelFunction("Remove", function(s)
-	local old = s.old_Remove
-
-	for k, v in pairs(s._hooks or {}) do
-		hook.Remove(v.name, k)
-	end
-
-	for k, v in pairs(s._timers or {}) do
-		timer.Remove(k)
-	end
-
-	old(s)
-
-	return s
+	hook.Add(name, s, func)
 end)
 
 CCR:AddPanelFunction("AddHook", function(s, name, id, func)
