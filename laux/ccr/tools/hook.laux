@@ -4,7 +4,9 @@ CCR:AddPanelFunction("AddHook", function(s, name, func)
 	assert(name, "Invalid hook name")
 	assert(func, "Invalid hook func")
 
-	hook.Add(name, s, func)
+	hook.Add(name, s, (...) =>
+			return func(s, ...)
+	end)
 end)
 
 CCR:AddPanelFunction("AddTimer", function(s, delay, rep, func)
