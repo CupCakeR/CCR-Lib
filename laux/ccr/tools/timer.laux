@@ -72,11 +72,19 @@ public class CCR.Timer
 	end
 end
 
-function CCR:CreateTimer(identifier, delay, repetitions, func = () => end)
+function CCR:CreateTimer(identifier, delay, repetitions, func = () => end, override = false)
 	assert(identifier)
 	assert(tonumber(delay))
 	assert(tonumber(repetitions))
 	assert(isfunction(func))
+
+	if (override) then
+		for i, timer in ipairs(CCR.Timers) do
+			if (timer:GetIdentifier() == identifier) then
+				timer:Remove()
+			end
+		end
+	end
 
 	local obj = CCR.Timer()
 	obj:SetIdentifier(identifier)
@@ -88,8 +96,8 @@ function CCR:CreateTimer(identifier, delay, repetitions, func = () => end)
 	return obj
 end
 
-function CCR:RunNextFrame(identifier, func = () => end)
-	return self:CreateTimer(identifier, 0, 1, func)
+function CCR:RunNextFrame(identifier, func = () => end, override)
+	return self:CreateTimer(identifier, 0, 1, func, override)
 end
 
 hook.Add("Tick", "CCR.Timers", () =>
