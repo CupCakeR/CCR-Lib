@@ -1,6 +1,19 @@
 
 -- TODO: Move to /classes?
 
+local _IsValid = (var) =>
+	if (var == nil) then
+		return false
+	end
+
+	local meta = getmetatable(var)
+	if (istable(meta) && meta.IsValid) then
+		return IsValid(var)
+	end
+
+	return true
+end
+
 CCR.Timers ||= {}
 
 public class CCR.Timer
@@ -28,6 +41,8 @@ public class CCR.Timer
 	end
 
 	IsValid()
+		return
+			_IsValid(self.identifier)		&&
 			CCR.Timers[self.index] == self
 	end
 
