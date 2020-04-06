@@ -85,9 +85,6 @@ function CCR:RunNextFrame(identifier, func = () => end)
 	return self:CreateTimer(identifier, 0, 1, func)
 end
 
--- TODO: Lookup table with numeric keys
-hook.Add("Tick", "CCR.Timer", () =>
-	for identifier, timer in pairs(CCR.Timers) do
-		timer:Perform()
+hook.Add("Tick", "CCR.Timers", () =>
 	end
 end)
