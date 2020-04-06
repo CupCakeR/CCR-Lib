@@ -55,7 +55,10 @@ public class CCR.Timer
 	end
 
 	Trigger(reset = true)
-		assert(self:IsValid())
+		if (!self:IsValid()) then
+			self:Remove()
+			return
+		end
 
 		if (reset) then
 			self.last_executed = CurTime()
