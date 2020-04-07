@@ -1,0 +1,191 @@
+
+local PANEL = {}
+
+function PANEL:Init()
+	self.color = ColorAlpha(grey(0), 128)
+end
+
+function PANEL:PostInit()
+	self:MakePopup()
+	self:AddHook("OnScreenSizeChanged", () ->
+		self:InvalidateLayout(true)
+	end)
+end
+
+function PANEL:PerformLayout(w, h)
+	self:SetSize(ScrW(), ScrH())
+	self:SetPos(0, 0)
+end
+
+function PANEL:Paint(w, h)
+	CCR:DrawPanelBlur(self)
+	CCR:RoundedBox(0, 0, w, h, self.color)
+end
+
+CCR:RegisterElement("Query.Background", PANEL, "Panel")
+
+
+
+PANEL = {}
+
+CCR:AccessorFunc(PANEL, "title", "Title")
+CCR:AccessorFunc(PANEL, "text", "Text")
+CCR:AccessorFunc(PANEL, "max_width", "MaxWidth", "Number")
+
+function PANEL:Init()
+	self:SetTitle("Undefined")
+	self.markup = false
+
+	self:RunNextFrame((s) =>
+		if (!self.canLayout) then
+			s:Remove()
+		end
+	end)
+
+	self:SetWide(256)
+
+	self.pnlBackground = CCR:NewElement("Query.Background")
+	self.pnlBackground:Dock(FILL)
+	self.pnlBackground:PostInit()
+
+	self.containerContent = CCR:NewElement("Panel", self)
+	self.containerContent:Dock(TOP)
+	self.containerContent:DockMargin(16, 16, 16, 0)
+	self.containerContent.CalculateSize = (s) =>
+		return 0, 0
+	end
+	self.containerContent.PerformLayout = (s, w, h) =>
+		s:SetTall(select(2, s:CalculateSize()))
+	end
+
+	self.containerButtons = CCR:NewElement("Panel", self)
+	self.containerButtons:Dock(TOP)
+	self.containerButtons:DockMargin(16, 16, 16, 0)
+	self.containerButtons.CalculateSize = (s) =>
+		return 0, 0
+	end
+	self.containerButtons.PerformLayout = (s, w, h) =>
+		s:SetTall(select(2, s:CalculateSize()))
+	end
+
+	local pnlGap = CCR:NewElement("Panel", self)
+	pnlGap:Dock(TOP)
+	pnlGap:SetTall(16)
+end
+
+function PANEL:PostInit()
+	self:Center()
+	self:MakePopup()
+
+	self.canLayout = true
+	self:InvalidateLayout(true)
+end
+
+function PANEL:Think()
+	if (!self:HasFocus()) then
+		self:RequestFocus()
+		self:MoveToFront()
+	end
+end
+
+function PANEL:OnRemove()
+	if (IsValid(self.pnlBackground)) then
+		self.pnlBackground:Remove()
+	end
+end
+
+function PANEL:PerformLayout(w, h)
+	assert(self.canLayout)
+
+	self.containerContent:InvalidateLayout(true)
+	self.containerButtons:InvalidateLayout(true)
+
+	local newW = math.max(w, select(1, self.containerContent:CalculateSize() + 32), select(1, self.containerButtons:CalculateSize() + 32))
+	if (newW != w) then
+		self:SetWide(newW)
+	end
+
+	self:SizeToChildren(false, true)
+	self:Center()
+
+	CCR:ResetCacheTarget(self.header)
+end
+
+function PANEL:Paint(w, h)
+	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Background)
+end
+
+CCR:RegisterElement("Query", PANEL, "CCR.Frame")
+
+function CCR:SimpleQuery(
+	title = "Undefined",
+	_markup = "Undefined",
+	textYes = "Undefined",
+	funcYes = () => end,
+	textNo = "Undefined",
+	funcNo = () => end,
+	maxWidth = nil,
+	preventCloseOnButtonClick = false
+)
+	local pnl = CCR:NewElement("Query")
+	pnl:SetTitle(title)
+
+	pnl.containerContent.markup = istable(_markup) && _markup || markup.Parse(`<font=CCR.17>${_markup}`, maxWidth || 256 - 32)
+	pnl.containerContent.Paint = (s, w, h) =>
+		s.markup:Draw(w / 2, h / 2, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	end
+	pnl.containerContent.CalculateSize = (s) =>
+		return s.markup:GetWidth(), s.markup:GetHeight()
+	end
+
+	local container = CCR:NewElement("Panel", pnl.containerButtons)
+	
+	local btnYes = CCR:NewElement("Button", container)
+	btnYes:SetText(textYes)
+	btnYes:SetColor(CCR:ThemeColors().Green)
+	btnYes:SetBackgroundColor(CCR:ThemeColors().Background)
+	btnYes:SizeToText()
+	btnYes.DoClick = (s) =>
+		funcYes(s, pnl)
+
+		if (!preventCloseOnButtonClick) then
+			pnl:Remove()
+		end
+	end
+	btnYes:PostInit()
+
+	local btnNo = CCR:NewElement("Button", container)
+	btnNo:SetText(textNo)
+	btnNo:SetColor(CCR:ThemeColors().Red)
+	btnNo:SetBackgroundColor(CCR:ThemeColors().Background)
+	btnNo:SizeToText()
+	btnNo.DoClick = (s) =>
+		funcNo(s, pnl)
+
+		if (!preventCloseOnButtonClick) then
+			pnl:Remove()
+		end
+	end
+	btnNo:PostInit()
+	
+	container.PerformLayout = (s, w, h) =>
+		btnNo:MoveRightOf(btnYes, 8)
+
+		s:SizeToChildren(true, true)
+		s:Center()
+	end
+
+	container:InvalidateLayout(true)
+
+	pnl.containerButtons.CalculateSize = (s, w, h) =>
+		return container:GetWide(), container:GetTall()
+	end
+
+	-- easier lookup from outside
+	pnl.btnYes = btnYes
+	pnl.btnNo = btnNo
+
+	pnl:PostInit()
+
+	return pnl
+end
