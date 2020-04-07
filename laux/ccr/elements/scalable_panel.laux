@@ -65,7 +65,7 @@ end
 
 function PANEL:Register()
 	self:SetPaintedManually(true)
-	self:AddHook("PostDrawHUD", "CCR.DrawScalablePanel", function(s)
+	self:AddHook("PostDrawHUD", function(s)
 		local scale = s:CalculateScale()
 
 		local x, y = s:GetPos()
@@ -183,7 +183,7 @@ function CCR:ScalablePanelTest()
 		end
 	end
 
-	pnl:AddHook("CCR.OnClientScaleChanged", "CCR.ScalableFrame", function(s)
+	pnl:AddHook("CCR.OnClientScaleChanged", function(s)
 		s:Center()
 	end)
 
