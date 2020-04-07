@@ -16,6 +16,9 @@ function CCR:Test()
 		CCR:NewContextMenu(s)
 			:Option()
 			:SetText("Lorem ipsum dolor sit amet")
+			:SetFunction(() =>
+				CCR:TestQuery()
+			end)
 			:Finish()
 
 			:Option()
