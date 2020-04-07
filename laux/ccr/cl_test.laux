@@ -17,7 +17,14 @@ function CCR:Test()
 			:Option()
 			:SetText("Lorem ipsum dolor sit amet")
 			:SetFunction(() =>
-				CCR:TestQuery()
+				CCR:SimpleQuery(
+					"Test query",
+					"Lorem ipsum dolor sit amet",
+					"Acccept",
+					nil,
+					"Decline",
+					nil
+				)
 			end)
 			:Finish()
 
