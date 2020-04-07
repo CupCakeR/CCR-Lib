@@ -8,4 +8,26 @@ function CCR:Test()
 	self.TestFrame:SetSize(500, 400)
 	self.TestFrame:Center()
 	self.TestFrame:MakePopup()
+
+	local pnl = CCR:NewElement("DPanel", self.TestFrame)
+	pnl:Dock(FILL)
+	pnl:DockMargin(16, 16, 16, 16)
+	pnl.OnMousePressed = (s, key) =>
+		CCR:NewContextMenu(s)
+			:Option()
+			:SetText("Lorem ipsum dolor sit amet")
+			:Finish()
+
+			:Option()
+			:SetText("consectetur adipiscing elit")
+			:Finish()
+
+			:Spacer()
+
+			:Option()
+			:SetText("| gae 1234 xABjkhbasdw")
+			:SetColor(CCR:ThemeColors().Red)
+			:Finish()
+		:PostInit()
+	end
 end
