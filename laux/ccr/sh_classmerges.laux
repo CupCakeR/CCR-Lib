@@ -6,7 +6,8 @@ function CCR:AddClassFunctions(_class)
 		error("_class HAS NO CCR_CLASSNAME")
 	end
 
-	local tbl = include("ccr/tools/class_funcs_merge.lua")
+	-- TODO: Cleanup
+	local tbl = include("ccr/tools/shared/class_funcs_merge.lua")
 	table.Merge(_class, tbl)
 	self:ApplyClassFunctions(_class)
 	return _class
