@@ -1,7 +1,7 @@
 
 -- https://www.materialui.co/flatuicolors
 
-local theme = CCR:NewTheme("material_dark")
+local theme = CCR.Theme("material_dark")
 theme:SetName("Material dark")
 theme:SetColors({
 	Primary			= rgb(50, 50, 50),
