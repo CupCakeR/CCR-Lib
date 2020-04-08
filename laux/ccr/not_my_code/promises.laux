@@ -1,6 +1,6 @@
 
--- https:--promisesaplus.com/
--- https:--github.com/zserge/lua-promises/blob/master/deferred.lua
+-- https://promisesaplus.com/
+-- https://github.com/zserge/lua-promises/blob/master/deferred.lua
 
 local M = {}
 
