@@ -1,33 +1,28 @@
 
--- TODO: laux public class
+public class CCR.Theme extends CCR.Base
+	constructor(id)
+		super()
 
-local CLASS = {}
-CLASS.__index = CLASS
+		CCR:AccessorFunc(self, "id", "ID")
+		CCR:AccessorFunc(self, "name", "Name")
+		CCR:AccessorFunc(self, "colors", "Colors")
+		CCR:AccessorFunc(self, "materials", "Materials")
+		CCR:AccessorFunc(self, "box_roundness", "BoxRoundness")
+	
+		self.id = id
 
-AccessorFunc(CLASS, "id", "ID", FORCE_STRING)
-AccessorFunc(CLASS, "name", "Name", FORCE_STRING)
-AccessorFunc(CLASS, "colors", "Colors")
-AccessorFunc(CLASS, "materials", "Materials")
-AccessorFunc(CLASS, "box_roundness", "BoxRoundness")
+		return self
+	end
 
-function CLASS.new(id)
-	local _self = setmetatable({}, CLASS)
+	__tostring()
+		return `CCR.Theme[${self.id}]`
+	end
 
-	_self.id = id
+	IsValid()
+		return self.id != nil && CCR.Themes[self.id] == self
+	end
 
-	hook.Run("CCR.NewTheme", _self)
-
-	return _self
-end
-
-function CLASS:__tostring()
-	return "CCR.Theme[" .. (self:GetID() or "Undefined id") .. "]"
-end
-
-function CLASS:Register()
-	CCR:RegisterTheme(self)
-end
-
-function CCR:NewTheme(id)
-	return CLASS.new(id)
+	Register()
+		CCR:RegisterTheme(self)
+	end
 end
