@@ -2,9 +2,9 @@
 CCR ||= {}
 
 if (SERVER) then
-	AddCSLuaFile("ccr/tools/resources.lua")
+	AddCSLuaFile("ccr/tools/shared/resources.lua")
 	AddCSLuaFile("ccr/sh_init.lua")
 end
 
-include("ccr/tools/resources.lua")
+include("ccr/tools/shared/resources.lua")
 include("ccr/sh_init.lua")
