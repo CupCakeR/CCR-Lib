@@ -111,14 +111,13 @@ end
 
 function PANEL:Paint(w, h)
 	if (self:GetDisableShadow()) then
-		CCR:CustomRoundedBox(4, 0, 0, w, h, self:GetThemeColors().PanelBackground, true, true, true, true)
+		CCR:CustomRoundedBox(4, 0, 0, w, h, self:GetThemeColors().Background, true, true, true, true)
 		return
 	end
 
 	local x, y = self:LocalToScreen()
 	BSHADOWS.BeginShadow()
-		CCR:CustomRoundedBox(4, x, y, w, h, self:GetThemeColors().PanelBackground, true, true, true, true)
-	BSHADOWS.EndShadow(1, 2, 2, 255, 0, 0)
+		CCR:CustomRoundedBox(4, x, y, w, h, self:GetThemeColors().Background, true, true, true, true)
 end
 
 CCR:RegisterElement("ContextMenu", PANEL, "DPanel")
