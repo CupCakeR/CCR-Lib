@@ -1,8 +1,6 @@
 -- NOTE https://gitlab.com/sleeppyy/xeninui/blob/master/lua/xeninui/libs/languages.lua
 
-CCR.Resources:CLASS("language")
-
-CCR.AddonLanguages = CCR.AddonLanguages || {}
+CCR.AddonLanguages ||= {}
 
 function CCR:GetAddonLanguage(addonId, languageId)
 	self.AddonLanguages[addonId] = self.AddonLanguages[addonId] || {}
@@ -20,7 +18,7 @@ function CCR:GetAddonLanguage(addonId, languageId)
 	return object
 end
 
-CCR.CanInitializeLanguage = CCR.CanInitializeLanguage || false
+CCR.CanInitializeLanguage ||= false
 hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function()
 	timer.Simple(3, function()
 		CCR.CanInitializeLanguage = true
