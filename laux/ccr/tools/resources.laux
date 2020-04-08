@@ -12,14 +12,14 @@ function CCR:IncludeFile(fileName, realm, sourceOverride)
 	local fileSource = trace["short_src"]
 	local fileToMerge = fileSource:GetPathFromFilename()
 
-	fileToMerge = fileToMerge .. fileName
+	fileToMerge ..= fileName
 	fileToMerge = fileToMerge:Split("/lua/")
 	fileToMerge = fileToMerge[2]
 
 	assert(fileToMerge, "Failed to get path from file name")
 
 	local fileNameSplit = fileName:Split("/")
-	fileName = fileNameSplit && fileNameSplit[#fileNameSplit] || fileName
+	fileName = fileNameSplit?[#fileNameSplit] || fileName
 
 	if (!realm) then
 		realm = fileName:sub(1, 2)
@@ -28,7 +28,7 @@ function CCR:IncludeFile(fileName, realm, sourceOverride)
 	assert(realms[realm], "Invalid realm")
 
 	if (!fileToMerge:EndsWith(".lua")) then
-		fileToMerge = fileToMerge .. ".lua"
+		fileToMerge ..= ".lua"
 	end
 
 	if (SERVER && (realm == "sh" || realm == "cl")) then
@@ -55,16 +55,16 @@ function CCR:IncludeRecursive(path, realmOverride, traceOverride)
 
 	local files, dirs = file.Find((source:GetPathFromFilename() .. path) .. "/*", "LUA")
 	for i, dir in ipairs(dirs) do
-		self:IncludeRecursive(path .. "/" .. dir, realmOverride, trace)
+		self:IncludeRecursive(`${path}/${dir}`, realmOverride, trace)
 	end
 
 	for i, fileName in ipairs(files) do
-		self:IncludeFile(path .. "/" .. fileName, realmOverride, trace)
+		self:IncludeFile(`${path}/${fileName}`, realmOverride, trace)
 	end
 end
 
-function CCR:IncludeClass(className) -- TODO: Check if it works?
-	return self:IncludeFile("classes/" .. className .. "/sh.lua", nil, 2)
+function CCR:IncludeClass(className)
+	return self:IncludeFile(`classes/${className}/sh.lua`, nil, 2)
 end
 
 function CCR:ExtendClass(_class, fileName, realm)
