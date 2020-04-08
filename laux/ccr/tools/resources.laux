@@ -5,12 +5,6 @@ local realms = {
 	["sh"] = true
 }
 
-local function _include(file)
-	local toReturn = include(file)
-	assert(toReturn || istable(toReturn), "Nothing to merge")
-	return toReturn
-end
-
 function CCR:IncludeFile(fileName, realm, sourceOverride)
 	assert(fileName, "Invalid fileName")
 
