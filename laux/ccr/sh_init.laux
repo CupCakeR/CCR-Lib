@@ -16,7 +16,7 @@ CCR:IncludeRecursive("tools/server", "sv")
 CCR:IncludeRecursive("tools/client", "cl")
 
 CCR:IncludeRecursive("classes", "sh")
-CCR:IncludeRecursive("themes", "cl")
+CCR:IncludeRecursive("themes", "sh") -- NOTE: Needs to be shared to be able to us this shit in configs
 CCR:IncludeRecursive("elements", "cl")
 
 CCR:Debug("Initialized.")
