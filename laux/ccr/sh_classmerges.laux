@@ -1,5 +1,5 @@
 
-CCR.ClassFunctions = CCR.ClassFunctions || {}
+CCR.ClassFunctions ||= {}
 
 function CCR:AddClassFunctions(_class)
 	if (!_class.CCR_CLASSNAME) then
