@@ -1,53 +1,24 @@
 
--- TODO: Clean this trash up ffs
-
-CCR.Resources:CL("cl_panelfuncs") -- Load b4 tools
-CCR.Resources:SH("sh_classmerges")
-
-
--- Tools
-CCR.Resources:SH("tools/_PROMISES")
-CCR.Resources:CL("tools/_BSHADOWS")
-CCR.Resources:CL("tools/_GRADIENT")
-CCR.Resources:SH("tools/resources")
-CCR.Resources:SV("tools/net")
-CCR.Resources:SH("tools/timer")
-CCR.Resources:SH("tools/accessor_funcs")
-CCR.Resources:SH("tools/serialization")
-CCR.Resources:SH("tools/class_funcs_merge")
-CCR.Resources:SH("tools/color")
-CCR.Resources:SH("tools/misc")
-CCR.Resources:SH("tools/sh_playerfuncs")
-CCR.Resources:SH("tools/table")
-CCR.Resources:SH("tools/entity_vars")
-CCR.Resources:SH("tools/language")
-CCR.Resources:SH("tools/names")
-CCR.Resources:CL("tools/vgui")
-CCR.Resources:CL("tools/draw")
-CCR.Resources:CL("tools/anim")
-CCR.Resources:CL("tools/text")
-CCR.Resources:CL("tools/hook")
-CCR.Resources:CL("tools/cache")
-CCR.Resources:CL("tools/imgur")
-
--- Config
-CCR.Resources:CLASS("base")
-CCR.Resources:CLASS("config")
-CCR.Resources:CLASS("mysqlite")
-
--- Theme
-CCR.Resources:CLASS("theme")
-CCR.Resources:SH("sh_themes")
-
-for k, v in pairs(file.Find("ccr/themes/*", "LUA")) do
-	v = string.StripExtension(v)
-	CCR.Resources:SH("themes/" .. v)
+function CCR:Debug(str) -- gay
+	MsgC(Color(0, 191, 255), "(CCR) ", color_white, str, "\n")
 end
 
-CCR.Resources:CL("cl_test")
+CCR:IncludeFile("not_my_code/promises", "sh")
+CCR:IncludeFile("not_my_code/bshadows", "cl")
+CCR:IncludeFile("not_my_code/gradient", "cl")
 
-for k, v in pairs(file.Find("ccr/elements/*", "LUA")) do
-	CCR.Resources:ELEMENT(v:StripExtension())
-end
+CCR:IncludeFile("cl_panelfuncs")
+CCR:IncludeFile("cl_test")
+CCR:IncludeFile("sh_classmerges") -- NOTE: Deprecated
+
+CCR:IncludeRecursive("tools/shared", "sh")
+CCR:IncludeRecursive("tools/server", "sv")
+CCR:IncludeRecursive("tools/client", "cl")
+
+CCR:IncludeRecursive("classes", "sh")
+CCR:IncludeRecursive("themes", "cl")
+CCR:IncludeRecursive("elements", "cl")
+
+CCR:Debug("Initialized.")
 
 hook.Run("CCR.OnLoaded")

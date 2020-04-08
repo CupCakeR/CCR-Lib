@@ -40,7 +40,7 @@ function CLASS:Initialize()
 		config = self:GetConfig()
 	}
 
-	CCR.Resources:SV("tools/_MYSQLITE")
+	CCR:IncludeFile("not_my_code/mysqlite", "sv")
 	_G[CCR_MYSQLITE_SETTINGS.moduleName].initialize()
 
 	self:AddHook(CCR_MYSQLITE_SETTINGS.moduleName .. ".DatabaseInitialized", function(s)
