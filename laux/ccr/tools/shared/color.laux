@@ -16,7 +16,7 @@ end
 -- COPYRIGHT https://github.com/minism/leaf/blob/master/color.lua
 local COLOR = FindMetaTable("Color")
 
---if COLOR.ToHSL then -- NOTE: Available in the next update (?)
+--[[--if COLOR.ToHSL then -- NOTE: Available in the next update (?)
 	function COLOR:ToHSL()
 		local r, g, b = self.r/255, self.g/255, self.b/255
 		local min, max = math.min(r, g, b), math.max(r, g, b)
@@ -66,7 +66,7 @@ local COLOR = FindMetaTable("Color")
 		return rgba((r + m) * 255, (g + m) * 255, (b + m) * 255, a)
 	end
 --end
-
+]]
 function COLOR:Shift(delta)
 	local a = self.a
 	if !delta then a, delta = delta, a end
