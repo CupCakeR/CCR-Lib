@@ -1,4 +1,7 @@
 
+-- TODO: Laux sytanx
+-- TODO: URL override because of trash countries blocking imgur
+
 CCR.ImgurImages = CCR.ImgurImages || {}
 
 local path = "ccr/imgur_images/"
