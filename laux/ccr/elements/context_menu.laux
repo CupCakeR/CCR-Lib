@@ -196,9 +196,8 @@ end
 function PANEL:Paint(w, h)
 	local x = 0
 	local textColor = CCR:LerpColor(self.lerpVal, ColorAlpha(self:GetColor(), 255 / 2), self:GetColor())
-	local backgroundColorAlpha = Lerp(self.lerpVal, 0, 1) -- FIXME: boi
-	
-	CCR:CustomRoundedBox(4, 0, 0, w, h, ColorAlpha(color_white, backgroundColorAlpha), true, true, true, true)
+
+	CCR:CustomRoundedBox(4, 0, 0, w, h, ColorAlpha(color_white, Lerp(self.lerpVal, 0, 5)), true, true, true, true)
 
 	if (self.icon) then
 		if (isstring(self.icon)) then
