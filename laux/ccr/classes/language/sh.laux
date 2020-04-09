@@ -1,42 +1,102 @@
 
-local CLASS = {}
-CLASS.__index = CLASS
+class CCR.Language extends CCR.Base
+	constructor(addonId, languageId)
+		super()
 
-CCR:AccessorFunc(CLASS, "addonId", "AddonID", "String")
-CCR:AccessorFunc(CLASS, "languageId", "LanguageID", "String")
-CCR:AccessorFunc(CLASS, "url", "URL", "String")
-CCR:AccessorFunc(CLASS, "raw", "Raw", "Table")
-CCR:AccessorFunc(CLASS, "phrases", "Phrases", "Table")
-CCR:AccessorFunc(CLASS, "initialized", "Initialized", "Boolean")
+		CCR:AccessorFunc(self, "addonId", "AddonID", "String")
+		CCR:AccessorFunc(self, "languageId", "LanguageID", "String")
+		CCR:AccessorFunc(self, "url", "URL", "String")
+		CCR:AccessorFunc(self, "raw", "Raw", "Table")
+		CCR:AccessorFunc(self, "phrases", "Phrases", "Table")
+		CCR:AccessorFunc(self, "initialized", "Initialized", "Boolean")
 
-CCR:ExtendClass(CLASS, "sh_prepare")
-CCR:ExtendClass(CLASS, "sh_translate")
+		self.addonId = addonId
+		self.languageId = languageId
+	end
 
-function CLASS.new(addonId, languageId)
-	local _self = setmetatable({}, CLASS)
+	__tostring()
+		return `CCR.Language[${self.addonId}][${self.languageId}]`
+	end
 
-	_self.addonId = addonId
-	_self.languageId = languageId
-	_self.url = "https://gitlab.com/CupCakeR/ccr-languages/raw/master/" .. _self.addonId .. "/"
-	_self.raw = {}
-	_self.Initialized = false
+	IsValid()
+		return CCR.AddonLanguages?[self.addonId]?[self.languageId] == self
+	end
 
-	CLASS.CCR_CLASSNAME = "CCR.Language[" .. (addonId || "Undefined addon id") .. "][" .. (languageId || "Undefined language id") .. "]"
-	CCR:AddClassFunctions(_self)
+	Download()
+		local url = self.url
+		url = url || `https://gitlab.com/CupCakeR/ccr-languages/raw/master/${addonId}/${self:GetLanguageID()}.json`
 
-	hook.Run("CCR.NewLanguage", _self)
+		local promise = CCR.NewPromise()
 
-	return _self
-end
+		http.Fetch(url, (body, size, headers, code) =>
+			if (body:sub(1, 15) == "<!DOCTYPE html>") then
+				return promise:reject("Invalid response (body)")
+			end
 
-function CLASS:__tostring()
-	return CLASS.CCR_CLASSNAME
-end
+			local tbl = util.JSONToTable(body)
+			if (!tbl) then
+				return promise:reject("Invalid json")
+			end
 
-function CLASS:Register()
-	-- CCR:RegisterTheme(self)
-end
+			promise:resolve(tbl)
+		end)
 
-function CCR:NewAddonLanguage(addonId, languageId)
-	return CLASS.new(addonId, languageId)
+		return promise
+	end
+
+	Queue()
+		self:AddHook("CCR.DoInitializeLanguage", () ->
+			self:Initialize()
+		end)
+	end
+
+	Initialize(force = false)
+		if (!force) then
+			assert(!self.initialized, "Tried to initialize language object but it was already initialized.")
+		end
+
+		if (!CCR.CanInitializeLanguage) then
+			return self:Queue()
+		end
+
+		self:Download():next((tbl) =>
+			self:SetRaw(tbl)
+			self:PreparePhrases()
+			self:SetInitialized(true)
+
+			hook.Run("CCR.OnLanguageInitialized", self, tbl)
+		end)
+	end
+
+	PreparePhrases()
+		assert(self:GetRaw(), "No phrases to prepare")
+
+		local copy = table.Copy(self:GetRaw()["phrases"])
+		local new = CCR:FlattenTable(copy, ".", true)
+
+		self:SetPhrases(new)
+	end
+
+	GetPhrase(phrase, replacements)
+		assert(phrase, "No phrase to translate")
+
+		local str = self:GetPhrases()[phrase]
+		if (!str && self:GetLanguageID() != "english") then
+			-- TODO: Get english language and fallback
+		end
+
+		if (!str) then
+			return `UNKNOWN: ${phrase}`
+		end
+
+		if (replacements) then
+			for k, v in pairs(replacements) do
+				str = str:Replace(`:${k}:`, v)
+			end
+		end
+
+		return str
+	end
+
+	Register() end
 end
