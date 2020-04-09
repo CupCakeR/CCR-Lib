@@ -111,10 +111,6 @@ function PANEL:PerformLayout(w, h)
 	CCR:ResetCacheTarget(self.header)
 end
 
-function PANEL:Paint(w, h)
-	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Background)
-end
-
 CCR:RegisterElement("Query", PANEL, "CCR.Frame")
 
 function CCR:SimpleQuery(
@@ -144,6 +140,7 @@ function CCR:SimpleQuery(
 	btnYes:SetText(textYes)
 	btnYes:SetColor(CCR:ThemeColors().Green)
 	btnYes:SetBackgroundColor(CCR:ThemeColors().Background)
+	btnYes:SetIcon(Material("error"))
 	btnYes:SizeToText()
 	btnYes.DoClick = (s) =>
 		funcYes(s, pnl)
