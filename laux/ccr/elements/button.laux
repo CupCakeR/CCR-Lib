@@ -103,13 +103,19 @@ function PANEL:Paint(w, h)
 	end
 end
 
--- TODO: Include icon for sizing?
-function PANEL:SizeToText(xGap, yGap)
-	xGap = xGap or 16
-	yGap = yGap or 8
-	surface.SetFont(self:GetFont())
-	local tw, th = surface.GetTextSize(self:GetText())
-	self:SetSize(tw + xGap * 2, th + yGap * 2)
+function PANEL:SizeToText(xGap = 12, yGap = 8)
+	local tw, th = CCR:GetTextSize(self.text, self.font)
+	local w, h = tw + xGap * 2, th + yGap * 2
+
+	if (self.icon) then
+		w += self.icon_gap || 2
+
+		local size = self.icon_size || h - 16
+		w += size
+	end
+
+	self:SetSize(w, h)
 end
+PANEL.SizeToContents = PANEL.SizeToText -- NOTE: Backwards compatibility
 
 CCR:RegisterElement("Button", PANEL, "Panel")
