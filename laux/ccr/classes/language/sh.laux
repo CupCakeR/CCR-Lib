@@ -1,5 +1,5 @@
 
-class CCR.Language extends CCR.Base
+public class CCR.Language extends CCR.Base
 	constructor(addonId, languageId)
 		super()
 
