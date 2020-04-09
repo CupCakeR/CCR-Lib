@@ -10,33 +10,33 @@ function CCR:Test()
 	self.TestFrame:MakePopup()
 
 	local pnl = CCR:NewElement("DPanel", self.TestFrame)
-	pnl:Dock(FILL)
+	pnl:Dock(TOP)
 	pnl:DockMargin(16, 16, 16, 16)
 	pnl.OnMousePressed = (s, key) =>
 		CCR:NewContextMenu(s)
 			:Option()
-			:SetText("Lorem ipsum dolor sit amet")
-			:SetFunction(() =>
-				CCR:SimpleQuery(
-					"Test query",
-					"Lorem ipsum dolor sit amet",
-					"Acccept",
-					nil,
-					"Decline",
-					nil
-				)
-			end)
+				:SetText("Lorem ipsum dolor sit amet")
+				:SetFunction(() =>
+					CCR:SimpleQuery(
+						"Test query",
+						"Lorem ipsum dolor sit amet",
+						"Acccept",
+						nil,
+						"Decline",
+						nil
+					)
+				end)
 			:Finish()
 
 			:Option()
-			:SetText("consectetur adipiscing elit")
+				:SetText("consectetur adipiscing elit")
 			:Finish()
 
 			:Spacer()
 
 			:Option()
-			:SetText("| gae 1234 xABjkhbasdw")
-			:SetColor(CCR:ThemeColors().Red)
+				:SetText("| gae 1234 xABjkhbasdw")
+				:SetColor(CCR:ThemeColors().Red)
 			:Finish()
 		:PostInit()
 	end
