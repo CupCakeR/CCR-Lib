@@ -1,5 +1,5 @@
 
-CCR.EntityVars = CCR.EntityVars || {}
+CCR.EntityVars ||= {}
 
 if (SERVER) then
 	util.AddNetworkString("CCR.EntityVar")
@@ -18,9 +18,7 @@ function CCR:SetEntityVar(ent, key, var)
 
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
 
-	if (self.EntityVars[ent][key] == var) then
-		return
-	end
+	stopif (self.EntityVars[ent][key] == var)
 
 	self.EntityVars[ent][key] = var
 
@@ -42,9 +40,7 @@ function CCR:GetEntityVar(ent, key, fallback)
 	self.EntityVars[ent] = self.EntityVars[ent] || {}
 
 	local var = self.EntityVars[ent][key]
-	if (var != nil) then
-		return var
-	end
+	stopif (var == nil)
 
 	return fallback
 end
