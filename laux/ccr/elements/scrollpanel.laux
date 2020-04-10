@@ -7,6 +7,7 @@ function PANEL:Init()
 	local vbar = self:GetVBar()
 	vbar:SetHideButtons(true)
 	vbar:SetWide(10)
+
 	--vbar:SetVisible(false)
 
 	vbar.Paint = function(s, w, h)
@@ -35,11 +36,29 @@ function PANEL:Init()
 	end
 end
 
-function PANEL:CheckInfiniteLoading()
-	local bar = self:GetVBar()
-	self:GetCanvas():DockPadding(0, 0, 8 + (bar:IsVisible() && 0 || 10), 0)
+function PANEL:PerformLayout()
+	local Tall = self.pnlCanvas:GetTall()
+	local Wide = self:GetWide()
+	local YPos = 0
 
+	self:Rebuild()
+
+	self.VBar:SetUp( self:GetTall(), self.pnlCanvas:GetTall() )
+	YPos = self.VBar:GetOffset()
+	
+	self.pnlCanvas:SetPos(0, YPos)
+	self.pnlCanvas:SetWide(self:GetWide() - 10 - 8)
+
+	self:Rebuild()
+
+	if ( Tall != self.pnlCanvas:GetTall() ) then
+		self.VBar:SetScroll( self.VBar:GetScroll() ) -- Make sure we are not too far down!
+	end
+end
+
+function PANEL:CheckInfiniteLoading()
 	if (self:GetInfiniteLoading()) then
+		local bar = self:GetVBar()
 		local cur = bar:GetScroll()
 		local max = bar.CanvasSize
 		
