@@ -118,7 +118,7 @@ function PANEL:Paint(w, h)
 	local x, y = self:LocalToScreen()
 	BSHADOWS.BeginShadow()
 		CCR:CustomRoundedBox(4, x, y, w, h, self:GetThemeColors().Background, true, true, true, true)
-	BSHADOWS.EndShadow(1, 1, 2, 255, 0, 0)
+	BSHADOWS.EndShadow(1, 1, 2, 255 / 2, 0, 0)
 end
 
 CCR:RegisterElement("ContextMenu", PANEL, "DPanel")
@@ -176,6 +176,10 @@ function PANEL:GetCalculatedSize()
 	local w = 8 + tw + 8
 	local h = 8 + th + 8
 
+	if (self.icon) then
+		w += h - 8 + 2
+	end
+
 	return w, h
 end
 
@@ -194,11 +198,11 @@ function PANEL:Finish()
 end
 
 function PANEL:Paint(w, h)
-	local x = 0
 	local textColor = CCR:LerpColor(self.lerpVal, ColorAlpha(self:GetColor(), 255 / 2), self:GetColor())
 
 	CCR:CustomRoundedBox(4, 0, 0, w, h, ColorAlpha(color_white, Lerp(self.lerpVal, 0, 5)), true, true, true, true)
 
+	local x = 8
 	if (self.icon) then
 		if (isstring(self.icon)) then
 			CCR:DrawImgurImage(self.icon, 4, 4, h - 8, h - 8, textColor)
@@ -207,10 +211,11 @@ function PANEL:Paint(w, h)
 			surface.SetDrawColor(textColor)
 			surface.DrawTexturedRect(0, 0, h, h)
 		end
+
 		x += h - 8 + 2
 	end
 
-	CCR:DrawText(self:GetText(), self:GetFont(), 8, h / 2, textColor, "l", "c")
+	CCR:DrawText(self:GetText(), self:GetFont(), x, h / 2, textColor, "l", "c")
 end
 
 CCR:RegisterElement("ContextMenu.Entry", PANEL, "EditablePanel")
