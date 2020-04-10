@@ -130,7 +130,7 @@ else
 
 		if (#send == 0) then return end
 
-		local steamId = p:IsBot() && BotSteamID64(p:Nick()) || p:SteamID()
+		local steamId = p:IsBot() && CCR:BotSteamID64(p:Nick()) || p:SteamID()
 		net.Start("CCR.FCI.UpdateList")
 			net.WriteBool(false)
 			net.WriteString(steamId)
