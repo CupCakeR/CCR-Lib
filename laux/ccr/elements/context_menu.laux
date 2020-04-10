@@ -215,8 +215,6 @@ end
 
 CCR:RegisterElement("ContextMenu.Entry", PANEL, "EditablePanel")
 
-
-
 function CCR:NewContextMenu(target)
 	local pnl = self:NewElement("ContextMenu")
 	pnl:SetTarget(target)
