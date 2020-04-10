@@ -9,7 +9,7 @@ function CCR:RegisterTheme(obj)
 	self.Themes[obj:GetID()] = obj
 
 	if (CLIENT) then -- dont debug print serverside, theme is only available serverside to prevent shit errors in configs
-		self:Debug("Registered theme \"" .. obj:GetName() .. "\"")
+		self.Logger:Log("Registered theme \"" .. obj:GetName() .. "\"")
 	end
 end
 

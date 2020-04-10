@@ -346,8 +346,9 @@ function CCR:NewTimedPromise(t) -- TODO: Identifier
 	return p
 end
 
-function CCR.PromiseError(msg)
-	MsgC("<CCR-Promise> Error: " .. (msg || "?"))
+function CCR.PromiseError(msg = "Undefined error")
+	--MsgC("<CCR-Promise> Error: " .. (msg || "?"))
+	CCR.Logger:Error(`Promise failed: ${msg}`)
 	debug.Trace()
 	error()
 end

@@ -1,0 +1,59 @@
+
+public class CCR.ConsoleLogger
+	static COLORS = {
+		["error"] =		rgb(255, 0, 0),
+		["warning"] =	rgb(241, 196, 15),
+		["log"] =		rgb(52, 152, 219),
+		["debug"] =		grey(200),
+	}
+
+	constructor(prefix, config)
+		CCR:AccessorFunc(self, "prefix", "Prefix", "String", false, "Undefined")
+		CCR:AccessorFunc(self, "config", "Config", "Table", false, {
+			log = true,
+			debug = true,
+			error = true,
+			warning = true
+		})
+
+		self.prefix = prefix || self.prefix
+		self.config = config || self.config
+	end
+
+	__tostring()
+		return `CCR.Logger[${self.prefix}]`
+	end
+
+	print(...)
+		local args = {}
+		for _, var in ipairs({...}) do
+			table.insert(args, var)
+		end
+
+		table.insert(args, "\n")
+		
+		MsgC(color_white, `(${self.prefix})`, grey(200), " > ", color_white, unpack(args))
+	end
+
+	Error(...)
+		stopif (!self.config.error)
+		self:print(CCR.ConsoleLogger["COLORS"].error, "Error: ", color_white, ...)
+	end
+
+	Warning(...)
+		stopif (!self.config.warning)
+		self:print(CCR.ConsoleLogger["COLORS"].warning, "Warning: ", color_white, ...)
+	end
+
+	Log(...)
+		stopif (!self.config.log)
+		self:print(CCR.ConsoleLogger["COLORS"].log, "Log: ", color_white, ...)
+	end
+
+	Debug(...)
+		stopif (!self.config.debug)
+		self:print(CCR.ConsoleLogger["COLORS"].debug, "Debug: ", color_white, ...)
+	end
+end
+
+CCR.Logger = CCR.ConsoleLogger("CCR")

@@ -1,8 +1,4 @@
 
-function CCR:Debug(str) -- gay
-	MsgC(Color(0, 191, 255), "(CCR) ", color_white, str, "\n")
-end
-
 CCR:IncludeFile("not_my_code/promises", "sh")
 CCR:IncludeFile("not_my_code/bshadows", "cl")
 CCR:IncludeFile("not_my_code/gradient", "cl")
@@ -19,6 +15,6 @@ CCR:IncludeRecursive("classes", "sh")
 CCR:IncludeRecursive("themes", "sh") -- NOTE: Needs to be shared to be able to us this shit in configs
 CCR:IncludeRecursive("elements", "cl")
 
-CCR:Debug("Initialized.")
+CCR.Logger:Log("Fully initialized library") -- NOTE: Dont save an instance because I dont want to override the var :(
 
 hook.Run("CCR.OnLoaded")

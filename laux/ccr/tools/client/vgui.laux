@@ -17,7 +17,7 @@ function CCR:NewElement(_class, parent, name)
 end
 
 function CCR:RegisterElement(_class, tbl, base)
-	self:Debug("Registered element \"" .. "CCR." .. _class .. "\"" )
+	self.Logger:Log("Registered element \"" .. "CCR." .. _class .. "\"" )
 
 	CCR:PreparePanelTheme(tbl)
 	CCR:PreparePanelFunctions(tbl)

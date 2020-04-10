@@ -32,7 +32,7 @@ local function dl(imageData)
 			return
 		end
 
-		CCR:Debug(`Successfully downloaded Imgur image (${imageData.id})`)
+		CCR.Logger:Log(`Successfully downloaded Imgur image (${imageData.id})`)
 
 		p:resolve(Material("../data/" .. path .. imageData.id .. "." .. imageData.type, imageData.params))
 	end, function()
