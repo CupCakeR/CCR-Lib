@@ -1,5 +1,5 @@
 
--- TODO: Remove? OUTDATED: Use ScalableFrame as base
+CCR:GenerateFont("CCR.Frame.Title", "ExtraLight", 24)
 
 local PANEL = {}
 
@@ -25,7 +25,7 @@ function PANEL:Init()
 
 			xOff = h / 2 + size / 2 - 4
 		end
-		CCR:DrawShadowText(1, self:GetTitle(), "CCR.24", xOff + 10, h / 2, color_white, "l", "c")
+		CCR:DrawShadowText(1, self:GetTitle(), "CCR.Frame.Title", xOff + 10, h / 2, color_white, "l", "c")
 	end
 
 		self.close = CCR:NewElement("DPanel", self.header)

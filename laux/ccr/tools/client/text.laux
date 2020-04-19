@@ -1,7 +1,7 @@
 
 function CCR:CreateFont(name, size, weight, add)
 	local tbl = {
-		font = "Roboto",
+		font = "Muli",
 		size = size,
 		weight = weight or 500
 	}
@@ -15,6 +15,16 @@ function CCR:CreateFont(name, size, weight, add)
 	surface.CreateFont(name, tbl)
 end
 
+function CCR:GenerateFont(name, style, merge = {})
+	local tbl = {
+		font = "Muli" .. (style && (" " .. style) || "")
+	}
+
+	table.Merge(tbl, tonumber(merge) && {size = merge, weight = 0} || merge)
+	surface.CreateFont(name, tbl)
+end
+
+-- FIXME: Get rid of this shit asap
 for i = 1, 100 do
 	CCR:CreateFont("CCR." .. i, i, 0)
 	CCR:CreateFont("CCR." .. i .. ".MEDIUM", i, 600)
