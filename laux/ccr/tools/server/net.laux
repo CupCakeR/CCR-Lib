@@ -1,5 +1,5 @@
 
-CCR.NetSpam = CCR.NetSpam || {}
+CCR.NetSpam ||= {}
 
 function CCR:NetSafeReceive(id, cb, dataFunc, options)
 	assert(id, "No ID specified")
