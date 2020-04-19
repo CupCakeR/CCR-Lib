@@ -33,7 +33,7 @@ function CCR:NetSafeReceive(id, cb, dataFunc, options)
 		end)
 
 		if (!pcallSuccess && !self.NetSpam[p][id].pcallError && isstring(_error) && _error != "") then
-			// TODO: Laux
+			-- TODO: Laux
 			local str = "Following net error was caused by :nick (:sid)! Message: \":id\", error: \n\t:error"
 			str = str:Replace(":nick", p:Nick())
 			str = str:Replace(":sid", p:SteamID())
@@ -56,7 +56,7 @@ function CCR:NetSafeReceive(id, cb, dataFunc, options)
 			end
 
 			if (options.doError && options.debounceAt < self.NetSpam[p][id].count && !self.NetSpam[p][id].spamError) then
-				// TODO: Laux
+				-- TODO: Laux
 				local str = ":nick (:sid) exceeded the spam limit (:limit/tick) of net message \":id\". This could be an ongoing attempt to crash the server.\n"
 				str = str:Replace(":nick", p:Nick())
 				str = str:Replace(":sid", p:SteamID())
