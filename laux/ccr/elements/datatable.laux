@@ -1,0 +1,86 @@
+
+-- TODO: Datatables, even tho idk why
+if (true) then
+	return
+end
+
+-- Meant to basically store the column configuration
+class Column
+	constructor(parent, id)
+		assert(parent)
+		assert(id)
+
+		CCR:AccessorFunc(self, "id", "ID")
+		CCR:AccessorFunc(self, "parent", "Parent")
+		CCR:AccessorFunc(self, "name", "Name")
+		CCR:AccessorFunc(self, "sortable", "Sortable")
+		CCR:AccessorFunc(self, "min_width", "MinWidth")
+
+		return self
+	end
+
+	IsValid()
+		IsValid(self.parent)
+	end
+end
+
+-- BASE
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "columns", "Columns")
+
+function PANEL:Init()
+end
+
+function PANEL:AddColumn(id)
+	assert(id, "ID must be specified")
+	assert(self.columns[id], `Column with ID "${id}" already exists`)
+
+	local column = Column(self, id)
+	self.columns[id] = column
+
+	return column
+end
+
+function PANEL:GetColumn(id)
+	return self.columns[id]
+end
+
+CCR:RegisterElement("DataTable", PANEL, "Panel")
+
+
+-- HEADER
+PANEL = {}
+
+CCR:AccessorFunc(PANEL, "name", "Name")
+CCR:AccessorFunc(PANEL, "sorted", "Sorted", "Number") -- 0: none; 1: asc; 2: desc
+
+function PANEL:Init()
+end
+
+function PANEL:GetColumn(id)
+	return self.columns[id]
+end
+
+CCR:RegisterElement("DataTable.Header", PANEL, "Panel")
+
+--
+
+function CCR:TestDatatable()
+	if IsValid(self.TestFrame) then
+		self.TestFrame:Remove()
+	end
+
+	self.TestFrame = CCR:NewElement("Frame")
+	self.TestFrame:SetSize(600, 400)
+	self.TestFrame:Center()
+	self.TestFrame:MakePopup()
+
+	local dt = CCR:NewElement("DataTable", self.TestFrame)
+	dt:Dock(FILL)
+
+	dt:AddColumn("test")
+		:SetName("Test")
+		:SetSortable(true)
+		:SetMinWidth(50)
+end
