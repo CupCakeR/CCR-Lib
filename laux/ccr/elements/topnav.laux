@@ -8,10 +8,10 @@ CCR:AccessorFunc(PANEL, "x_gap", "GapX", "Integer")
 
 function PANEL:Init()
 	self.tabs = {}
-	self.font = "CCR.29"
+	self.font = "CCR.24"
 	self.x_gap = 32
 
-	self:SetTall(64)
+	self:SetTall(55)
 end
 
 function PANEL:AddTab(id, name, pnlClass = "Panel", btnDock = LEFT)
