@@ -43,23 +43,25 @@ function PANEL:SetForceActive(b)
 	self.force_active = b
 
 	if b then
-		self:OnCursorEntered()
+		self:_OnCursorEntered()
 	else
-		self:OnCursorExited()
+		self:_OnCursorExited()
 	end
 end
 
-function PANEL:OnCursorEntered()
+function PANEL:_OnCursorEntered()
 	if self:GetBlocked() then return end
 	self:Lerp("curAlphaHover", 1)
 	self:LerpColor("curColorText", color_white)
 end
+PANEL.OnCursorEntered = PANEL._OnCursorEntered
 
-function PANEL:OnCursorExited()
+function PANEL:_OnCursorExited()
 	if self:GetForceActive() == true then return end
 	self:Lerp("curAlphaHover", 0)
 	self:LerpColor("curColorText", self:GetColor())
 end
+PANEL.OnCursorExited = PANEL._OnCursorExited
 
 function PANEL:OnMousePressed(key)
 	if key == MOUSE_LEFT and !self:GetBlocked() then
