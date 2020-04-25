@@ -1,0 +1,221 @@
+
+class Choice
+	constructor(parent, id)
+		assert(parent)
+		assert(id)
+
+		CCR:AccessorFunc(self, "id", "ID")
+		CCR:AccessorFunc(self, "parent", "Parent")
+		CCR:AccessorFunc(self, "name", "Name")
+		CCR:AccessorFunc(self, "value", "Value")
+
+		self.id = id
+		self.parent = parent
+
+		return self
+	end
+
+	IsValid()
+		return IsValid(self.parent)
+	end
+
+	__tostring()
+		return "CCR.ComboBox.Choice"
+	end
+
+	Finish()
+		return self:GetParent():_RegisterChoice(self)
+	end
+end
+
+CCR:PrepareImgurImage("CCR.ComboBox.Arrow", "2QGKAd6")
+CCR:GenerateFont("CCR.ComboBox.Text", "Light", 19)
+
+-- BASE
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "font", "Font", "String")
+CCR:AccessorFunc(PANEL, "placeholder", "Placeholder", "String")
+CCR:AccessorFunc(PANEL, "space_x", "SpaceX", "Number")
+CCR:AccessorFunc(PANEL, "space_y", "SpaceY", "Number")
+CCR:AccessorFunc(PANEL, "exclude_active", "ExcludeActive", "Boolean")
+
+function PANEL:Init()
+	self.choices = {}
+	self.current = false
+
+	self.font = "CCR.ComboBox.Text"
+	self.placeholder = "Undefined"
+	self.space_x = 12
+	self.space_y = 8
+	self.exclude_active = true
+
+	self:SetCursor("hand")
+
+	self.lerpHover = 0
+	self.lerpArrowRotation = 0
+
+	self.order = {} -- used to not destroy sorting yikes
+end
+
+function PANEL:OnCursorEntered()
+	self:Lerp("lerpHover", 1)
+end
+
+function PANEL:OnCursorExited()
+	self:Lerp("lerpHover", 0)
+end
+
+function PANEL:OnMousePressed(key)
+	stopif key != MOUSE_LEFT
+	stopif self.context
+
+	self.context = CCR:NewContextMenu(self)
+
+	for i, id in ipairs(self.order) do
+		local choice = self.choices[id]
+
+		continueif (self.exclude_active && choice == self.current)
+
+		self.context:Option()
+			:SetText(choice:GetName())
+			:SetFont(self:GetFont())
+			:SetFunction((s) =>
+				stopif !IsValid(self)
+				self:SetActive(choice)
+			end)
+		:Finish()
+	end
+
+	self.context:PostInit()
+	self.context:SetWide(self:GetWide())
+
+	local x, y = self:LocalToScreen(0, self:GetTall())
+	self.context:SetPos(x, y)
+
+	self.context.OnRemove = (s) =>
+		stopif !IsValid(self)
+
+		self:Lerp("lerpArrowRotation", 0)
+		self.context = nil
+	end
+
+	self:Lerp("lerpArrowRotation", 1)
+end
+
+function PANEL:NewChoice(id)
+	assert(id)
+	assert(!self.choices[id])
+
+	self.chainedChoice = Choice(self, id)
+
+	return self.chainedChoice
+end
+
+function PANEL:_RegisterChoice(choice)
+	choice = choice || self.chainedChoice
+	assert(choice)
+
+	self.choices[choice:GetID()] = choice
+	self.choiceCached = nil
+
+	table.insert(self.order, choice:GetID())
+
+	return self
+end
+
+function PANEL:SetActive(choice, preventCall)
+	if (isstring(choice)) then
+		choice = self.choices[choice]
+	end
+
+	self.current = choice
+	stopif preventCall
+	self:OnSelect(choice)
+end
+
+function PANEL:_OnSelect(choice)
+	self.current = choice
+end
+
+function PANEL:GetCurrentValue()
+	return self.current?.value
+end
+
+function PANEL:OnSelect(choice) end
+
+function PANEL:SizeToContents(bW, bH)
+	-- calculate actual box size, not the context menu
+	local w, h = 1, 1
+	for id, choice in pairs(self.choices) do
+		local tw, th = CCR:GetTextSize(choice:GetName(), self:GetFont())
+		w = math.max(w, tw)
+		h = math.max(h, th)
+	end
+
+	if (self.placeholder) then
+		local tw, th = CCR:GetTextSize(self.placeholder, self:GetFont())
+		w = math.max(w, tw)
+		h = math.max(h, th)
+	end
+
+	-- arrow
+	w = w + 24 + (h - 20)
+
+	w = w + (self.space_x * 2)
+	h = h + (self.space_y * 2)
+
+	if (bW && w != self:GetWide()) then
+		self:SetWide(w)
+	end
+
+	if (bH && h != self:GetTall()) then
+		self:SetTall(h)
+	end
+end
+
+function PANEL:Paint(w, h)
+	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Primary)
+	CCR:RoundedBox(1, 1, w - 2, h - 2, grey(35))
+
+	local hoverColor = CCR:LerpColor(self.lerpHover, grey(200), color_white)
+	if (!self.current && self.placeholder) then
+		CCR:DrawText(self.placeholder, self:GetFont(), self.space_x, h / 2, hoverColor, "l", "c")
+	elseif (self.current) then
+		local choice = self.current
+		CCR:DrawText(choice:GetName(), self:GetFont(), self.space_x, h / 2, color_white, "l", "c")
+	end
+
+	CCR:DrawImgurImageRotated("CCR.ComboBox.Arrow", w - 8 - ((h - 20) / 2) - 2, h / 2, h - 20, h - 20, hoverColor, 180 * self.lerpArrowRotation)
+end
+
+CCR:RegisterElement("ComboBox", PANEL, "DPanel")
+
+--
+
+function CCR:TestCombo()
+	if IsValid(self.TestFrame) then
+		self.TestFrame:Remove()
+	end
+
+	self.TestFrame = CCR:NewElement("Frame")
+	self.TestFrame:SetSize(600, 400)
+	self.TestFrame:Center()
+	self.TestFrame:MakePopup()
+
+	local dt = CCR:NewElement("ComboBox", self.TestFrame)
+	dt:SetPos(8, 50)
+	
+	dt:SetPlaceholder("Select something")
+	dt:NewChoice("test")
+		:SetName("Test")
+		:Finish()
+	:NewChoice("negro")
+		:SetName("Negro")
+		:Finish()
+	:NewChoice("test_name")
+		:SetName("Some long as n-word name")
+		:Finish()
+
+	dt:SizeToContents(true, true)
+end
