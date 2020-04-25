@@ -1,0 +1,137 @@
+
+CCR.Currencies ||= {}
+
+function CCR:GetCurrency(id)
+	return self.Currencies[id]
+end
+
+function CCR:RegisterCurrency(currency)
+	assert(currency.id, "Currency has no ID")
+	self.Currencies[currency.id] = currency
+end
+
+-- currencies
+
+local obj = CCR:NewCurrency("darkrp")
+	obj.Add = (p, amt) ->
+		p:addMoney(amt)
+	end
+	obj.Get = (p, amt) ->
+		return p:getDarkRPVar("money")
+	end
+	obj.CanAfford = (p, amt) ->
+		return p:canAfford(amt)
+	end
+	obj.Format = (amt) ->
+		return DarkRP.formatMoney(amt)
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("pointshop_1")
+	obj.Add = (p, amt) ->
+		p:PS_SetPoints(ply:PS_GetPoints() + amt)
+	end
+	obj.Get = (p, amt) ->
+		return p:PS_GetPoints()
+	end
+	obj.CanAfford = (p, amt) ->
+		return p:PS_GetPoints() >= amt
+	end
+	obj.Format = (amt) ->
+		return string.Comma(amt) .. PS.Config.PointsName
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("pointshop_2")
+	obj.Add = (p, amt) ->
+		p:PS2_AddStandardPoints(amt)
+	end
+	obj.Get = (p, amt) ->
+		return p.PS2_Wallet.points
+	end
+	obj.CanAfford = (p, amt) ->
+		return p.PS2_Wallet.points >= amt
+	end
+	obj.Format = (amt) ->
+		return string.Comma(amt) .. " points"
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("pointshop_2_premium")
+	obj.Add = (p, amt) ->
+		p:PS2_AddStandardPoints(amt)
+	end
+	obj.Get = (p, amt) ->
+		return p.PS2_Wallet.premiumPoints
+	end
+	obj.CanAfford = (p, amt) ->
+		return p.PS2_Wallet.premiumPoints >= amt
+	end
+	obj.Format = (amt) ->
+		return string.Comma(amt) .. " points"
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("santosrp")
+	obj.Add = (p, amt) ->
+		p:AddMoney(amt)
+	end
+	obj.Get = (p, amt) ->
+		return p:GetMoney()
+	end
+	obj.CanAfford = (p, amt) ->
+		return p:CanAfford(amt)
+	end
+	obj.Format = (amt) ->
+		return string.Comma("$" .. amt)
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("helix")
+	obj.Add = (p, amt) ->
+		p:GiveMoney(amt, false)
+	end
+	obj.Get = (p, amt) ->
+		return p:getDarkRPVar("money")
+	end
+	obj.CanAfford = (p, amt) ->
+		return p:HasMoney(amt)
+	end
+	obj.Format = (amt) ->
+		return string.Comma(ix.currency.symbol .. amt)
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("underdone")
+	obj.Add = (p, amt) ->
+		if amt < 0 then
+			p:RemoveItem("money", -amt)
+		else
+			p:AddItem("money", amt)
+		end
+	end
+	obj.Get = (p, amt) ->
+		return p.Data.Inventory["money"] || 0
+	end
+	obj.CanAfford = (p, amt) ->
+		return (p.Data.Inventory["money"] || 0) >= amt
+	end
+	obj.Format = (amt) ->
+		return '$' .. string.Comma(amt)
+	end
+obj:Register()
+
+local obj = CCR:NewCurrency("brcs")
+	obj.Add = (p, amt) ->
+		p:AddBRCS_Credits(amt)
+	end
+	obj.Get = (p, amt) ->
+		return p:GetBRCS_Credits()
+	end
+	obj.CanAfford = (p, amt) ->
+		return p:GetBRCS_Credits() >= amt
+	end
+	obj.Format = (amt) ->
+		return BRICKSCREDITSTORE.FormatCredits(amt, true)
+	end
+obj:Register()
