@@ -1,6 +1,8 @@
 
 -- TODO: Proper icon support
 
+CCR:GenerateFont("CCR.ContextMenu.Title", nil, 17)
+
 local PANEL = {}
 
 CCR:AccessorFunc(PANEL, "target", "Target")
@@ -136,7 +138,7 @@ CCR:AccessorFunc(PANEL, "func", "Function", "Function")
 
 function PANEL:Init()
 	self.text = "Undefined"
-	self.font = "CCR.18"
+	self.font = "CCR.ContextMenu.Title"
 	self.color = grey(255)
 	self.icon = nil
 
@@ -170,7 +172,6 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:GetCalculatedSize()
-	-- TODO: Icon support
 	local tw, th = CCR:GetTextSize(self:GetText(), self:GetFont())
 
 	local w = 8 + tw + 8
