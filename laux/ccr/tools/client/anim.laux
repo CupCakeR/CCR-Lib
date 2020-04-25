@@ -74,16 +74,19 @@ CCR:AddPanelFunction("LerpPos", function(s, x, y, dur, callback)
 	return anim
 end)
 
--- CCR:AddPanelFunction("LerpAlpha", function(s, to, dur, callback)
--- 	local anim = s:NewAnimation(dur or .1)
--- 	anim.from = s:GetAlpha()
--- 	anim.to = to
--- 	anim.Think = function(_s, pnl, frac)
--- 		s:SetAlpha(Lerp(frac, 0, 1), _s.from, _s.to)
--- 	end
--- 	anim.OnEnd = function(_s)
--- 		if (callback) then
--- 			callback(s)
--- 		end
--- 	end
--- end)
+-- NOTE: https://gitlab.com/sleeppyy/xeninui/-/blob/master/lua/xeninui/libs/essentials.lua#L250-266
+CCR:AddPanelFunction("LerpAlpha", function(s, alpha, time = .1, callback = function() end)
+	s.Alpha ||= 0
+
+	local oldThink = s.Think
+	s.Think = function(pnl)
+		if (oldThink) then oldThink(pnl) end
+
+		-- Shitty workaround
+		s:SetAlpha(pnl.Alpha >= 250 and 255 or pnl.Alpha)
+	end
+	s:Lerp("Alpha", alpha, time, function()
+		s.Think = oldThink
+		callback(s)
+	end)
+end)
