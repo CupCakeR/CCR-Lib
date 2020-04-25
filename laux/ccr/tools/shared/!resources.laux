@@ -59,6 +59,7 @@ function CCR:IncludeRecursive(path, realmOverride, traceOverride)
 	end
 
 	for i, fileName in ipairs(files) do
+		continueif (fileName:sub(1, 1) == "!")
 		self:IncludeFile(`${path}/${fileName}`, realmOverride, trace)
 	end
 end

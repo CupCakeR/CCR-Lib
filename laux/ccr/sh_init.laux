@@ -1,4 +1,6 @@
 
+CCR:IncludeFile("classes/base/!sh.lua", "sh") -- make sure base loads first
+
 CCR:IncludeFile("not_my_code/promises", "sh")
 CCR:IncludeFile("not_my_code/bshadows", "cl")
 CCR:IncludeFile("not_my_code/gradient", "cl")
