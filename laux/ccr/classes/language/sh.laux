@@ -1,4 +1,3 @@
-
 public class CCR.Language extends CCR.Base
 	constructor(addonId, languageId)
 		super()
@@ -12,6 +11,11 @@ public class CCR.Language extends CCR.Base
 
 		self.addonId = addonId
 		self.languageId = languageId
+		self.raw = {}
+		self.phrases = {}
+		self.initialized = false
+
+		return self
 	end
 
 	__tostring()
@@ -23,8 +27,11 @@ public class CCR.Language extends CCR.Base
 	end
 
 	Download()
+		assert(self.addonId, "No addon id set")
+		assert(self.languageId, "No language id set")
+
 		local url = self.url
-		url = url || `https://gitlab.com/CupCakeR/ccr-languages/raw/master/${addonId}/${self:GetLanguageID()}.json`
+		url = url || `https://gitlab.com/CupCakeR/ccr-languages/raw/master/${self.addonId}/${self.languageId}.json`
 
 		local promise = CCR.NewPromise()
 
@@ -65,7 +72,7 @@ public class CCR.Language extends CCR.Base
 			self:SetInitialized(true)
 
 			hook.Run("CCR.OnLanguageInitialized", self, tbl)
-		end)
+		end, CCR.PromiseError)
 	end
 
 	PreparePhrases()
@@ -77,8 +84,22 @@ public class CCR.Language extends CCR.Base
 		self:SetPhrases(new)
 	end
 
-	GetPhrase(phrase, replacements)
+	GetPhrase(phrase, replacements, pluralizationValue)
 		assert(phrase, "No phrase to translate")
+
+		if (pluralizationValue) then
+			local singular
+			if (tonumber(pluralizationValue)) then
+				singular = pluralizationValue == 1
+			elseif (pluralizationValue == true) then
+				singular = select(2, next(replacements)) == 1
+			else
+				error("Invalid pluralizationValue")
+			end
+
+			phrase ..= "."
+			phrase ..= (singular && "singular" || "plural")
+		end
 
 		local str = self:GetPhrases()[phrase]
 		if (!str && self:GetLanguageID() != "english") then
@@ -99,4 +120,8 @@ public class CCR.Language extends CCR.Base
 	end
 
 	Register() end
+end
+
+function CCR:NewAddonLanguage(addonId, languageId)
+	return CCR.Language(addonId, languageId)
 end
