@@ -8,7 +8,7 @@ class Currency
 		CCR:AccessorFunc(self, "id", "ID", "String")
 		
 		self.id = id
-		
+
 		return self
 	end
 
@@ -45,7 +45,7 @@ end
 
 -- currencies
 
-local obj = CCR:NewCurrency("darkrp")
+local obj = CCR.NewCurrency("darkrp")
 	obj.Add = (p, amt) ->
 		p:addMoney(amt)
 	end
@@ -60,7 +60,7 @@ local obj = CCR:NewCurrency("darkrp")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("pointshop_1")
+local obj = CCR.NewCurrency("pointshop_1")
 	obj.Add = (p, amt) ->
 		p:PS_SetPoints(ply:PS_GetPoints() + amt)
 	end
@@ -75,7 +75,7 @@ local obj = CCR:NewCurrency("pointshop_1")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("pointshop_2")
+local obj = CCR.NewCurrency("pointshop_2")
 	obj.Add = (p, amt) ->
 		p:PS2_AddStandardPoints(amt)
 	end
@@ -90,7 +90,7 @@ local obj = CCR:NewCurrency("pointshop_2")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("pointshop_2_premium")
+local obj = CCR.NewCurrency("pointshop_2_premium")
 	obj.Add = (p, amt) ->
 		p:PS2_AddStandardPoints(amt)
 	end
@@ -105,7 +105,7 @@ local obj = CCR:NewCurrency("pointshop_2_premium")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("santosrp")
+local obj = CCR.NewCurrency("santosrp")
 	obj.Add = (p, amt) ->
 		p:AddMoney(amt)
 	end
@@ -120,7 +120,7 @@ local obj = CCR:NewCurrency("santosrp")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("helix")
+local obj = CCR.NewCurrency("helix")
 	obj.Add = (p, amt) ->
 		p:GiveMoney(amt, false)
 	end
@@ -135,7 +135,7 @@ local obj = CCR:NewCurrency("helix")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("underdone")
+local obj = CCR.NewCurrency("underdone")
 	obj.Add = (p, amt) ->
 		if amt < 0 then
 			p:RemoveItem("money", -amt)
@@ -154,7 +154,7 @@ local obj = CCR:NewCurrency("underdone")
 	end
 obj:Register()
 
-local obj = CCR:NewCurrency("brcs")
+local obj = CCR.NewCurrency("brcs")
 	obj.Add = (p, amt) ->
 		p:AddBRCS_Credits(amt)
 	end
