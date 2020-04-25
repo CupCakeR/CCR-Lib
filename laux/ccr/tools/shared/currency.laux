@@ -1,4 +1,37 @@
 
+-- actual class
+
+class Currency
+	constructor(id)
+		assert(id)
+
+		CCR:AccessorFunc(self, "id", "ID", "String")
+		
+		self.id = id
+		
+		return self
+	end
+
+	__tostring()
+		return `CCR.Currency[${self.id}]`
+	end
+
+	Add(p, amt) end
+	Get(p) end
+	CanAfford(p, amt) end
+	Format(amt) end
+
+	Register()
+		CCR:RegisterCurrency(self)
+	end
+end
+
+function CCR.NewCurrency(name)
+	return Currency(name)
+end
+
+-- funcs
+
 CCR.Currencies ||= {}
 
 function CCR:GetCurrency(id)
