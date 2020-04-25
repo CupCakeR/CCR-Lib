@@ -89,3 +89,17 @@ function CCR:DrawImgurImage(id, x, y, w, h, clr = color_white)
 	surface.SetDrawColor(clr)
 	surface.DrawTexturedRect(x, y, w, h)
 end
+
+function CCR:DrawImgurImageRotated(id, x, y, w, h, clr = color_white, rot = 0)
+	local img = self:GetImgurImage(id)
+	if (img == matLoading) then
+		self:DrawLoading(x + w / 2, y + h / 2, math.max(math.min(w, h) / 2, 32), color_white)
+		return
+	elseif (!img) then
+		return
+	end
+
+	surface.SetMaterial(img)
+	surface.SetDrawColor(clr)
+	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+end
