@@ -1,6 +1,6 @@
 
 CCR.NetSpam ||= {}
-
+-- FIXME: Remove CCR:NetSafeReceive
 function CCR:NetSafeReceive(id, cb, dataFunc, options)
 	assert(id, "No ID specified")
 	assert(isfunction(cb), "No callback specified")
@@ -33,7 +33,7 @@ function CCR:NetSafeReceive(id, cb, dataFunc, options)
 		end)
 
 		if (!pcallSuccess && !self.NetSpam[p][id].pcallError && isstring(_error) && _error != "") then
-			// TODO: Laux
+			-- TODO: Laux
 			local str = "Following net error was caused by :nick (:sid)! Message: \":id\", error: \n\t:error"
 			str = str:Replace(":nick", p:Nick())
 			str = str:Replace(":sid", p:SteamID())
@@ -56,7 +56,7 @@ function CCR:NetSafeReceive(id, cb, dataFunc, options)
 			end
 
 			if (options.doError && options.debounceAt < self.NetSpam[p][id].count && !self.NetSpam[p][id].spamError) then
-				// TODO: Laux
+				-- TODO: Laux
 				local str = ":nick (:sid) exceeded the spam limit (:limit/tick) of net message \":id\". This could be an ongoing attempt to crash the server.\n"
 				str = str:Replace(":nick", p:Nick())
 				str = str:Replace(":sid", p:SteamID())
@@ -80,3 +80,117 @@ end
 hook.Add("Tick", "CCR.NetSafeReceive", function()
 	CCR.NetSpam = {}
 end)
+
+-------------------- V2
+
+CCR.NetReceivers ||= {}
+
+public class CCR.NetReceiver -- NOTE: We cant extend base due to load order, fix?
+	constructor(id)
+		assert(id)
+
+		util.AddNetworkString(id)
+
+		CCR:AccessorFunc(self, "id", "ID")
+		CCR:AccessorFunc(self, "debounce", "Debounce")
+		CCR:AccessorFunc(self, "cooldown", "Cooldown")
+
+		self.id = id
+		self.debounce = false
+		self.cooldown = false
+
+		self.cooldowns = {}
+		self.players = {}
+		self.errors = {}
+
+		hook.Add("Tick", self, (s) =>
+			s.players = {}
+		end)
+
+		return self
+	end
+
+	IsValid()
+		return CCR.NetReceivers[self.id] == self
+	end
+
+	Error(p, err = "Undefined")
+		self.players[p].did_error = true
+		CCR.Logger:Error(`Network error in message "${self.id}" caused by ${p:Nick()} (${p:SteamID()})!\n Error: ${err}!`)
+		return self
+	end
+
+	__tostring()
+		return `CCR.NetReceiver[${self.id}]`
+	end
+
+	_receive(len, p)
+		self.players[p] ||= {
+			tick_calls = 0,
+			did_error = false
+		}
+
+		local tbl = self.players[p]
+
+		tbl.tick_calls++
+
+		stopif tbl.did_error
+
+		local cd = self.cooldown && self.cooldowns[p]
+		if (cd && cd + self.cooldown > CurTime()) then
+			tbl.did_error = true
+			return self:Error(p, "Ignored cooldown")
+		end
+
+		self.cooldowns[p] = CurTime()
+
+		local data = {}
+		local succ, err = pcall(self.Read, self, data)
+		if (!succ) then
+			tbl.did_error = true
+			return self:Error(p, err)
+		end
+
+		local run = (s, p, data, len) =>
+			stopif (!s || !IsValid(s) || !IsValid(p))
+
+			local succ, err = pcall(s.Process, s, p, data, len)
+			if (!succ) then
+				s.players[p].did_error = true
+				return self:Error(p, err)
+			end
+		end
+
+		if (self.debounce) then
+			return CCR:Debounce(`${self}[${p:SteamID()}]`, self.debounce && (tonumber(self.debounce) || 0), () => run(self, p, data, len) end)
+		end
+
+		run(self, p, data, len)
+	end
+
+	Read(data) end
+	Process(p, data, len) end
+
+	SetReadFunc(func) self.Read = func return self end -- chaining
+	SetProcessFunc(func) self.Process = func return self end -- chaining
+
+	Register()
+		CCR.NetReceivers[self.id] = self
+
+		net.Receive(self.id, (len, p) =>
+			stopif !IsValid(self)
+			self:_receive(len, p)
+		end)
+	end
+end
+
+-- CCR.NetReceiver("CCR.TestNetwork")
+-- 	:SetDebounce(1)
+-- 	:SetCooldown(false)
+-- 	:SetReadFunc((data) ->
+-- 		data.string = net.ReadString()
+-- 	end)
+-- 	:SetProcessFunc((p, data, len) ->
+-- 		print(p, data.string, len)
+-- 	end)
+-- :Register()
