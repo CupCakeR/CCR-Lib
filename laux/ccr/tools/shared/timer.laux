@@ -90,7 +90,7 @@ public class CCR.Timer
 	end
 end
 
-function CCR:CreateTimer(identifier, delay, repetitions, func = () => end, override = false)
+function CCR:CreateTimer(identifier, delay, repetitions, func = () => end, override = true)
 	assert(identifier)
 	assert(tonumber(delay))
 	assert(tonumber(repetitions))
