@@ -1,0 +1,48 @@
+
+public class CCR.Switch
+	constructor(compare)
+		self.compare = compare
+		self.expressions = {}
+
+		return self
+	end
+
+	case(expressions, fn)		
+		if (istable(expressions)) then
+			for i, expr in ipairs(expressions) do
+				table.insert(self.expressions, {
+					expr = expr,
+					func = fn
+				})
+			end
+
+			return self
+		end
+
+		table.insert(self.expressions, {
+			expr = expressions,
+			func = fn
+		})
+
+		return self
+	end
+
+	run()
+		for i, tbl in ipairs(self.expressions) do
+			continueif (tbl.expr != self.compare)
+			breakif (tbl.func() == false)
+		end
+	end
+end
+
+-- local switch = CCR.Switch(true)
+-- 	:case({false, true}, () =>
+-- 		return true
+-- 	end)
+-- 	:case(true, () =>
+-- 		print("ran true")
+-- 	end)
+-- 	:case(1, () =>
+-- 		print("ran 1")
+-- 	end)
+-- :run()
