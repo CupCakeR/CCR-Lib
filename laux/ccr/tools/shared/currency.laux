@@ -74,6 +74,21 @@ local obj = CCR.NewCurrency("darkrp")
 	end
 obj:Register()
 
+local obj = CCR.NewCurrency("basewars")
+	obj.Add = (p, amt) =>
+		p:GiveMoney(amt)
+	end
+	obj.Get = (p, amt) =>
+		return p:GetMoney()
+	end
+	obj.CanAfford = (p, amt) =>
+		return p:GetMoney() >= amt
+	end
+	obj.Format = (amt) =>
+		return BaseWars.NumberFormat(amt)
+	end
+obj:Register()
+
 local obj = CCR.NewCurrency("pointshop_1")
 	obj.Add = (p, amt) =>
 		p:PS_SetPoints(ply:PS_GetPoints() + amt)
