@@ -33,7 +33,7 @@ local function isfunction(f)
 	return type(f) == 'function'
 end
 
-local function promise(deferred, next, success, failure, nonpromisecb)
+local function promise(deferred, next, success, failure = CCR.PromiseError, nonpromisecb)
 	if type(deferred) == 'table' and type(deferred.value) == 'table' and isfunction(next) then
 		local called = false
 		local ok, err = pcall(next, deferred.value, function(v)
@@ -170,7 +170,7 @@ function M.new(options)
 	options = options or {}
 	local d
 	d = {
-		next = function(self, success, failure)
+		next = function(self, success, failure = CCR.PromiseError)
 			local next = M.new({success = success, failure = failure, extend = options.extend})
 			if d.state == RESOLVED then
 				next:resolve(d.value)
@@ -347,8 +347,7 @@ function CCR:NewTimedPromise(t) -- TODO: Identifier
 end
 
 function CCR.PromiseError(msg = "Undefined error")
-	--MsgC("<CCR-Promise> Error: " .. (msg || "?"))
 	CCR.Logger:Error(`Promise failed: ${msg}`)
 	debug.Trace()
-	error()
+	error("break, see above")
 end
