@@ -3,33 +3,39 @@
 -- // TODO: Make text fully optional to be able just to use the element itself (slider)
 -- // TODO: Use DrawArc instead of trash material
 
+CCR:GenerateFont("CCR.NumSlider.Label", "Light", 20)
+
 local PANEL = {}
 
-AccessorFunc(PANEL, "_text", "Text", FORCE_STRING)
-AccessorFunc(PANEL, "_font", "Font", FORCE_STRING)
-AccessorFunc(PANEL, "_value", "Value", FORCE_NUMBER)
-AccessorFunc(PANEL, "_min", "Min", FORCE_NUMBER)
-AccessorFunc(PANEL, "_max", "Max", FORCE_NUMBER)
-AccessorFunc(PANEL, "_decimals", "Decimals", FORCE_NUMBER)
-AccessorFunc(PANEL, "_slider_color", "SliderColor")
+CCR:AccessorFunc(PANEL, "cvar", "ConVar")
+CCR:AccessorFunc(PANEL, "value", "Value")
+CCR:AccessorFunc(PANEL, "min", "Min")
+CCR:AccessorFunc(PANEL, "max", "Max")
+CCR:AccessorFunc(PANEL, "decimals", "Decimals")
+CCR:AccessorFunc(PANEL, "slider_width", "SliderWidth")
+CCR:AccessorFunc(PANEL, "circle_color", "CircleColor")
+
+CCR:AccessorFunc(PANEL, "text", "Text")
+CCR:AccessorFunc(PANEL, "font", "Font")
 
 function PANEL:Init()
-	self._text = "?"
-	self._value = 0
-	self._min = 0
-	self._max = 10
-	self._decimals = 0
-	self._slider_color = color_white
+	self.text = "Undefined"
+	self.value = 0
+	self.min = 0
+	self.max = 0
+	self.decimals = 0
+	self.circle_color = color_white
+	self.slider_width = 200
 end
 
 function PANEL:PostInit()
-	self.text = self:Add("DLabel")
-	self.text:SetText(self:GetText())
-	self.text:SetFont(self:GetFont() or "CCR.12")
-	self.text:SetColor(color_white)
-	self.text:SetAlpha(255)
-	self.text:Dock(LEFT)
-	self.text:SizeToContents()
+	self.label = self:Add("DLabel")
+	self.label:SetText(self.text)
+	self.label:SetFont(self.font or "CCR.NumSlider.Label")
+	self.label:SetColor(color_white)
+	self.label:SetAlpha(255)
+	self.label:Dock(LEFT)
+	self.label:SizeToContents()
 
 	self.display = self:Add("DLabel")
 	self.display:SetText(self:GetValue())
@@ -37,24 +43,24 @@ function PANEL:PostInit()
 	self.display:SetFont("CCR.18")
 	self.display.Paint = function(s, w, h)
 		surface.DisableClipping(true)
-			draw.RoundedBox(6, -4, -2, w + 8, h + 4, self:GetThemeColors().Background)
+			draw.RoundedBox(6, -4, -2, w + 8, h + 4, CCR:ThemeColors().Background)
 		surface.DisableClipping(false)
 	end
 
 	local mat = Material("nicksys/circle.png", "smooth")
 	self.slider = self:Add("DPanel")
 	self.slider:SetCursor("hand")
-	self.slider:SetSize(100, 20)
+	self.slider:SetSize(self.slider_width, 20)
 	self.slider.min = self:GetMin()
 	self.slider.max = self:GetMax()
 	self.slider.decimals = self:GetDecimals()
 	self.slider.Paint = function(s, w, h)
-		surface.SetDrawColor(self:GetThemeColors().Primary)
+		surface.SetDrawColor(CCR:ThemeColors().Primary)
 		surface.DrawLine(h / 2, h / 2, w - (h / 2), h / 2)
 
-		local frac = math.Clamp((self:GetValue() - self:GetMin()) / (self:GetMax() - self:GetMin()), 0, 1)
+		local frac = math.Clamp((self.value - s.min) / (s.max - s.min), 0, 1)
 		local pos = Lerp(frac, 0, w - h)
-		surface.SetDrawColor(self._slider_color)
+		surface.SetDrawColor(self.circle_color)
 		surface.SetMaterial(mat)
 		surface.DrawTexturedRect(pos, 0, h, h)
 
@@ -66,21 +72,22 @@ function PANEL:PostInit()
 
 			local mx, _ = s:CursorPos()
 			mx = math.Clamp(mx, 0, w)
-			self:SetValue(Lerp(mx / w, self:GetMin(), self:GetMax()))
+			self:SetValue(Lerp(mx / w, s.min, s.max))
 		end
 	end
 	self.slider.OnMousePressed = function(s, key)
 		s.focus = true
 	end
 
-	self.can_layout = true
+	stopif (!self:GetConVar())
+	self:SetValue(GetConVar(self:GetConVar()):GetFloat(), true)
 end
 
 function PANEL:SetValue(val, prevent)
 	val = math.Round(val, self:GetDecimals())
 	val = math.Clamp(val, self:GetMin(), self:GetMax())
 
-	self._value = val
+	self.value = val
 
 	if IsValid(self.display) then
 		self.display:SetText(self:GetValue())
@@ -90,10 +97,13 @@ function PANEL:SetValue(val, prevent)
 	if !prevent then
 		self:OnValueChanged(val)
 	end
+
+	stopif (!self:GetConVar())
+	GetConVar(self:GetConVar()):SetFloat(self.value)
 end
 
 function PANEL:SetMin(min)
-	self._min = min
+	self.min = min
 
 	if min > self:GetValue() then
 		self:SetValue(min)
@@ -101,7 +111,7 @@ function PANEL:SetMin(min)
 end
 
 function PANEL:SetMax(max)
-	self._max = max
+	self.max = max
 
 	if max < self:GetValue() then
 		self:SetValue(max)
@@ -111,8 +121,6 @@ end
 function PANEL:OnValueChanged(val) end
 
 function PANEL:PerformLayout(w, h)
-	if !self.can_layout then return end
-
 	self.slider:SetPos(w - self.slider:GetWide())
 	self.slider:CenterVertical()
 
@@ -120,9 +128,9 @@ function PANEL:PerformLayout(w, h)
 	self.display:CenterVertical()
 	self.display:MoveLeftOf(self.slider, 8)
 
-	self.text:CenterVertical()
+	self.label:CenterVertical()
 
-	self:SetSize(w, math.max(self.text:GetTall(), self.slider:GetTall()))
+	self:SizeToChildren(true, true)
 end
 
 function PANEL:Paint(w, h)
