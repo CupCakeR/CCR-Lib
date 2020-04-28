@@ -1,76 +1,175 @@
 
+-- local PANEL = {}
+
+-- AccessorFunc(PANEL, "text", "Text", FORCE_STRING)
+-- AccessorFunc(PANEL, "font", "Font", FORCE_STRING)
+-- AccessorFunc(PANEL, "state", "State", FORCE_BOOL)
+-- AccessorFunc(PANEL, "color_bg", "BackgroundColor")
+-- AccessorFunc(PANEL, "color_text", "TextColor")
+-- AccessorFunc(PANEL, "color_on", "OnColor")
+-- AccessorFunc(PANEL, "color_off", "OffColor")
+
+-- function PANEL:Init()
+-- 	self.text = "?"
+-- 	self.font = "CCR.16"
+-- 	self.state = false
+-- 	self.color_bg = self:GetThemeColors().PanelBackground
+-- 	self.color_text = grey(200)
+-- 	self.color_off, self.color_on = grey(75), grey(175)
+-- end
+
+-- function PANEL:PostInit()
+-- 	-- self.labelText = CCR:NewElement("DLabel", self)
+-- 	-- self.labelText:SetText(self:GetText())
+-- 	-- self.labelText:SetFont(self:GetFont())
+-- 	-- self.labelText:SetColor(color_white)
+-- 	-- self.labelText:SetAlpha(self:GetState() and 255 or 125)
+-- 	-- self.labelText:Dock(LEFT)
+-- 	-- self.labelText:SizeToContents()
+-- 	-- self.labelText.Paint = function(s)
+-- 	-- 	if !self.slider then return end
+-- 	-- 	s:SetAlpha(Lerp(self.slider.lerp, 125, 255))
+-- 	-- end
+
+-- 	self.slider = CCR:NewElement("Panel", self)
+-- 	self.slider:SetCursor("hand")
+-- 	self.slider:SetSize(64, 24)
+-- 	self.slider.state = self:GetState() || false
+-- 	self.slider.lerp = self:GetState() && 1 || 0
+-- 	self.slider.Paint = function(s, w, h)
+-- 		CCR:RoundedBox(0, 0, w, h, self:GetBackgroundColor())
+
+-- 		local sliderColor = CCR:LerpColor(s.lerp, self:GetOffColor(), self:GetOnColor())
+
+-- 		local _w = w / 2 - (2 * 3)
+-- 		local x = Lerp(s.lerp, 3, w - _w - 3)
+-- 		CCR:RoundedBox(x, 3, _w, h - (2 * 3), sliderColor)
+-- 	end
+-- 	self.slider.OnMousePressed = function(s, key)
+-- 		if key == MOUSE_LEFT then
+-- 			s.state = !s.state
+-- 			s:Lerp("lerp", s.state && 1 || 0)
+
+-- 			self:OnStateChanged(s.state)
+-- 		end
+-- 	end
+
+-- 	self.can_layout = true
+-- end
+
+-- function PANEL:OnStateChanged(b) end
+
+-- function PANEL:PerformLayout(w, h)
+-- 	if !self.can_layout then return end
+
+-- 	self.slider:SetPos(w - self.slider:GetWide())
+-- 	self.slider:CenterVertical()
+-- 	-- self.labelText:CenterVertical()
+
+-- 	-- self:SetSize(w, math.max(self.labelText:GetTall(), self.slider:GetTall()))
+-- end
+
+-- function PANEL:Paint(w, h)
+-- 	CCR:DrawText(self:GetText(), self:GetFont(), 0, h / 2, self:GetTextColor(), "l", "c")
+-- end
+
+-- CCR:RegisterElement("BoolSlider", PANEL, "Panel")
+
+
+CCR:GenerateFont("CCR.BoolSlider.Label", "Light", 20)
+
 local PANEL = {}
 
-AccessorFunc(PANEL, "text", "Text", FORCE_STRING)
-AccessorFunc(PANEL, "font", "Font", FORCE_STRING)
-AccessorFunc(PANEL, "state", "State", FORCE_BOOL)
-AccessorFunc(PANEL, "color_bg", "BackgroundColor")
-AccessorFunc(PANEL, "color_text", "TextColor")
-AccessorFunc(PANEL, "color_on", "OnColor")
-AccessorFunc(PANEL, "color_off", "OffColor")
+CCR:AccessorFunc(PANEL, "cvar", "ConVar")
+CCR:AccessorFunc(PANEL, "state", "State", "Boolean")
+
+CCR:AccessorFunc(PANEL, "text", "Text", "String")
+CCR:AccessorFunc(PANEL, "font", "Font", "String")
+CCR:AccessorFunc(PANEL, "color_text", "TextColor", "Color")
 
 function PANEL:Init()
-	self.text = "?"
-	self.font = "CCR.16"
-	self.state = false
-	self.color_bg = self:GetThemeColors().PanelBackground
-	self.color_text = grey(200)
-	self.color_off, self.color_on = grey(75), grey(175)
+	self.text = "Undefined"
+	self.font = "CCR.BoolSlider.Label"
+	self.color_text = color_white
 end
 
 function PANEL:PostInit()
-	-- self.labelText = CCR:NewElement("DLabel", self)
-	-- self.labelText:SetText(self:GetText())
-	-- self.labelText:SetFont(self:GetFont())
-	-- self.labelText:SetColor(color_white)
-	-- self.labelText:SetAlpha(self:GetState() and 255 or 125)
-	-- self.labelText:Dock(LEFT)
-	-- self.labelText:SizeToContents()
-	-- self.labelText.Paint = function(s)
-	-- 	if !self.slider then return end
-	-- 	s:SetAlpha(Lerp(self.slider.lerp, 125, 255))
-	-- end
+	local clrCircleOn = CCR:ThemeColors().Green
+	local clrCircleOff = grey(128)
+	local clrBackgroundOn = CCR:ThemeColors().Secondary
+	local clrBackgroundOff = CCR:ThemeColors().Primary
+
+	self.lerpVar = 0
+
+	self.label = CCR:NewElement("DLabel", self)
+	self.label:SetText(self.text)
+	self.label:SetFont(self.font)
+	self.label:SetTextColor(self.color_text)
+	self.label:SetContentAlignment(5)
+	self.label.Think = (s) =>
+		s:SetAlpha(Lerp(self.lerpVar, 50, 255))
+	end
 
 	self.slider = CCR:NewElement("Panel", self)
 	self.slider:SetCursor("hand")
 	self.slider:SetSize(64, 24)
-	self.slider.state = self:GetState() || false
-	self.slider.lerp = self:GetState() && 1 || 0
-	self.slider.Paint = function(s, w, h)
-		CCR:RoundedBox(0, 0, w, h, self:GetBackgroundColor())
+	self.slider.Paint = (s, w, h) =>
+		local clr = CCR:LerpColor(self.lerpVar, clrBackgroundOff, clrBackgroundOn)
+		CCR:CustomRoundedBox(h / 2, 0, 0, w, h, clr, true, true, true, true)
+		
+		local size = h / 2 - 2
+		local xOff = size + 2
+		local xOn = w - xOff
 
-		local sliderColor = CCR:LerpColor(s.lerp, self:GetOffColor(), self:GetOnColor())
-
-		local _w = w / 2 - (2 * 3)
-		local x = Lerp(s.lerp, 3, w - _w - 3)
-		CCR:RoundedBox(x, 3, _w, h - (2 * 3), sliderColor)
+		local x = Lerp(self.lerpVar, xOff, xOn)
+		clr = CCR:LerpColor(self.lerpVar, clrCircleOff, clrCircleOn)
+		CCR:DrawCircle(x, h / 2, size, clr)
 	end
-	self.slider.OnMousePressed = function(s, key)
-		if key == MOUSE_LEFT then
-			s.state = !s.state
-			s:Lerp("lerp", s.state && 1 || 0)
-
-			self:OnStateChanged(s.state)
-		end
+	self.slider.OnMousePressed = (s, key) =>
+		stopif (key != MOUSE_LEFT)
+		self:SetState(!self:GetState(), true)
 	end
 
-	self.can_layout = true
+	stopif (!self:GetConVar())
+
+	local cvar = GetConVar(self:GetConVar())
+	local bInt = cvar:GetBool() && 1 || 0
+	self.lerpVar = bInt
+	self.state = tobool(bInt)
+end
+
+function PANEL:SetState(b, call)
+	self:Lerp("lerpVar", b && 1 || 0)
+	self.state = b
+
+	if (call) then
+		self:OnStateChanged(b)
+	end
+
+	stopif (!self:GetConVar())
+
+	local cvar = GetConVar(self:GetConVar())
+	cvar:SetBool(b)
 end
 
 function PANEL:OnStateChanged(b) end
 
+function PANEL:GetConVarObject()
+	return GetConVar(self:GetConVar())
+end
+
 function PANEL:PerformLayout(w, h)
-	if !self.can_layout then return end
+	stopif (!IsValid(self.slider))
+
+	self.label:SizeToContents()
+	self.label:SetPos(0, 0)
+	self.label:CenterVertical()
 
 	self.slider:SetPos(w - self.slider:GetWide())
 	self.slider:CenterVertical()
-	-- self.labelText:CenterVertical()
-
-	-- self:SetSize(w, math.max(self.labelText:GetTall(), self.slider:GetTall()))
 end
 
 function PANEL:Paint(w, h)
-	CCR:DrawText(self:GetText(), self:GetFont(), 0, h / 2, self:GetTextColor(), "l", "c")
 end
 
 CCR:RegisterElement("BoolSlider", PANEL, "Panel")
