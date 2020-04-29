@@ -210,3 +210,30 @@ function CCR:DrawPanelBlur(pnl, amt, alpha = 255)
 		surface.DrawTexturedRect(x * -1, y * -1, w, h)
 	end
 end
+
+function CCR:DrawPanelBlurCached(pnl, id, amt = 6, alpha = 255)
+	assert(pnl)
+	assert(id)
+
+	pnl._blur_cache ||= {}
+	
+	if (!pnl._blur_cache[id]) then
+		local mat = Material("pp/blurscreen")
+		for i = 1, 3 do
+			mat:SetFloat("$blur", (i / 3) * (amt))
+			mat:Recompute()
+		end
+
+		pnl._blur_cache[id] = mat
+	end
+
+	local x, y = pnl:LocalToScreen(0, 0)
+	local w, h = ScrW(), ScrH()
+
+	surface.SetDrawColor(255, 255, 255, alpha)
+	surface.SetMaterial(pnl._blur_cache[id])
+	render.UpdateScreenEffectTexture()
+	surface.DrawTexturedRect(x * -1, y * -1, w, h)
+
+	return pnl._blur_cache[id]
+end
