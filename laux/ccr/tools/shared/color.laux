@@ -1,9 +1,20 @@
 
 -- NOTE globals because i have to get used to it anyway
+local greyCache = {}
+
 rgb = Color
 rgba = Color
 grey = function(n, a)
-	return rgb(n, n, n, a or 255)
+	if (a) then
+		return rgb(n, n, n, a)
+	end
+
+	if (greyCache[n]) then
+		return greyCache[n]
+	end
+
+	greyCache[n] = rgb(n, n, n, 255)
+	return greyCache[n]
 end
 gray = grey
 
