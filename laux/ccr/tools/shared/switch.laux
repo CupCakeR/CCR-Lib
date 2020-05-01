@@ -7,7 +7,7 @@ public class CCR.Switch
 		return self
 	end
 
-	case(expressions, fn)		
+	case(expressions, fn)
 		if (istable(expressions)) then
 			for i, expr in ipairs(expressions) do
 				table.insert(self.expressions, {
