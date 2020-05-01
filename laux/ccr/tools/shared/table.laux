@@ -29,6 +29,7 @@ local function convertTableValuesToNumbersRecursive(tbl, excludedKeys)
 	end
 end
 
+// TODO: base off new table to prevent possible overrides?
 function CCR:ConvertTableValuesToNumbersRecursive(tbl, excludedKeys = {})
 	local keys = {}
 	for k, v in pairs(excludedKeys) do
