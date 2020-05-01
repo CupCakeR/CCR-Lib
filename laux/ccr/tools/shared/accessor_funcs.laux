@@ -1,77 +1,85 @@
 
-local check_types = {
-	["table"] = function(_, val)
-		return istable(val)
-	end,
-	["number"] = function(_, val)
-		return isnumber(val)
-	end,
-	["integer"] = function(_, val)
-		return isnumber(val) && (val == math.floor(val))
-	end,
-	["string"] = function(_, val)
-		return isstring(val)
-	end,
-	["bool"] = function(_, val)
-		return isbool(val)
-	end,
-	["entity"] = function(_, val)
-		return isentity(val)
-	end,
-	["player"] = function(_, val)
-		return isentity(val) && val:IsPlayer()
-	end,
-	["vector"] = function(_, val)
-		return isvector(val)
-	end,
-	["angle"] = function(_, val)
-		return isangle(val)
-	end,
-	["material"] = function(_, val)
-		return type(val) == "IMaterial"
-	end,
-	["color"] = function(_, val)
-		return IsColor(val)
-	end,
-	["panel"] = function(_, val)
-		return ispanel(val)
-	end,
-	["function"] = function(_, val)
-		return isfunction(val)
-	end
+
+local function is_nil_null(value)
+	return value == NULL || value == nil
+end
+
+local types = {
+	["table"] = {
+		check = (v) => return istable(v) end
+	},
+	["number"] = {
+		check = (v) => return isnumber(v) end,
+		convert = (v) => return tonumber(v) end
+	},
+	["integer"] = {
+		check = (v) => return
+			(tonumber(v)) &&
+			tonumber(v) == math.floor(tonumber(v))
+		end
+	},
+	["bool"] = {
+		check = (v) => return isbool(v) end,
+		convert = (v) => return tobool(v) end
+	},
+	["string"] = {
+		check = (v) => return isstring(v) end,
+		convert = (v) => return tostring(v) end
+	},
+	["entity"] = {
+		check = (v) => return isentity(v) end,
+	},
+	["player"] = {
+		check = (v) => return isentity(v) && v:IsPlayer() end,
+	},
+	["vector"] = {
+		check = (v) => return isvector(v) end,
+	},
+	["angle"] = {
+		check = (v) => return isangle(v) end,
+	},
+	["material"] = {
+		check = (v) => return type(v) == "IMaterial" end,
+	},
+	["color"] = {
+		check = (v) => return IsColor(v) end,
+	},
+	["panel"] = {
+		check = (v) => return ispanel(v) end,
+	},
+	["function"] = {
+		check = (v) => return isfunction(v) end,
+	}
 }
 
 local aliases = {
 	["boolean"] = "bool",
 }
 
-local function is_nil_null(value)
-	return value == NULL || value == nil
-end
+function CCR:AccessorFunc(object, key, name, forceType, canBeNil, default, serializable = true)
+	object["Set" .. name] = (s, value) =>
+		if (forceType) then
+			forceType = forceType:lower()
+			forceType = aliases[forceType] || forceType
 
-function CCR:AccessorFunc(object, key, name, force_type, nil_null, default, serializable = true)
-	object["Set" .. name] = function(s, value)
-		if force_type then
-			local check, type_name
-			if (force_type && isstring(force_type)) then
-				local lower = force_type:lower()
-				if (aliases[lower]) then
-					lower = aliases[lower]
-				end
+			local typeTable = types[forceType]
+			assert(typeTable, `Invalid accessor function type "${forceType}"!`)
 
-				check = check_types[lower]
-				if (!check) then
-					error("CCR: Type to check does not exist.")
-				end
-			elseif (isfunction(force_type)) then
-				check = force_type
+			local funcCheck = typeTable.check
+			local funcConvert = typeTable.convert
+
+			local bCheck = funcCheck(value)
+			if (canBeNil && is_nil_null(value)) then
+				value = value
 			else
-				error("CCR: Invalid type to force.")
-			end
-
-			check, type_name = check(s, value)
-			if (!check && !(nil_null && is_nil_null(value))) then
-				error("CCR: Invalid type, " .. (isstring(force_type) && force_type || type_name || "INVALID TYPE") .. " expected, got " .. type(value) .. "!")
+				if (bCheck) then
+					value = value
+				elseif (funcConvert) then
+					value = funcConvert(value)
+					assert(value, "Convert failed")
+				else
+					error(`Expected type "${forceType}", got "${type(value):lower()}"`)
+				end
 			end
 		end
 
@@ -79,7 +87,7 @@ function CCR:AccessorFunc(object, key, name, force_type, nil_null, default, seri
 		return s
 	end
 
-	object["Get" .. name] = function(s)
+	object["Get" .. name] = (s) =>
 		return s[key]
 	end
 
@@ -91,7 +99,7 @@ function CCR:AccessorFunc(object, key, name, force_type, nil_null, default, seri
 	object._accessors[key] = {
 		key = key,
 		name = name,
-		force_type = force_type,
+		force_type = forceType,
 		nil_null = nil_null,
 		default = default,
 		serializable = serializable
