@@ -16,3 +16,24 @@ function CCR:FlattenTable(tbl, delimiter)
 	makeNonNestedRecursive(new, "", tbl, delimiter || ".")
 	return new
 end
+
+local function convertTableValuesToNumbersRecursive(tbl, excludedKeys)
+	for k, v in pairs(tbl) do
+		continueif (excludedKeys[k])
+
+		if (istable(v)) then
+			convertTableValuesToNumbersRecursive(v, excludedKeys)
+		else
+			tbl[k] = tonumber(v) || v
+		end
+	end
+end
+
+function CCR:ConvertTableValuesToNumbersRecursive(tbl, excludedKeys = {})
+	local keys = {}
+	for k, v in pairs(excludedKeys) do
+		keys[isnumber(k) && v || k] = true
+	end
+
+	convertTableValuesToNumbersRecursive(tbl, keys)
+end
