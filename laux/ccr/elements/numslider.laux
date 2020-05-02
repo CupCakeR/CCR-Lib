@@ -47,7 +47,6 @@ function PANEL:PostInit()
 		surface.DisableClipping(false)
 	end
 
-	local mat = Material("nicksys/circle.png", "smooth")
 	self.slider = self:Add("DPanel")
 	self.slider:SetCursor("hand")
 	self.slider:SetSize(self.slider_width, 20)
@@ -60,9 +59,7 @@ function PANEL:PostInit()
 
 		local frac = math.Clamp((self.value - s.min) / (s.max - s.min), 0, 1)
 		local pos = Lerp(frac, 0, w - h)
-		surface.SetDrawColor(self.circle_color)
-		surface.SetMaterial(mat)
-		surface.DrawTexturedRect(pos, 0, h, h)
+		CCR:DrawCircle(pos, h / 2, h / 2, color_white)
 
 		if s.focus then
 			if !input.IsButtonDown(MOUSE_LEFT) then
