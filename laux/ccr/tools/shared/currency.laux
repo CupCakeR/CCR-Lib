@@ -85,7 +85,7 @@ local obj = CCR.NewCurrency("basewars")
 		return p:GetMoney() >= amt
 	end
 	obj.Format = (amt) =>
-		return BaseWars.NumberFormat(amt)
+		return (BaseWars.LANG["CURRENCY"] || "?") .. BaseWars.NumberFormat(amt)
 	end
 obj:Register()
 
