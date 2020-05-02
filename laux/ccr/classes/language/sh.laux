@@ -79,7 +79,7 @@ public class CCR.Language extends CCR.Base
 		assert(self:GetRaw(), "No phrases to prepare")
 
 		local copy = table.Copy(self:GetRaw()["phrases"])
-		local new = CCR:FlattenTable(copy, ".", true)
+		local new = CCR.FlattenTable(copy, ".", true)
 
 		self:SetPhrases(new)
 	end

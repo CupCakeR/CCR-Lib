@@ -11,7 +11,7 @@ local function makeNonNestedRecursive(tblOut, key, tblIn, delimiter)
 	end
 end
 
-function CCR:FlattenTable(tbl, delimiter)
+function CCR.FlattenTable(tbl, delimiter)
 	local new = {}
 	makeNonNestedRecursive(new, "", tbl, delimiter || ".")
 	return new
@@ -29,8 +29,8 @@ local function convertTableValuesToNumbersRecursive(tbl, excludedKeys)
 	end
 end
 
-// TODO: base off new table to prevent possible overrides?
-function CCR:ConvertTableValuesToNumbersRecursive(tbl, excludedKeys = {})
+-- TODO: base off new table to prevent possible overrides?
+function CCR.ConvertTableValuesToNumbersRecursive(tbl, excludedKeys = {})
 	local keys = {}
 	for k, v in pairs(excludedKeys) do
 		keys[isnumber(k) && v || k] = true
