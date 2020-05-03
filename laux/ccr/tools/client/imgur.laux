@@ -22,7 +22,10 @@ local function dl(imageData)
 		return p
 	end
 
-	http.Fetch("https://i.imgur.com/" .. imageData.id .. "." .. imageData.type, function(body)
+	local url = "https://proxy.duckduckgo.com/iu/?u="
+	url ..= "https://i.imgur.com/" .. imageData.id .. "." .. imageData.type
+
+	http.Fetch(url, function(body)
 		file.CreateDir(path)
 		file.Write(path .. imageData.id .. "." .. imageData.type, body)
 
