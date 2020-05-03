@@ -19,4 +19,5 @@ CCR:IncludeRecursive("elements", "cl")
 
 CCR.Logger:Log("Fully initialized library") -- NOTE: Dont save an instance because I dont want to override the var :(
 
+hook.Run("CCR.PreLoadAddons")
 hook.Run("CCR.OnLoaded")
