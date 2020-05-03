@@ -6,6 +6,8 @@ local PANEL = {}
 CCR:AccessorFunc(PANEL, "title", "Title", "String")
 CCR:AccessorFunc(PANEL, "matBranding", "BrandingMaterial", "Material")
 
+CCR:GetImgurImage("CCR.CloseButton", {id = "kGgLLUq"})
+
 function PANEL:Init()
 	self:SetTitle("No title")
 
@@ -39,9 +41,7 @@ function PANEL:Init()
 			CCR:RoundedBox(0, 0, w, h, s.colorBackground)
 
 			local sub = 6
-			surface.SetDrawColor(s.colorMaterial)
-			surface.SetMaterial(s:GetThemeMaterials().close)
-			surface.DrawTexturedRect(sub / 2, sub / 2, h - sub, h - sub)
+			CCR:DrawImgurImage("CCR.CloseButton", sub / 2, sub / 2, h - sub, h - sub, s.colorMaterial)
 		end
 		self.close.OnCursorEntered = function(s)
 			s:LerpColor("colorBackground", self:GetThemeColors().Red)
