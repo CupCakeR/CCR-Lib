@@ -18,8 +18,5 @@ theme:SetColors({
 	["LightBlue"]	= hex("2980b9"):Lighten(20),
 	["Blue"]		= hex("3498db"),
 })
-theme:SetMaterials({
-	close = CLIENT && Material("ccr_lib/close_x.png", "smooth")
-})
 theme:SetBoxRoundness(7)
 theme:Register()
