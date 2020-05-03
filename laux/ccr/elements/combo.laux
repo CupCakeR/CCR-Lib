@@ -29,7 +29,7 @@ class Choice
 end
 
 CCR:PrepareImgurImage("CCR.ComboBox.Arrow", "2QGKAd6")
-CCR:GenerateFont("CCR.ComboBox.Text", "Light", 19)
+CCR:GenerateFont("CCR.ComboBox.Text", nil, 19)
 
 -- BASE
 local PANEL = {}
