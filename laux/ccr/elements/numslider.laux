@@ -3,7 +3,7 @@
 -- // TODO: Make text fully optional to be able just to use the element itself (slider)
 -- // TODO: Use DrawArc instead of trash material
 
-CCR:GenerateFont("CCR.NumSlider.Label", "Light", 20)
+CCR:GenerateFont("CCR.NumSlider.Label", nil, 20)
 
 local PANEL = {}
 
