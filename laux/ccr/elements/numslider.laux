@@ -59,7 +59,7 @@ function PANEL:PostInit()
 
 		local frac = math.Clamp((self.value - s.min) / (s.max - s.min), 0, 1)
 		local pos = Lerp(frac, 0, w - h)
-		CCR:DrawCircle(pos, h / 2, h / 2, color_white)
+		CCR:DrawCircle(pos, h / 2, h / 2, grey(128))
 
 		if s.focus then
 			if !input.IsButtonDown(MOUSE_LEFT) then
