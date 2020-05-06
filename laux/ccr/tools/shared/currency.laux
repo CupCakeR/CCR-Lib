@@ -197,3 +197,18 @@ local obj = CCR.NewCurrency("brcs")
 		return BRICKSCREDITSTORE.FormatCredits(amt, true)
 	end
 obj:Register()
+
+local obj = CCR.NewCurrency("mtoken")
+    obj.Add = (p, amt) =>
+        mTokens.AddPlayerTokens(p, amt)
+    end
+    obj.Get = (p, amt) =>
+        return mTokens.GetPlayerTokens(p)
+    end
+    obj.CanAfford = (p, amt) =>
+        return mTokens.CanPlayerAfford(p, amt)
+    end
+    obj.Format = (amt) =>
+        return amt .. (" Token" .. (amt == 1 && "s" || ""))
+    end
+obj:Register()
