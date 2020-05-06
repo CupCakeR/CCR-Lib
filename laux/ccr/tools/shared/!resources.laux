@@ -100,6 +100,8 @@ function CCR:IncludeClass(className)
 end
 
 function CCR:ExtendClass(_class, fileName, realm)
+	print("CCR-Resources: Deprecated function, this should not have been called?!")
+
 	assert(_class, "Invalid class")
 	assert(fileName, "Invalid fileName")
 
