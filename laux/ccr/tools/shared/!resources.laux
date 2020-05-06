@@ -5,18 +5,49 @@ local realms = {
 	["sh"] = true
 }
 
+local function getSourceInfo()
+	local stack = 1
+	local here = true
+	local foundBefore = false
+
+	while (true) do
+		local info = debug.getinfo(stack, "S")
+		if (!info && !foundBefore) then
+			error("invalid debug.getinfo result, called outside of an addon?")
+		end
+
+		local isThisFile = info["short_src"]:EndsWith("!resources.lua")
+		if (isThisFile) then
+			foundBefore = true
+		end
+
+		if (!info["short_src"]:EndsWith("!resources.lua") && foundBefore) then
+			return info
+		else
+			foundBefore = true
+		end
+
+		if (stack > 15) then
+			error("breaking loop, preventing crash")
+		end
+
+		stack++
+	end
+end
+
 function CCR:IncludeFile(fileName, realm, sourceOverride)
 	assert(fileName, "Invalid fileName")
 
-	local trace = istable(sourceOverride) && sourceOverride || debug.getinfo(sourceOverride || 2, "S")
+	local trace = istable(sourceOverride) && sourceOverride || getSourceInfo()
 	local fileSource = trace["short_src"]
 	local fileToMerge = fileSource:GetPathFromFilename()
 
+	-- TODO: Check if fileToMerge begins with "lua/" and skip the splitting trash
 	fileToMerge ..= fileName
-	fileToMerge = fileToMerge:Split("/lua/")
+	fileToMerge = fileToMerge:Split("lua/")
 	fileToMerge = fileToMerge[2]
 
-	assert(fileToMerge, "Failed to get path from file name")
+	assert(fileToMerge, `Failed to get path from file name "${fileSource}"`)
 
 	local fileNameSplit = fileName:Split("/")
 	fileName = fileNameSplit?[#fileNameSplit] || fileName
@@ -47,10 +78,10 @@ function CCR:IncludeVGUI(fileName)
 end
 
 function CCR:IncludeRecursive(path, realmOverride, traceOverride)
-	local trace = traceOverride || debug.getinfo(sourceOverride || 2, "S")
+	local trace = traceOverride || getSourceInfo()
 	local source = trace["short_src"]
 
-	source = source:Split("/lua/")
+	source = source:Split("lua/")
 	source = source[2]
 
 	local files, dirs = file.Find((source:GetPathFromFilename() .. path) .. "/*", "LUA")
@@ -65,14 +96,16 @@ function CCR:IncludeRecursive(path, realmOverride, traceOverride)
 end
 
 function CCR:IncludeClass(className)
-	return self:IncludeFile(`classes/${className}/sh.lua`, nil, 2)
+	return self:IncludeFile(`classes/${className}/sh.lua`, nil)
 end
 
 function CCR:ExtendClass(_class, fileName, realm)
+	print("CCR-Resources: Deprecated function, this should not have been called?!")
+
 	assert(_class, "Invalid class")
 	assert(fileName, "Invalid fileName")
 
-	local returned = self:IncludeFile(fileName, realm, 3)
+	local returned = self:IncludeFile(fileName, realm)
 	if (returned) then
 		table.Merge(_class, returned)
 	end
