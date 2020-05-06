@@ -48,7 +48,7 @@ local obj = CCR.NewCurrency("ccr_debug")
 	obj.Add = (p, amt) =>
 		CCR.Logger:Log(`Debug curreny -> Add ${amt} - ${p:Nick()}`)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return 0
 	end
 	obj.CanAfford = (p, amt) =>
@@ -63,7 +63,7 @@ local obj = CCR.NewCurrency("darkrp")
 	obj.Add = (p, amt) =>
 		p:addMoney(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:getDarkRPVar("money")
 	end
 	obj.CanAfford = (p, amt) =>
@@ -78,7 +78,7 @@ local obj = CCR.NewCurrency("basewars")
 	obj.Add = (p, amt) =>
 		p:GiveMoney(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:GetMoney()
 	end
 	obj.CanAfford = (p, amt) =>
@@ -93,7 +93,7 @@ local obj = CCR.NewCurrency("pointshop_1")
 	obj.Add = (p, amt) =>
 		p:PS_SetPoints(ply:PS_GetPoints() + amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:PS_GetPoints()
 	end
 	obj.CanAfford = (p, amt) =>
@@ -108,7 +108,7 @@ local obj = CCR.NewCurrency("pointshop_2")
 	obj.Add = (p, amt) =>
 		p:PS2_AddStandardPoints(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p.PS2_Wallet.points
 	end
 	obj.CanAfford = (p, amt) =>
@@ -123,7 +123,7 @@ local obj = CCR.NewCurrency("pointshop_2_premium")
 	obj.Add = (p, amt) =>
 		p:PS2_AddStandardPoints(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p.PS2_Wallet.premiumPoints
 	end
 	obj.CanAfford = (p, amt) =>
@@ -138,7 +138,7 @@ local obj = CCR.NewCurrency("santosrp")
 	obj.Add = (p, amt) =>
 		p:AddMoney(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:GetMoney()
 	end
 	obj.CanAfford = (p, amt) =>
@@ -153,7 +153,7 @@ local obj = CCR.NewCurrency("helix")
 	obj.Add = (p, amt) =>
 		p:GiveMoney(amt, false)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:getDarkRPVar("money")
 	end
 	obj.CanAfford = (p, amt) =>
@@ -172,7 +172,7 @@ local obj = CCR.NewCurrency("underdone")
 			p:AddItem("money", amt)
 		end
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p.Data.Inventory["money"] || 0
 	end
 	obj.CanAfford = (p, amt) =>
@@ -187,7 +187,7 @@ local obj = CCR.NewCurrency("brcs")
 	obj.Add = (p, amt) =>
 		p:AddBRCS_Credits(amt)
 	end
-	obj.Get = (p, amt) =>
+	obj.Get = (p) =>
 		return p:GetBRCS_Credits()
 	end
 	obj.CanAfford = (p, amt) =>
@@ -202,7 +202,7 @@ local obj = CCR.NewCurrency("mtoken")
     obj.Add = (p, amt) =>
         mTokens.AddPlayerTokens(p, amt)
     end
-    obj.Get = (p, amt) =>
+    obj.Get = (p) =>
         return mTokens.GetPlayerTokens(p)
     end
     obj.CanAfford = (p, amt) =>
