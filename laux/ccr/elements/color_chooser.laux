@@ -1,0 +1,88 @@
+
+CCR:GenerateFont("CCR.ColorChooser.Label", nil, 20)
+CCR:GenerateFont("CCR.ColorChooser.RGB", nil, 20)
+
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "cvar", "ConVar")
+
+CCR:AccessorFunc(PANEL, "text", "Text", "String")
+CCR:AccessorFunc(PANEL, "font", "Font", "String")
+CCR:AccessorFunc(PANEL, "color_text", "TextColor", "Color")
+
+function PANEL:Init()
+	self.text = "Undefined"
+	self.font = "CCR.ColorChooser.Label"
+	self.color_text = color_white
+end
+
+function PANEL:PostInit()
+	self.label = CCR:NewElement("DLabel", self)
+	self.label:SetText(self.text)
+	self.label:SetFont(self.font)
+	self.label:SetTextColor(self.color_text)
+	self.label:SetContentAlignment(5)
+	self.label:SizeToContents()
+
+	local funcChange = (pnl, key, value = "") =>
+		if (string.find(value, ".", 1, true)) then
+			pnl:SetText(value:Replace(".", ""))
+			pnl:SetValue(pnl:GetText())
+			return
+		end
+
+		print("passed")
+	end
+	
+	self.textEntryContainer = CCR:NewElement("Panel", self)
+
+		local r = CCR:NewElement("TextEntry", self.textEntryContainer)
+		r:SetSize(50, 30)
+		r:SetFont("CCR.ColorChooser.RGB")
+
+		r.textentry:SetNumeric(true)
+		r.textentry:SetUpdateOnType(true)
+		r.textentry.OnValueChange = (s, value) => funcChange(s, "r", value) end
+		
+		local b = CCR:NewElement("TextEntry", self.textEntryContainer)
+		b:SetSize(50, 30)
+		b:SetFont("CCR.ColorChooser.RGB")
+		b:MoveRightOf(r, 4)
+		b.PerformLayout = funcCenter
+
+		local c = CCR:NewElement("TextEntry", self.textEntryContainer)
+		c:SetSize(50, 30)
+		c:SetFont("CCR.ColorChooser.RGB")
+		c:MoveRightOf(b, 4)
+		c.PerformLayout = funcCenter
+
+	self.textEntryContainer.PerformLayout = (s, w, h) =>
+		s:SizeToChildren(true, true)
+	end
+
+	-- self.textEntry = CCR:NewElement("TextEntry", self)
+	-- self.textEntry.PerformLayout = (s, w, h) =>
+	-- 	local tw, th = CCR:GetTextSize("FFFFFF", s.textentry:GetFont())
+	-- 	local l, t, r, b = s.textentry:GetDockMargin()
+	-- 	print(l, t, r, b)
+	-- 	s:SetSize(tw + l + r, th + t + b)
+	-- end
+end
+
+function PANEL:OnStateChanged(b) end
+
+function PANEL:GetConVarObject()
+	return GetConVar(self:GetConVar())
+end
+
+function PANEL:PerformLayout(w, h)
+	self.label:CenterVertical()
+	self.textEntryContainer:SetPos(w - self.textEntryContainer:GetWide())
+
+	self:SizeToChildren(true, true)
+end
+
+function PANEL:Paint(w, h)
+end
+
+CCR:RegisterElement("ColorChooser", PANEL, "Panel")
