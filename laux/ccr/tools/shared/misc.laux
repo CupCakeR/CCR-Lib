@@ -65,8 +65,18 @@ end
 
 CCR.InitCallQueue ||= {}
 CCR.GamemodeInitialized ||= false
-		table.remove(CCR.InitCallQueue, i)
-	end
+hook.Add("Initialize", "CCR.CallPostInitialize", () =>
+	timer.Simple(0, () =>
+		local remove = {}
+		for i, func in ipairs(CCR.InitCallQueue) do
+			func()
+			remove[i] = true
+		end
+
+		for i, _ in pairs(remove) do
+			table.remove(CCR.InitCallQueue, i)
+		end
+	end)
 
 	CCR.GamemodeInitialized = true
 end)
