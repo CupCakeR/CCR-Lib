@@ -75,6 +75,15 @@ function PANEL:SetState(b, call)
 	cvar:SetBool(b)
 end
 
+function PANEL:SetStateInstant(b, call)
+	self.state = b
+	self.lerpVar = b && 1 || 0
+
+	if (call) then
+		self:SetState(b, true)
+	end
+end
+
 function PANEL:OnStateChanged(b) end
 
 function PANEL:GetConVarObject()
