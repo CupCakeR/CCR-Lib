@@ -1,6 +1,8 @@
 
 local PANEL = {}
 
+CCR:GenerateFont("CCR.ImageLabel.Text", nil, 17)
+
 AccessorFunc(PANEL, "force_active", "ForceActive")
 
 AccessorFunc(PANEL, "icon_size", "IconSize")
@@ -28,7 +30,7 @@ AccessorFunc(PANEL, "color_icon", "IconColor")
 
 function PANEL:Init()
 	self.text = "Undefined"
-	self.font = "CCR.17"
+	self.font = "CCR.ImageLabel.Text"
 	self.icon_size = 32
 	self.icon_gap = 4
 	self.color_text = color_white

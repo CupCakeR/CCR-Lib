@@ -1,4 +1,6 @@
 
+CCR:GenerateFont("CCR.Query.Text", nil, 17)
+
 local PANEL = {}
 
 function PANEL:Init()
@@ -126,7 +128,7 @@ function CCR:SimpleQuery(
 	local pnl = CCR:NewElement("Query")
 	pnl:SetTitle(title)
 
-	pnl.containerContent.markup = istable(_markup) && _markup || markup.Parse(`<font=CCR.17>${_markup}`, maxWidth || 256 - 32)
+	pnl.containerContent.markup = istable(_markup) && _markup || markup.Parse(`<font=CCR.Query.Text>${_markup}`, maxWidth || 256 - 32)
 	pnl.containerContent.Paint = (s, w, h) =>
 		s.markup:Draw(w / 2, h / 2, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end

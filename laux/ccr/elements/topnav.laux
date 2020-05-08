@@ -1,4 +1,6 @@
 
+CCR:GenerateFont("CCR.TopNav.Name", nil, 25)
+
 local PANEL = {}
 
 CCR:AccessorFunc(PANEL, "canvas", "Canvas", "Panel")
@@ -8,7 +10,7 @@ CCR:AccessorFunc(PANEL, "x_gap", "GapX", "Integer")
 
 function PANEL:Init()
 	self.tabs = {}
-	self.font = "CCR.24"
+	self.font = "CCR.TopNav.Name"
 	self.x_gap = 32
 
 	self:SetTall(55)

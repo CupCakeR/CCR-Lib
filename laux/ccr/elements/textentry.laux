@@ -1,4 +1,6 @@
 
+CCR:GenerateFont("CCR.TextEntry.Label", nil, 13)
+
 local PANEL = {}
 
 AccessorFunc(PANEL, "font", "Font")
@@ -12,7 +14,7 @@ function PANEL:Init()
 	self:SetPlaceholder("?")
 	self:SetPlaceholderColor(Color(125, 125, 125))
 	self:SetBackgroundColor(self:GetThemeColors().Primary)
-	self:SetFont("CCR.13")
+	self:SetFont("CCR.TextEntry.Label")
 
 	self.textentry = self:Add("DTextEntry")
 	self.textentry:Dock(FILL)

@@ -25,7 +25,7 @@ function PANEL:Init()
 
 			xOff = h / 2 + size / 2 - 4
 		end
-		CCR:DrawShadowText(1, self:GetTitle(), "CCR.25", xOff + 10, h / 2, color_white, "l", "c")
+		--CCR:DrawShadowText(1, self:GetTitle(), "CCR.25", xOff + 10, h / 2, color_white, "l", "c")
 	end
 
 		self.close = CCR:NewElement("DPanel", self.header)

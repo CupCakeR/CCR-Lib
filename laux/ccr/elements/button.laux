@@ -1,6 +1,8 @@
 
 local PANEL = {}
 
+CCR:GenerateFont("CCR.Button.Text", nil, 17)
+
 AccessorFunc(PANEL, "force_active", "ForceActive")
 
 AccessorFunc(PANEL, "loading", "Loading", FORCE_BOOL)
@@ -20,7 +22,7 @@ AccessorFunc(PANEL, "colorBackground", "BackgroundColor")
 function PANEL:Init()
 	self:SetCursor("hand")
 	self:SetText("Undefined")
-	self:SetFont("CCR.17")
+	self:SetFont("CCR.Button.Text")
 
 	self:SetOutline(1)
 	self:SetBackgroundColor(self:GetThemeColors().PanelBackground)

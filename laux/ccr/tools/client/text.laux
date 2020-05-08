@@ -17,7 +17,8 @@ end
 
 function CCR:GenerateFont(name, style, merge = {})
 	local tbl = {
-		font = "Muli" .. (style && (" " .. style) || "")
+		font = "Muli" .. (style && (" " .. style) || ""),
+		antialias = true,
 	}
 
 	table.Merge(tbl, tonumber(merge) && {size = merge, weight = 0} || merge)
@@ -25,11 +26,11 @@ function CCR:GenerateFont(name, style, merge = {})
 end
 
 -- FIXME: Get rid of this shit asap
-for i = 1, 100 do
-	CCR:CreateFont("CCR." .. i, i, 0)
-	CCR:CreateFont("CCR." .. i .. ".MEDIUM", i, 600)
-	CCR:CreateFont("CCR." .. i .. ".BOLD", i, 1000)
-end
+-- for i = 1, 100 do
+-- 	CCR:CreateFont("CCR." .. i, i, 0)
+-- 	CCR:CreateFont("CCR." .. i .. ".MEDIUM", i, 600)
+-- 	CCR:CreateFont("CCR." .. i .. ".BOLD", i, 1000)
+-- end
 
 local aligns = {
 	["l"] = TEXT_ALIGN_LEFT,
