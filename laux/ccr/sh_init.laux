@@ -17,7 +17,7 @@ CCR:IncludeRecursive("classes", "sh")
 CCR:IncludeRecursive("themes", "sh") -- NOTE: Needs to be shared to be able to us this shit in configs
 CCR:IncludeRecursive("elements", "cl")
 
-CCR.Logger:Log("Fully initialized library") -- NOTE: Dont save an instance because I dont want to override the var :(
+CCR.Logger:Log("Fully initialized library")
 
 hook.Run("CCR.PreLoadAddons")
 hook.Run("CCR.OnLoaded")
