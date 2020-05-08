@@ -58,7 +58,7 @@ function PANEL:PostInit()
 		surface.DrawLine(h / 2, h / 2, w - (h / 2), h / 2)
 
 		local frac = math.Clamp((self.value - s.min) / (s.max - s.min), 0, 1)
-		local pos = Lerp(frac, 0, w - h)
+		local pos = Lerp(frac, h, w - h)
 		CCR:DrawCircle(pos, h / 2, h / 2, grey(128))
 
 		if s.focus then
