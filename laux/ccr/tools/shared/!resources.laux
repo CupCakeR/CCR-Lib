@@ -28,11 +28,13 @@ local function getSourceInfo()
 		end
 
 		if (stack > 15) then
-			error("breaking loop, preventing crash")
+			break
 		end
 
 		stack++
 	end
+
+	error("CCR: UNABLE TO FIND THE ACTUAL SOURCE OF FILE")
 end
 
 function CCR:IncludeFile(fileName, realm, sourceOverride)
