@@ -22,7 +22,7 @@ function PANEL:PostInit()
 	local clrBackgroundOn = CCR:ThemeColors().Secondary
 	local clrBackgroundOff = CCR:ThemeColors().Primary
 
-	self.lerpVar = 0
+	self.lerpVar ||= 0
 
 	self.label = CCR:NewElement("DLabel", self)
 	self.label:SetText(self.text)
