@@ -120,6 +120,9 @@ end
 
 hook.Add("Tick", "CCR.Timers", () =>
 	for i, timer in ipairs(CCR.Timers) do
-		pcall(() => timer:Perform() end)
+		local success, err = pcall(() => timer:Perform() end)
+		if (!success) then
+			CCR.Logger:Error(`Timer "${timer:GetIdentifier()}" failed, error: ${err}`)
+		end
 	end
 end)
