@@ -123,6 +123,9 @@ hook.Add("Tick", "CCR.Timers", () =>
 		local success, err = pcall(() => timer:Perform() end)
 		if (!success) then
 			CCR.Logger:Error(`Timer "${timer:GetIdentifier()}" failed, error: ${err}`)
+			CCR.Logger:Error("^ Removed timer to prevent error spam.")
+
+			timer:Remove()
 		end
 	end
 end)
