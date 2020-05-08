@@ -17,7 +17,7 @@ BSHADOWS.ShadowMaterial = CreateMaterial("bshadows", "UnlitGeneric", {
 	["alpha"] = 1
 })
 
-hook.Add("CCR.OnResolutionChanged", "BSHADOWS", function()
+hook.Add("OnScreenSizeChanged", "BSHADOWS", function()
 	local w, h = ScrW(), ScrH()
 	BSHADOWS.RenderTarget = GetRenderTarget("bshadows_original", w, h)
 	BSHADOWS.RenderTarget2 = GetRenderTarget("bshadows_shadow", w, h)

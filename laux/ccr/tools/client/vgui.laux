@@ -32,11 +32,3 @@ end
 function CCR:CopyAndPrepareDefaultElement(_class)
 	self:RegisterElement(_class, {}, _class)
 end
-
-local lastW, lastH = ScrW(), ScrH()
-hook.Add("Think", "CCR.Resolution", function()
-	if (lastW != ScrW() || lastH != ScrH()) then
-		hook.Run("CCR.OnResolutionChanged", {lastW, lastH})
-		lastW, lastH = ScrW(), ScrH()
-	end
-end)
