@@ -63,11 +63,8 @@ function CCR:UniqueRandomIntegers(amt, from, to)
 	return toReturn
 end
 
-CCR.InitCallQueue = {}
-CCR.GamemodeInitialized = CCR.GamemodeInitialized || false
-hook.Add("Initialize", "CCR.GM", () =>
-	for i, func in ipairs(CCR.InitCallQueue) do
-		func()
+CCR.InitCallQueue ||= {}
+CCR.GamemodeInitialized ||= false
 		table.remove(CCR.InitCallQueue, i)
 	end
 
