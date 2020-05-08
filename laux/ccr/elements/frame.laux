@@ -76,4 +76,4 @@ function PANEL:Paint(w, h)
 	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Background)]]
 end
 
-CCR:RegisterElement("Frame", PANEL, "Panel")
+CCR:RegisterElement("Frame", PANEL, "EditablePanel")
