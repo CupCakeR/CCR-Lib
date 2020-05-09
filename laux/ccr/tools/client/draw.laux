@@ -187,12 +187,9 @@ function CCR:RoundedBox(x, y, w, h, clr, tl, tr, bl, br)
 	end
 end
 
--- TODO: Rename/Add Xenin mat to our lib, its mine anyway
-local matLoading = Material("xenin/loading.png", "smooth")
-function CCR:DrawLoading(x, y, size, col)
-	surface.SetMaterial(matLoading)
-	surface.SetDrawColor(col)
-	surface.DrawTexturedRectRotated(x, y, size, size, ((CurTime()) % 360) * -100)
+function CCR:DrawLoading(x, y, size, clr = color_white)
+	stopif (!self.ImgurImages["CCR.Loading"])
+	CCR:DrawImgurImageRotated("CCR.Loading", x, y, size, size, clr, ((CurTime()) % 360) * -100)
 end
 
 local blur = Material("pp/blurscreen")

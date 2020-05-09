@@ -6,7 +6,7 @@ CCR.ImgurImages = CCR.ImgurImages || {}
 
 local path = "ccr/imgur_images/"
 local matError = Material("error")
-local matLoading = Material("xenin/loading.png", "smooth") -- TODO: Rename/Add Xenin mat to our lib, its mine anyway
+local matLoading = "CCR.Loading" -- TODO: Rename/Add Xenin mat to our lib, its mine anyway
 
 local function dl(imageData)
 	assert(imageData, "Invalid image data")
@@ -48,7 +48,7 @@ end
 function CCR:GetImgurImage(imageId, imageData)
 	if (self.ImgurImages[imageId]) then
 		if (istable(self.ImgurImages[imageId])) then -- its a promise
-			return matLoading
+			return self.ImgurImages[matLoading]
 		end
 
 		return self.ImgurImages[imageId]
@@ -66,22 +66,20 @@ function CCR:GetImgurImage(imageId, imageData)
 		}
 	end
 
-	self.ImgurImages[imageId] = p -- NOTE: Set to promise ABOVE dl() because file.Read is instant
-
-	dl(imageData):next(function(img)
+	self.ImgurImages[imageId] = dl(imageData):next(function(img)
 		self.ImgurImages[imageId] = img
 	end, function()
 		CCR.PromiseError(`Failed to download image - Name: ${imageId} - ID: ${imageData.id}`)
 	end)
 
-	return matLoading
+	return self.ImgurImages[matLoading]
 end
 CCR.PrepareImgurImage = CCR.GetImgurImage -- ffs, naming
 -- CCR:GetImgurImage("test", {id = "ZF0p28U"})
 
 function CCR:DrawImgurImage(id, x, y, w, h, clr = color_white)
 	local img = self:GetImgurImage(id)
-	if (img == matLoading) then
+	if (img == self.ImgurImages[matLoading]) then
 		self:DrawLoading(x + w / 2, y + h / 2, math.max(math.min(w, h) / 2, 32), color_white)
 		return
 	elseif (!img) then
@@ -95,7 +93,7 @@ end
 
 function CCR:DrawImgurImageRotated(id, x, y, w, h, clr = color_white, rot = 0)
 	local img = self:GetImgurImage(id)
-	if (img == matLoading) then
+	if (img == self.ImgurImages[matLoading] && id != "CCR.Loading") then -- endless loop oof
 		self:DrawLoading(x + w / 2, y + h / 2, math.max(math.min(w, h) / 2, 32), color_white)
 		return
 	elseif (!img) then
@@ -106,3 +104,5 @@ function CCR:DrawImgurImageRotated(id, x, y, w, h, clr = color_white, rot = 0)
 	surface.SetDrawColor(clr)
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
+
+CCR:PrepareImgurImage("CCR.Loading", "zpTXpiN")
