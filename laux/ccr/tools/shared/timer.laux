@@ -16,7 +16,7 @@ end
 
 CCR.Timers ||= {}
 
-public class CCR.Timer
+class Timer
 	constructor()
 		CCR:AccessorFunc(self, "index", "Index", "Number")
 		CCR:AccessorFunc(self, "identifier", "Identifier")
@@ -42,7 +42,7 @@ public class CCR.Timer
 
 	IsValid()
 		return
-			_IsValid(self.identifier)		&&
+			_IsValid(self.identifier) &&
 			CCR.Timers[self.index] == self
 	end
 
@@ -56,7 +56,6 @@ public class CCR.Timer
 
 	Trigger(reset = true)
 		if (!self:IsValid()) then
-			self:Remove()
 			return
 		end
 
@@ -65,18 +64,12 @@ public class CCR.Timer
 		end
 
 		self.total_repetitions++
-		self.func()
 
 		if (self.repetitions > 0 && self.total_repetitions >= self.repetitions) then
 			self:Remove()
 		end
 
-		return self
-	end
-
-	Register()
-		local index = table.insert(CCR.Timers, self)
-		self:SetIndex(index)
+		self.func() -- NOTE: Call func() AFTER remove otherwise Remove() removes the same timer (id) if it gets re-created in the callback
 
 		return self
 	end
@@ -88,6 +81,17 @@ public class CCR.Timer
 			timer:SetIndex(i)
 		end
 	end
+
+	Register()
+		local index = table.insert(CCR.Timers, self)
+		self:SetIndex(index)
+
+		return self
+	end
+end
+
+function CCR.NewTimer(...)
+	return Timer(...)
 end
 
 function CCR:CreateTimer(identifier, delay, repetitions, func = () => end, override = true)
@@ -104,7 +108,7 @@ function CCR:CreateTimer(identifier, delay, repetitions, func = () => end, overr
 		end
 	end
 
-	local obj = CCR.Timer()
+	local obj = CCR.NewTimer()
 	obj:SetIdentifier(identifier)
 	obj:SetDelay(delay)
 	obj:SetRepetitions(repetitions)
