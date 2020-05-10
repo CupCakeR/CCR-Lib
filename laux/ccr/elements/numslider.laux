@@ -81,10 +81,14 @@ function PANEL:PostInit()
 end
 
 function PANEL:SetValue(val, prevent)
+	self._last_value = self.value
+
 	val = math.Round(val, self:GetDecimals())
 	val = math.Clamp(val, self:GetMin(), self:GetMax())
 
 	self.value = val
+
+	stopif (self.value == self._last_value)
 
 	if IsValid(self.display) then
 		self.display:SetText(self:GetValue())
