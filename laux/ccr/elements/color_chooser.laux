@@ -9,11 +9,18 @@ CCR:AccessorFunc(PANEL, "cvar", "ConVar")
 CCR:AccessorFunc(PANEL, "text", "Text", "String")
 CCR:AccessorFunc(PANEL, "font", "Font", "String")
 CCR:AccessorFunc(PANEL, "color_text", "TextColor", "Color")
+CCR:AccessorFunc(PANEL, "color", "Color", "Color")
 
 function PANEL:Init()
 	self.text = "Undefined"
 	self.font = "CCR.ColorChooser.Label"
 	self.color_text = color_white
+
+	self.color = Color(255, 255, 255)
+end
+
+function PANEL:SetColor(clr)
+	self.color = Color(clr.r, clr.g, clr.b, clr.a)
 end
 
 function PANEL:PostInit()
@@ -25,36 +32,107 @@ function PANEL:PostInit()
 	self.label:SizeToContents()
 
 	local funcChange = (pnl, key, value = "") =>
-		if (string.find(value, ".", 1, true)) then
+		value = tostring(value)
+
+		if (value:find(".", 1, true)) then
+			pnl:SetValue(value:Replace(".", ""))
 			pnl:SetText(value:Replace(".", ""))
-			pnl:SetValue(pnl:GetText())
-			return
 		end
 
-		print("passed")
+		if (value:len() > 3 || (tonumber(value) || 0) > 255) then
+			local new = 255
+			pnl:SetText(new)
+			pnl:SetValue(new)
+		end
+
+		local new = tostring(tonumber(value))
+		if (value != new) then
+			pnl:SetText(new)
+			pnl:SetValue(new)
+		end
+
+		if (!value || value == "") then
+			pnl:SetText("0")
+			pnl:SetValue("0")
+		end
+
+		value = pnl:GetValue()
+
+		self.color[key] = tonumber(value)
+		self:OnColorChanged(Color(self.color.r, self.color.g, self.color.b, self.color.a))
 	end
 	
 	self.textEntryContainer = CCR:NewElement("Panel", self)
 
 		local r = CCR:NewElement("TextEntry", self.textEntryContainer)
-		r:SetSize(50, 30)
+		r:SetSize(50, 28)
 		r:SetFont("CCR.ColorChooser.RGB")
+		r.PaintOver = (s, w, h) =>
+			CCR:MaskInverse(() =>
+				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
+			end, () =>
+				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Red)
+			end)
+		end
 
+		r.textentry:SetValue(self.color.r || 0)
 		r.textentry:SetNumeric(true)
 		r.textentry:SetUpdateOnType(true)
 		r.textentry.OnValueChange = (s, value) => funcChange(s, "r", value) end
 		
-		local b = CCR:NewElement("TextEntry", self.textEntryContainer)
-		b:SetSize(50, 30)
-		b:SetFont("CCR.ColorChooser.RGB")
-		b:MoveRightOf(r, 4)
-		b.PerformLayout = funcCenter
+		local g = CCR:NewElement("TextEntry", self.textEntryContainer)
+		g:SetSize(50, 28)
+		g:SetFont("CCR.ColorChooser.RGB")
+		g:MoveRightOf(r, 4)
+		g.PerformLayout = funcCenter
+		g.PaintOver = (s, w, h) =>
+			CCR:MaskInverse(() =>
+				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
+			end, () =>
+				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Green)
+			end)
+		end
 
-		local c = CCR:NewElement("TextEntry", self.textEntryContainer)
-		c:SetSize(50, 30)
-		c:SetFont("CCR.ColorChooser.RGB")
-		c:MoveRightOf(b, 4)
-		c.PerformLayout = funcCenter
+		g.textentry:SetValue(self.color.g || 0)
+		g.textentry:SetNumeric(true)
+		g.textentry:SetUpdateOnType(true)
+		g.textentry.OnValueChange = (s, value) => funcChange(s, "g", value) end
+
+		local b = CCR:NewElement("TextEntry", self.textEntryContainer)
+		b:SetSize(50, 28)
+		b:SetFont("CCR.ColorChooser.RGB")
+		b:MoveRightOf(g, 4)
+		b.PerformLayout = funcCenter
+		b.PaintOver = (s, w, h) =>
+			CCR:MaskInverse(() =>
+				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
+			end, () =>
+				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Blue)
+			end)
+		end
+
+		b.textentry:SetValue(self.color.b || 0)
+		b.textentry:SetNumeric(true)
+		b.textentry:SetUpdateOnType(true)
+		b.textentry.OnValueChange = (s, value) => funcChange(s, "b", value) end
+
+		local a = CCR:NewElement("TextEntry", self.textEntryContainer)
+		a:SetSize(50, 28)
+		a:SetFont("CCR.ColorChooser.RGB")
+		a:MoveRightOf(b, 4)
+		a.PerformLayout = funcCenter
+		a.PaintOver = (s, w, h) =>
+			CCR:MaskInverse(() =>
+				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
+			end, () =>
+				CCR:RoundedBox(0, 0, w, h, color_white)
+			end)
+		end
+
+		a.textentry:SetValue(self.color.a || 0)
+		a.textentry:SetNumeric(true)
+		a.textentry:SetUpdateOnType(true)
+		a.textentry.OnValueChange = (s, value) => funcChange(s, "a", value) end
 
 	self.textEntryContainer.PerformLayout = (s, w, h) =>
 		s:SizeToChildren(true, true)
@@ -67,9 +145,16 @@ function PANEL:PostInit()
 	-- 	print(l, t, r, b)
 	-- 	s:SetSize(tw + l + r, th + t + b)
 	-- end
+
+	self.preview = CCR:NewElement("Panel", self)
+	self.preview.Paint = (s, w, h) =>
+		CCR:DrawCircle(h / 2, h / 2, h / 2, self.color)
+	end
+
+	self:InvalidateLayout(true)
 end
 
-function PANEL:OnStateChanged(b) end
+function PANEL:OnColorChanged(clr) end
 
 function PANEL:GetConVarObject()
 	return GetConVar(self:GetConVar())
@@ -78,6 +163,11 @@ end
 function PANEL:PerformLayout(w, h)
 	self.label:CenterVertical()
 	self.textEntryContainer:SetPos(w - self.textEntryContainer:GetWide())
+	
+	stopif (!IsValid(self.preview))
+	local tall = self.textEntryContainer:GetTall()
+	self.preview:SetSize(tall, tall)
+	self.preview:MoveLeftOf(self.textEntryContainer, 8)
 
 	self:SizeToChildren(true, true)
 end
