@@ -112,6 +112,18 @@ function PANEL:NewChoice(id)
 	return self.chainedChoice
 end
 
+function PANEL:RemoveChoice(id)
+	for i, _id in ipairs(self.order) do
+		if (_id == id) then
+			table.remove(self.order, i)
+		end
+	end
+
+	self.choices[id] = nil
+
+	return self
+end
+
 function PANEL:_RegisterChoice(choice)
 	choice = choice || self.chainedChoice
 	assert(choice)
