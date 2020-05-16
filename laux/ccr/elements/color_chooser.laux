@@ -151,6 +151,7 @@ function PANEL:PostInit()
 		CCR:DrawCircle(h / 2, h / 2, h / 2, self.color)
 	end
 
+	self.textEntryContainer:InvalidateLayout(true)
 	self:InvalidateLayout(true)
 end
 
