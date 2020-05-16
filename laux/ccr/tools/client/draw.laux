@@ -215,13 +215,12 @@ function CCR:DrawPanelBlurCached(pnl, id, amt = 6, alpha = 255)
 	pnl._blur_cache ||= {}
 	
 	if (!pnl._blur_cache[id]) then
-		local mat = Material("pp/blurscreen")
 		for i = 1, 3 do
-			mat:SetFloat("$blur", (i / 3) * (amt))
-			mat:Recompute()
+			blur:SetFloat("$blur", (i / 3) * (amt))
+			blur:Recompute()
 		end
 
-		pnl._blur_cache[id] = mat
+		pnl._blur_cache[id] = blur
 	end
 
 	local x, y = pnl:LocalToScreen(0, 0)
