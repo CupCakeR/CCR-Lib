@@ -38,3 +38,25 @@ function CCR.ConvertTableValuesToNumbersRecursive(tbl, excludedKeys = {})
 
 	convertTableValuesToNumbersRecursive(tbl, keys)
 end
+
+function CCR.TableEquals(a, b, isSecond = false)
+	for k, v in pairs(a) do
+		if (b[k] == nil) then
+			return false
+		end
+
+		continueif (v == b[k])
+
+		if (istable(v) && istable(b[k]) && !CCR.TableEquals(v, b[k])) then
+			return false
+		elseif (!istable(v) && !istable(b[k]) && b[k] != v) then
+			return false
+		end
+	end
+
+	if (isSecond) then
+		return true
+	end
+
+	return CCR.TableEquals(b, a, true)
+end
