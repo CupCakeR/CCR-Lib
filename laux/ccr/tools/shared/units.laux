@@ -1,0 +1,21 @@
+
+public class CCR.Units
+	static ToKilometers(num) return num * 1.905 / 100000 end
+	static FromKilometers(num) return num / 1.905 * 100000 end
+
+	static ToMeters(num) return num * 1.905 / 100 end
+	static FromMeters(num) return num / 1.905 * 100 end
+
+	static ToCentimeters(num) return num * 1.905 end
+	static FromCentimeters(num) return num / 1.905 end
+
+	-- shithole units
+	static ToMiles(num) return num * ( 1 / 16 ) / 5280 end
+	static FromMiles(num) return num / ( 1 / 16 ) * 5280 end
+
+	static ToInches(num) return num * 0.75 end
+	static FromInches(num) return num / 0.75 end
+
+	static ToFeet(num) return num * (1 / 16) end
+	static FromFeet(num) return num / (1 / 16) end
+end
