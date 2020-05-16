@@ -187,9 +187,11 @@ function CCR:RoundedBox(x, y, w, h, clr, tl, tr, bl, br)
 	end
 end
 
+local matLoading = Material("ccr_lib/loading.png", "smooth")
 function CCR:DrawLoading(x, y, size, clr = color_white)
-	stopif (!self.ImgurImages["CCR.Loading"])
-	CCR:DrawImgurImageRotated("CCR.Loading", x, y, size, size, clr, ((CurTime()) % 360) * -100)
+	surface.SetMaterial(matLoading)
+	surface.SetDrawColor(clr)
+	surface.DrawTexturedRectRotated(x, y, size, size, ((CurTime()) % 360) * -100)
 end
 
 local blur = Material("pp/blurscreen")
