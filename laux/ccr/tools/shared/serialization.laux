@@ -46,7 +46,7 @@ function CCR:Serialize(obj)
 
 		if (istable(new[key])) then
 			for k, v in pairs(new[key]) do
-				if (istable(v)) then
+				if (istable(v) && v._accessors) then -- NOTE: Only serialize actual objects which use our AccessorFunc
 					new[key][k] = self:Serialize(v)
 				end
 
