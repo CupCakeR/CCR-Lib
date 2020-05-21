@@ -1,5 +1,5 @@
 
-CCR:GenerateFont("CCR.Query.Text", nil, 17)
+CCR:GenerateFont("CCR.Query.Text", "SemiBold", 18)
 
 local PANEL = {}
 
@@ -142,7 +142,7 @@ function CCR:SimpleQuery(
 	btnYes:SetText(textYes)
 	btnYes:SetColor(CCR:ThemeColors().Green)
 	btnYes:SetBackgroundColor(CCR:ThemeColors().Background)
-	btnYes:SetIcon(Material("error"))
+	-- btnYes:SetIcon(Material("error"))
 	btnYes:SizeToText()
 	btnYes.DoClick = (s) =>
 		funcYes(s, pnl)
