@@ -212,3 +212,19 @@ local obj = CCR.NewCurrency("mtoken")
 		return amt .. (" Token" .. (amt == 1 && "s" || ""))
 	end
 obj:Register()
+
+local obj = CCR.NewCurrency("glorified_banking")
+	obj.Add = (p, amt) =>
+		stopif (CLIENT)
+		GlorifiedBanking.AddPlayerBalance(p, amt)
+	end
+	obj.Get = (p) =>
+		return GlorifiedBanking.GetPlayerBalance(p)
+	end
+	obj.CanAfford = (p, amt) =>
+		return GlorifiedBanking.CanPlayerAfford(p, amt)
+	end
+	obj.Format = (amt) =>
+		return '$' .. string.Comma(amt)
+	end
+obj:Register()
