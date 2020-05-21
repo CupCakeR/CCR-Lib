@@ -199,16 +199,16 @@ local obj = CCR.NewCurrency("brcs")
 obj:Register()
 
 local obj = CCR.NewCurrency("mtoken")
-    obj.Add = (p, amt) =>
-        mTokens.AddPlayerTokens(p, amt)
-    end
-    obj.Get = (p) =>
-        return mTokens.GetPlayerTokens(p)
-    end
-    obj.CanAfford = (p, amt) =>
-        return mTokens.CanPlayerAfford(p, amt)
-    end
-    obj.Format = (amt) =>
-        return amt .. (" Token" .. (amt == 1 && "s" || ""))
-    end
+	obj.Add = (p, amt) =>
+		mTokens.AddPlayerTokens(p, amt)
+	end
+	obj.Get = (p) =>
+		return mTokens.GetPlayerTokens(p)
+	end
+	obj.CanAfford = (p, amt) =>
+		return mTokens.CanPlayerAfford(p, amt)
+	end
+	obj.Format = (amt) =>
+		return amt .. (" Token" .. (amt == 1 && "s" || ""))
+	end
 obj:Register()
