@@ -1,6 +1,6 @@
 
 CCR:GenerateFont("CCR.ColorChooser.Label", nil, 20)
-CCR:GenerateFont("CCR.ColorChooser.RGB", nil, 20)
+CCR:GenerateFont("CCR.ColorChooser.RGB", "SemiBold", 20)
 
 local PANEL = {}
 
@@ -10,11 +10,13 @@ CCR:AccessorFunc(PANEL, "text", "Text", "String")
 CCR:AccessorFunc(PANEL, "font", "Font", "String")
 CCR:AccessorFunc(PANEL, "color_text", "TextColor", "Color")
 CCR:AccessorFunc(PANEL, "color", "Color", "Color")
+CCR:AccessorFunc(PANEL, "preview_color", "PreviewColor", "Boolean")
 
 function PANEL:Init()
 	self.text = "Undefined"
 	self.font = "CCR.ColorChooser.Label"
 	self.color_text = color_white
+	self.preview_color = true
 
 	self.color = Color(255, 255, 255)
 end
@@ -23,6 +25,7 @@ function PANEL:SetColor(clr)
 	self.color = Color(clr.r, clr.g, clr.b, clr.a)
 end
 
+local matGradientR = Material("vgui/gradient-r")
 function PANEL:PostInit()
 	self.label = CCR:NewElement("DLabel", self)
 	self.label:SetText(self.text)
@@ -32,109 +35,176 @@ function PANEL:PostInit()
 	self.label:SizeToContents()
 
 	local funcChange = (pnl, key, value = "") =>
-		value = tostring(value)
-
-		if (value:find(".", 1, true)) then
-			pnl:SetValue(value:Replace(".", ""))
-			pnl:SetText(value:Replace(".", ""))
-		end
-
-		if (value:len() > 3 || (tonumber(value) || 0) > 255) then
-			local new = 255
-			pnl:SetText(new)
-			pnl:SetValue(new)
-		end
-
-		local new = tostring(tonumber(value))
-		if (value != new) then
-			pnl:SetText(new)
-			pnl:SetValue(new)
-		end
-
-		if (!value || value == "") then
-			pnl:SetText("0")
-			pnl:SetValue("0")
-		end
-
-		value = pnl:GetValue()
-
-		self.color[key] = tonumber(value)
+		value = tonumber(value)
+		assert(value)
+		self.color[key] = value
 		self:OnColorChanged(Color(self.color.r, self.color.g, self.color.b, self.color.a))
 	end
 	
-	self.textEntryContainer = CCR:NewElement("Panel", self)
+	self.container = CCR:NewElement("Panel", self)
 
-		local r = CCR:NewElement("TextEntry", self.textEntryContainer)
-		r:SetSize(50, 28)
-		r:SetFont("CCR.ColorChooser.RGB")
-		r.PaintOver = (s, w, h) =>
-			CCR:MaskInverse(() =>
-				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
-			end, () =>
-				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Red)
-			end)
+		local function createPopup(parent, key, clr)
+			local pnl = CCR:NewElement("Panel", parent)
+			pnl:SetSize(128, 25)
+			pnl:SetPos(0, 0)
+			pnl:SetZPos(1488)
+			pnl:SetPaintedManually(true)
+			pnl:MouseCapture(true)
+			pnl.Paint = (_s, w, h) =>
+				CCR:RoundedBox(0, 0, w, h, clr)
+				CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().Background)
+
+				DisableClipping(true)
+					surface.SetDrawColor(clr)
+					surface.DrawLine(w / 2, h, w / 2, h + 4)
+				DisableClipping(false)
+
+				surface.SetDrawColor(clr)
+				surface.SetMaterial(matGradientR)
+				surface.DrawTexturedRect(16, h / 2 - 1, w - 32, 2)
+
+				local frac = parent.value / 255
+				frac = math.Clamp(frac, 0, 1)
+
+				local x = w - 32
+				x = 16 + x * frac
+				CCR:DrawCircle(x, h / 2, 5, color_white)
+			end
+
+			pnl.startX = parent:LocalCursorPos()
+			pnl.startValue = parent.value
+			pnl.frameNum = FrameNumber()
+			pnl.OnCursorMoved = (_s, x, y) =>
+				stopif (_s.frameNum == FrameNumber()) -- NOTE: Workaround to compensate that the cursor calc is off by 1 frame
+				parent.value = math.Clamp(_s.startValue + (-(_s.startX - x)), 0, 255)
+				funcChange(s, key, parent.value)
+			end
+
+			parent.popup = pnl
 		end
 
-		r.textentry:SetValue(self.color.r || 0)
-		r.textentry:SetNumeric(true)
-		r.textentry:SetUpdateOnType(true)
-		r.textentry.OnValueChange = (s, value) => funcChange(s, "r", value) end
-		
-		local g = CCR:NewElement("TextEntry", self.textEntryContainer)
-		g:SetSize(50, 28)
-		g:SetFont("CCR.ColorChooser.RGB")
+		local r = CCR:NewElement("Panel", self.container)
+		r:SetSize(45, 28)
+		r.value = self.color.r || 0
+		r.Paint = (s, w, h) =>
+			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Red)
+			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
+			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
+
+			if (s.popup) then
+				local x, y = s:LocalToScreen(0, 0)
+				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+			end
+		end
+		r.OnMousePressed = (s, key) =>
+			stopif (key != MOUSE_LEFT)
+			createPopup(s, "r", CCR:ThemeColors().Red)
+		end
+		r.OnMouseReleased = (s) =>
+			if (IsValid(s.popup)) then
+				s.popup:Remove()
+				s.popup = nil
+			end
+		end
+		r.Think = (s, b) =>
+			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
+				s:OnMouseReleased(MOUSE_LEFT)
+			end
+		end
+
+
+		local g = CCR:NewElement("Panel", self.container)
+		g:SetSize(45, 28)
 		g:MoveRightOf(r, 4)
-		g.PerformLayout = funcCenter
-		g.PaintOver = (s, w, h) =>
-			CCR:MaskInverse(() =>
-				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
-			end, () =>
-				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Green)
-			end)
+		g.value = self.color.g || 0
+		g.Paint = (s, w, h) =>
+			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Green)
+			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
+			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
+
+			if (s.popup) then
+				local x, y = s:LocalToScreen(0, 0)
+				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+			end
+		end
+		g.OnMousePressed = (s, key) =>
+			stopif (key != MOUSE_LEFT)
+			createPopup(s, "g", CCR:ThemeColors().Green)
+		end
+		g.OnMouseReleased = (s) =>
+			if (IsValid(s.popup)) then
+				s.popup:Remove()
+				s.popup = nil
+			end
+		end
+		g.Think = (s, b) =>
+			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
+				s:OnMouseReleased(MOUSE_LEFT)
+			end
 		end
 
-		g.textentry:SetValue(self.color.g || 0)
-		g.textentry:SetNumeric(true)
-		g.textentry:SetUpdateOnType(true)
-		g.textentry.OnValueChange = (s, value) => funcChange(s, "g", value) end
 
-		local b = CCR:NewElement("TextEntry", self.textEntryContainer)
-		b:SetSize(50, 28)
-		b:SetFont("CCR.ColorChooser.RGB")
+		local b = CCR:NewElement("Panel", self.container)
+		b:SetSize(45, 28)
 		b:MoveRightOf(g, 4)
-		b.PerformLayout = funcCenter
-		b.PaintOver = (s, w, h) =>
-			CCR:MaskInverse(() =>
-				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
-			end, () =>
-				CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Blue)
-			end)
+		b.value = self.color.b || 0
+		b.Paint = (s, w, h) =>
+			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Blue)
+			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
+			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
+
+			if (s.popup) then
+				local x, y = s:LocalToScreen(0, 0)
+				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+			end
+		end
+		b.OnMousePressed = (s, key) =>
+			stopif (key != MOUSE_LEFT)
+			createPopup(s, "b", CCR:ThemeColors().Blue)
+		end
+		b.OnMouseReleased = (s) =>
+			if (IsValid(s.popup)) then
+				s.popup:Remove()
+				s.popup = nil
+			end
+		end
+		b.Think = (s, b) =>
+			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
+				s:OnMouseReleased(MOUSE_LEFT)
+			end
 		end
 
-		b.textentry:SetValue(self.color.b || 0)
-		b.textentry:SetNumeric(true)
-		b.textentry:SetUpdateOnType(true)
-		b.textentry.OnValueChange = (s, value) => funcChange(s, "b", value) end
-
-		local a = CCR:NewElement("TextEntry", self.textEntryContainer)
-		a:SetSize(50, 28)
-		a:SetFont("CCR.ColorChooser.RGB")
+		local a = CCR:NewElement("Panel", self.container)
+		a:SetSize(45, 28)
 		a:MoveRightOf(b, 4)
-		a.PerformLayout = funcCenter
-		a.PaintOver = (s, w, h) =>
-			CCR:MaskInverse(() =>
-				CCR:RoundedBox(1, 1, w - 2, h - 2, color_white)
-			end, () =>
-				CCR:RoundedBox(0, 0, w, h, color_white)
-			end)
+		a.value = self.color.a || 0
+		a.Paint = (s, w, h) =>
+			CCR:RoundedBox(0, 0, w, h, color_white)
+			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
+			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
+
+			if (s.popup) then
+				local x, y = s:LocalToScreen(0, 0)
+				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+			end
+		end
+		a.OnMousePressed = (s, key) =>
+			stopif (key != MOUSE_LEFT)
+			createPopup(s, "a", CCR:ThemeColors().Blue)
+		end
+		a.OnMouseReleased = (s) =>
+			if (IsValid(s.popup)) then
+				s.popup:Remove()
+				s.popup = nil
+			end
+		end
+		a.Think = (s, b) =>
+			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
+				s:OnMouseReleased(MOUSE_LEFT)
+			end
 		end
 
-		a.textentry:SetValue(self.color.a || 0)
-		a.textentry:SetNumeric(true)
-		a.textentry:SetUpdateOnType(true)
-		a.textentry.OnValueChange = (s, value) => funcChange(s, "a", value) end
-
-	self.textEntryContainer.PerformLayout = (s, w, h) =>
+	self.container.PerformLayout = (s, w, h) =>
 		s:SizeToChildren(true, true)
 	end
 
@@ -146,12 +216,14 @@ function PANEL:PostInit()
 	-- 	s:SetSize(tw + l + r, th + t + b)
 	-- end
 
-	self.preview = CCR:NewElement("Panel", self)
-	self.preview.Paint = (s, w, h) =>
-		CCR:DrawCircle(h / 2, h / 2, h / 2, self.color)
+	if (self:GetPreviewColor()) then
+		self.preview = CCR:NewElement("Panel", self)
+		self.preview.Paint = (s, w, h) =>
+			CCR:DrawCircle(h / 2, h / 2, h / 2, self.color)
+		end
 	end
 
-	self.textEntryContainer:InvalidateLayout(true)
+	self.container:InvalidateLayout(true)
 	self:InvalidateLayout(true)
 end
 
@@ -163,12 +235,13 @@ end
 
 function PANEL:PerformLayout(w, h)
 	self.label:CenterVertical()
-	self.textEntryContainer:SetPos(w - self.textEntryContainer:GetWide())
+	self.container:SetPos(w - self.container:GetWide())
 	
-	stopif (!IsValid(self.preview))
-	local tall = self.textEntryContainer:GetTall()
-	self.preview:SetSize(tall, tall)
-	self.preview:MoveLeftOf(self.textEntryContainer, 8)
+	if (IsValid(self.preview)) then
+		local tall = self.container:GetTall()
+		self.preview:SetSize(tall, tall)
+		self.preview:MoveLeftOf(self.container, 8)
+	end
 
 	self:SizeToChildren(true, true)
 end
