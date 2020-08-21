@@ -175,6 +175,8 @@ end
 
 -- test
 
+stopif (true)
+
 local cfg = CCR.ConfigController()
 	:newField("test")
 		:setValidator(CCR.ConfigController.VALIDATOR_STRING)
