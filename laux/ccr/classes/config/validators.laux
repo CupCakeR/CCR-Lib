@@ -1,0 +1,148 @@
+
+local validators = {}
+
+class Table extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "table"
+	static validate(value)
+		local _type = type(value)
+		assert(istable(value), `expected value to be of type "table", got "${_type}"`)
+	end
+end
+validators["table"] = Table
+
+class Array extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "array"
+	static validate(value)
+		local _type = type(value)
+		assert(istable(value), `expected value to be of type "table", got "${_type}"`)
+		assert(table.IsSequential(value), `expected value to be a sequential table (array)`)
+	end
+end
+validators["array"] = Array
+
+class Boolean extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "boolean"
+	static validate(value)
+		local _type = type(value)
+		assert(isbool(value), `expected value to be of type "boolean", got "${_type}"`)
+	end
+end
+validators["boolean"] = Boolean
+
+class Number extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "number"
+	static validate(value)
+		local _type = type(value)
+		assert(isnumber(value), `expected value to be of type "number", got "${_type}"`)
+	end
+end
+validators["number"] = Number
+
+class Integer extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "integer"
+	static validate(value)
+		local _type = type(value)
+		assert(isnumber(value) && value == math.floor(value), `expected value to be of type "integer", got "${_type}"`)
+	end
+end
+validators["integer"] = Integer
+
+class String extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "string"
+	static validate(value)
+		local _type = type(value)
+		assert(isstring(value), `expected value to be of type "string", got "${_type}"`)
+	end
+end
+validators["string"] = String
+
+class Entity extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+	__type() end
+
+	static id = "entity"
+	static validate(value)
+		local _type = type(value)
+		assert(isentity(value), `expected value to be of type "entity", got "${_type}"`)
+	end
+end
+validators["entity"] = Entity
+
+class Vector extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "vector"
+	static validate(value)
+		local _type = type(value)
+		assert(isvector(value), `expected value to be of type "vector", got "${_type}"`)
+	end
+end
+validators["vector"] = Vector
+
+class Angle extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "angle"
+	static validate(value)
+		local _type = type(value)
+		assert(isangle(value), `expected value to be of type "angle", got "${_type}"`)
+	end
+end
+validators["angle"] = Angle
+
+class Material extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "material"
+	static validate(value)
+		local _type = type(value)
+		assert(type(value) == "IMaterial", `expected value to be of type "IMaterial", got "${_type}"`)
+	end
+end
+validators["material"] = Material
+
+class Color extends CCR.Config.FieldValidator
+	__type() end
+
+	static id = "color"
+	static validate(value)
+		local _type = type(value)
+		assert(IsColor(value), `expected value to be of type "color", got "${_type}"`)
+	end
+end
+validators["color"] = Color
+
+class Panel extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+	__type() end
+
+	static id = "panel"
+	static validate(value)
+		local _type = type(value)
+		assert(ispanel(value), `expected value to be of type "panel", got "${_type}"`)
+	end
+end
+validators["panel"] = Panel
+
+class Function extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+	__type() end
+
+	static id = "function"
+	static validate(value)
+		local _type = type(value)
+		assert(isfunction(value), `expected value to be of type "function", got "${_type}"`)
+	end
+end
+validators["function"] = Function
+
+return validators
