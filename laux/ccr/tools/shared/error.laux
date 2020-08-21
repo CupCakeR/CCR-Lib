@@ -35,6 +35,4 @@ function ErrorNoHaltTrace(message)
 	print("")
 	ErrorNoHalt(str)
 	print("")
-
-	PrintTable(lines)
 end
