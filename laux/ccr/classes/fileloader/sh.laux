@@ -1,0 +1,174 @@
+
+stopif (true)
+
+local function getSourceInfo()
+	local stack = 1
+	local here = true
+	local foundBefore = false
+
+	while (true) do
+		local info = debug.getinfo(stack, "S")
+		if (!info && !foundBefore) then
+			error("invalid debug.getinfo result, called outside of an addon?")
+		end
+
+		local isThisFile = info["short_src"]:EndsWith("!sh.lua")
+		if (isThisFile) then
+			foundBefore = true
+		end
+
+		if (!info["short_src"]:EndsWith("!sh.lua") && foundBefore) then
+			return info
+		else
+			foundBefore = true
+		end
+
+		breakif (stack > 15)
+
+		stack++
+	end
+
+	error("CCR: UNABLE TO FIND THE ACTUAL SOURCE OF FILE")
+end
+
+class File
+	_get _set filePath
+	_get _set parent
+	_get _set realm
+
+	constructor(parent)
+		assert(parent)
+
+		self.parent = parent
+		return self
+	end
+
+	__type()
+		return "CCR.File"
+	end
+
+	determineRealm()
+		local path = self.filePath
+
+		assert(path, "no file path set")
+
+		-- realm by filename
+		local fileName = path:Split("/")
+		fileName = fileName[#fileName]
+
+		print(fileName)
+	end
+
+
+	-- chaining
+	addFile(...)
+		self:finish() -- trigger checks
+		return self.parent:addFile(...)
+	end
+
+	finish()
+		assert(self.filePath, "no file path set")
+
+		if (self.realm == CCR.FileLoader.AUTO) then
+			self:determineRealm()
+		end
+
+		return self.parent
+	end
+
+	include()
+		return self.parent:include()
+	end
+end
+
+public class CCR.FileLoader
+	static SERVER = "server"
+	static CLIENT = "client"
+	static SHARED = "shared"
+	static AUTO = "auto"
+
+	_get root
+	root = nil
+
+	_get files
+	files = {}
+
+	_get path
+	path = false
+
+	constructor(root)
+		-- TODO: if root == nil -> get path from debug func
+		if (!root) then
+			root = getSourceInfo()
+			root = root["short_src"]
+			root = root:GetPathFromFilename()
+			root = root:Split("lua/")[2]
+
+			if (root:EndsWith("/")) then
+				root = root:sub(1, #root - 1)
+			end
+		end
+
+		print(root)
+
+		-- assert(fileToMerge, `Failed to get path from file name "${fileSource}"`)
+
+		self.root = root
+	end
+
+	addFile(realm, name)
+		if (name == nil) then
+			name = realm
+			realm = nil
+		end
+
+		local file = File(self)
+		file:setFilePath(`${self:getCurrentPath()}/${name}.lua`)
+		file:setRealm(realm || CCR.FileLoader.AUTO)
+
+		table.insert(self.files, file)
+
+		return file
+	end
+
+	setPath(path: string)
+		if (path:StartWith("/")) then
+			path = path:sub(2, #path - 1)
+		end
+
+		self.path = path
+	end
+
+	finishPath()
+		self.path = false
+		return self
+	end
+
+	getCurrentPath()
+		local path = self.root
+		if (self.path) then
+			path ..= `/${self.path}`
+		end
+
+		return path
+	end
+
+	__tostring()
+		return `CCR.FileLoader`
+	end
+
+	include()
+		assert(self.root, "no root path set")
+
+		print(self:getCurrentPath())
+		PrintTable(self.files)
+	end
+end
+
+local loader = CCR.FileLoader()
+loader:addFile(loader.SHARED, "test")
+loader:addFile(loader.SERVER, "test2")
+
+loader:include()
+
+print("in")
