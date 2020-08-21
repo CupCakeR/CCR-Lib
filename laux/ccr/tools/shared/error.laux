@@ -14,7 +14,9 @@ function ErrorNoHaltTrace(message)
 	local str = ""
 	for i, line in ipairs(lines) do
 		if (i == 1) then
-			str ..= `[ERRORNOHALT] ${line.short_src}:${line.currentline}: ${message}\n`
+			-- TODO: Show actual source of the func call
+			-- str ..= `[ERRORNOHALT] ${line.short_src}:${line.currentline}: ${message}\n`
+			str ..= `[ERRORNOHALT] ${message}\n`
 			continue
 		end
 
