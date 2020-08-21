@@ -12,6 +12,10 @@ class Currency
 		return self
 	end
 
+	__type()
+		return "CCR.Currency"
+	end
+
 	__tostring()
 		return `CCR.Currency[${self.id}]`
 	end
@@ -91,7 +95,7 @@ obj:Register()
 
 local obj = CCR.NewCurrency("pointshop_1")
 	obj.Add = (p, amt) =>
-		p:PS_SetPoints(ply:PS_GetPoints() + amt)
+		p:PS_SetPoints(p:PS_GetPoints() + amt)
 	end
 	obj.Get = (p) =>
 		return p:PS_GetPoints()

@@ -36,6 +36,10 @@ class Timer
 		return self
 	end
 
+	__type()
+		return "CCR.Timer"
+	end
+
 	__tostring()
 		return `CCR.Timer[${self.identifier}]`
 	end
