@@ -23,6 +23,8 @@ end
 
 -- v2
 
+CCR.Config ||= {}
+
 -- the actual field, holds the value and verifies it on input
 class Field
 	_get key
@@ -61,7 +63,7 @@ class FieldController
 	_get fields
 	fields = {}
 	
-	constructor(parent: CCR.ConfigController)
+	constructor(parent: CCR.Config)
 		self.parent = parent
 	end
 
@@ -127,9 +129,9 @@ public class CCR.Config.FieldValidator
 	static id = "undefined"
 	static validate(value) error("implement me") end -- throw exception if :oof:
 end
-local validators = CCR:IncludeFile("validators", "sh")
+local validators = CCR:IncludeFile("!validators", "sh")
 
-public class CCR.ConfigController
+public class CCR.Config
 	static VALIDATOR_TABLE			= validators["table"]
 	static VALIDATOR_ARRAY			= validators["array"]
 	static VALIDATOR_BOOLEAN		= validators["boolean"]
@@ -177,19 +179,19 @@ end
 
 stopif (true)
 
-local cfg = CCR.ConfigController()
+local cfg = CCR.Config()
 	:newField("test")
-		:setValidator(CCR.ConfigController.VALIDATOR_STRING)
+		:setValidator(CCR.Config.VALIDATOR_STRING)
 		:setDefault("0")
 	:finish()
 
 	:newField("shit")
-		:setValidator(CCR.ConfigController.VALIDATOR_BOOLEAN)
+		:setValidator(CCR.Config.VALIDATOR_BOOLEAN)
 		:setDefault(true)
 	:finish()
 
 	:newField("shitArray")
-		:setValidator(CCR.ConfigController.VALIDATOR_ARRAY)
+		:setValidator(CCR.Config.VALIDATOR_ARRAY)
 		:setDefault({
 			"a",
 			["b"] = 1
@@ -197,7 +199,7 @@ local cfg = CCR.ConfigController()
 	:finish()
 
 	:newField("tableKeyBool")
-		:setValidator(CCR.ConfigController.VALIDATOR_TABLE)
+		:setValidator(CCR.Config.VALIDATOR_TABLE)
 		:setDefault({
 			"sm", "oll", "pp"
 		})
