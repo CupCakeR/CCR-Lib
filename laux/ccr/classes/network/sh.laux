@@ -1,0 +1,70 @@
+
+public class CCR.Network
+	_get _set prefix
+
+	constructor()
+		self:setPrefix("")
+	end
+
+	prepare(str)
+		if (istable(str)) then
+			for i, v in ipairs(str) do
+				util.AddNetworkString(self:getPrefix() .. v)
+			end
+		else
+			util.AddNetworkString(self:getPrefix() .. str)
+		end
+	end
+
+	receiver(name, func = () => end)
+		net.Receive(self:getPrefix() .. name, (len, ply) =>
+			func(self, ply or LocalPlayer(), len)
+		end)
+	end
+
+	send(name, target, func)
+		net.Start(self:getPrefix() .. name)
+
+		if (CLIENT) then
+			target(self)
+		
+			net.SendToServer()
+		else
+			func(self)
+
+			net.Send(target)
+		end
+	end
+
+	compress(data)
+		local tbl = false
+		if (istable(data)) then
+			data = util.TableToJSON(data)
+			tbl = true
+		end
+
+		data = util.Compress(data)
+		local len = data:len()
+
+		net.WriteUInt(len, 32)
+		net.WriteBool(tbl)
+		net.WriteData(data, len)
+	end
+
+	decompress()
+		local len = net.ReadUInt(32)
+		local tbl = net.ReadBool()
+		local data = net.ReadData(len)
+		data = util.Decompress(data)
+
+		if (tbl) then
+			data = util.JSONToTable(data)
+		end
+
+		return data
+	end
+
+	__type()
+		return "CCR.Network"
+	end
+end
