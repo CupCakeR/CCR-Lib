@@ -145,4 +145,26 @@ class Function extends CCR.Config.FieldValidator -- NOTE: why the fuck would we 
 end
 validators["function"] = Function
 
+-- specials
+
+class DBConfig extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+	__type() end
+
+	static id = "db_config"
+	static validate(value)
+		local _type = type(value)
+		assert(istable(value), `expected value to be of type "table" (db config), got "${_type}"`)
+
+		assert(value.EnableMySQL != nil, `database config requires "EnableMySQL" field to be set`)
+		assert(value.Host != nil, `database config requires "Host" field to be set`)
+		assert(value.Username != nil, `database config requires "Username" field to be set`)
+		assert(value.Password != nil, `database config requires "Password" field to be set`)
+		assert(value.Database_name != nil, `database config requires "Database_name" field to be set`)
+		assert(value.Database_port != nil, `database config requires "Database_port" field to be set`)
+		assert(value.Preferred_module != nil, `database config requires "Preferred_module" field to be set`)
+		assert(value.MultiStatements != nil, `database config requires "MultiStatements" field to be set`)
+	end
+end
+validators["db_config"] = DBConfig
+
 return validators
