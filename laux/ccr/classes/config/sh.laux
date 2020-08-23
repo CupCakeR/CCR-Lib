@@ -97,6 +97,8 @@ class FieldController
 			end
 
 			self[field.key] = value
+
+			return self
 		end
 
 		-- set default
@@ -145,6 +147,7 @@ public class CCR.Config
 	static VALIDATOR_COLOR			= validators["color"]
 	static VALIDATOR_PANEL			= validators["panel"]
 	static VALIDATOR_FUNCTION		= validators["function"]
+	static VALIDATOR_DBCONFIG		= validators["db_config"]
 
 	_get fieldController
 	fieldController = nil
@@ -183,6 +186,11 @@ local cfg = CCR.Config()
 	:newField("test")
 		:setValidator(CCR.Config.VALIDATOR_STRING)
 		:setDefault("0")
+	:finish()
+
+	:newField("db")
+		:setValidator(CCR.Config.VALIDATOR_DBCONFIG)
+		:setDefault({})
 	:finish()
 
 	:newField("shit")
