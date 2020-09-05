@@ -243,4 +243,36 @@ local obj = CCR.NewCurrency("glorified_banking")
 	end
 obj:Register()
 
+local obj = CCR.NewCurrency("sh_pointshop")
+	obj.add = (p, amt) =>
+		stopif (CLIENT)
+		return p:SH_AddPremiumPoints(amt, nil, nil, nil)
+	end
+	obj.get = (p) =>
+		return p:SH_GetStandardPoints()
+	end
+	obj.canAfford = (p, amt) =>
+		return p:SH_CanAffordStandard(amt)
+	end
+	obj.format = (amt) =>
+		return string.Comma(amt) .. " point" .. (amt == 1 && "s" || "")
+	end
+obj:Register()
+
+local obj = CCR.NewCurrency("sh_pointshop_premium")
+	obj.add = (p, amt) =>
+		stopif (CLIENT)
+		return p:SH_AddStandardPoints(amt, nil, nil, nil)
+	end
+	obj.get = (p) =>
+		return p:SH_GetPremiumPoints()
+	end
+	obj.canAfford = (p, amt) =>
+		return p:SH_CanAffordPremium(amt)
+	end
+	obj.format = (amt) =>
+		return string.Comma(amt) .. " premium point" .. (amt == 1 && "s" || "")
+	end
+obj:Register()
+
 hook.Run("CCR.PostCurrenciesLoaded")
