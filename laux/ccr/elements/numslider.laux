@@ -16,10 +16,12 @@ CCR:AccessorFunc(PANEL, "slider_width", "SliderWidth")
 CCR:AccessorFunc(PANEL, "circle_color", "CircleColor")
 
 CCR:AccessorFunc(PANEL, "text", "Text")
+CCR:AccessorFunc(PANEL, "text_color", "TextColor")
 CCR:AccessorFunc(PANEL, "font", "Font")
 
 function PANEL:Init()
 	self.text = "Undefined"
+	self.text_color = color_white
 	self.value = 0
 	self.min = 0
 	self.max = 0
@@ -32,7 +34,7 @@ function PANEL:PostInit()
 	self.label = self:Add("DLabel")
 	self.label:SetText(self.text)
 	self.label:SetFont(self.font or "CCR.NumSlider.Label")
-	self.label:SetColor(color_white)
+	self.label:SetColor(self.text_color || color_white)
 	self.label:SetAlpha(255)
 	self.label:Dock(LEFT)
 	self.label:SizeToContents()
