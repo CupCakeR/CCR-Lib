@@ -2,10 +2,10 @@
 -- actual class
 
 class Currency
+	_get _set id
+
 	constructor(id)
 		assert(id)
-
-		CCR:AccessorFunc(self, "id", "ID", "String")
 		
 		self.id = id
 
