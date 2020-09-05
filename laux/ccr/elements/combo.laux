@@ -23,6 +23,10 @@ class Choice
 		return "CCR.ComboBox.Choice"
 	end
 
+	__type()
+		return tostring(self)
+	end
+
 	Finish()
 		return self:GetParent():_RegisterChoice(self)
 	end

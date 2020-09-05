@@ -19,6 +19,8 @@ class Column
 		return self
 	end
 
+	__type() return "dont use me" end
+
 	IsValid()
 		IsValid(self.parent)
 	end
