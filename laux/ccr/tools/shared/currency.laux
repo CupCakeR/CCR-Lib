@@ -46,8 +46,14 @@ function CCR:GetCurrency(id)
 	return self.Currencies[id]
 end
 
-function CCR:RegisterCurrency(currency)
+function CCR:RegisterCurrency(currency, override)
 	assert(currency.id, "Currency has no ID")
+
+	if (!override && self.Currencies[currency.id]) then
+		self.Logger:Warning(`Currency with ID ${currency.id} does already exist, skipping...`)
+		return
+	end
+
 	self.Currencies[currency.id] = currency
 end
 
@@ -236,3 +242,5 @@ local obj = CCR.NewCurrency("glorified_banking")
 		return '$' .. string.Comma(amt)
 	end
 obj:Register()
+
+hook.Run("CCR.PostCurrenciesLoaded")
