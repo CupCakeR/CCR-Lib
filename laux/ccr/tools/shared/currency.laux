@@ -34,6 +34,10 @@ function CCR.NewCurrency(name)
 	return Currency(name)
 end
 
+function CCR.Currency(...)
+	return Currency(...)
+end
+
 -- funcs
 
 CCR.Currencies ||= {}
