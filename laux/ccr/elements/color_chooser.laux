@@ -43,12 +43,13 @@ function PANEL:PostInit()
 	
 	self.container = CCR:NewElement("Panel", self)
 
+	do
 		local function createPopup(parent, key, clr)
-			local pnl = CCR:NewElement("Panel", parent)
+			parent:SetCursor("blank")
+
+			local pnl = CCR:NewElement("Panel")
 			pnl:SetSize(128, 25)
-			pnl:SetPos(0, 0)
-			pnl:SetZPos(1488)
-			pnl:SetPaintedManually(true)
+			pnl:SetDrawOnTop(true)
 			pnl:MouseCapture(true)
 			pnl.Paint = (_s, w, h) =>
 				CCR:RoundedBox(0, 0, w, h, clr)
@@ -71,138 +72,102 @@ function PANEL:PostInit()
 				CCR:DrawCircle(x, h / 2, 5, color_white)
 			end
 
-			pnl.startX = parent:LocalCursorPos()
+			pnl.parent = parent
+			pnl.Think = (s) =>
+				if (!IsValid(s.parent)) then
+					s:Remove()
+					return
+				end
+
+				s:SetCursor("blank")
+				s:PosToParent()
+			end
+			pnl.PosToParent = (s) =>
+				local w, h = s.parent:GetSize()
+				local x, y = s.parent:LocalToScreen(0, 0)
+				s:SetPos(x + w / 2 - s:GetWide() / 2, y - 4 - s:GetTall())
+			end
+			pnl:PosToParent()
+
+			pnl.startX = pnl:LocalCursorPos() - pnl:GetPos()
 			pnl.startValue = parent.value
 			pnl.frameNum = FrameNumber()
-			pnl.OnCursorMoved = (_s, x, y) =>
-				stopif (_s.frameNum == FrameNumber()) -- NOTE: Workaround to compensate that the cursor calc is off by 1 frame
-				parent.value = math.Clamp(_s.startValue + (-(_s.startX - x)), 0, 255)
-				funcChange(s, key, parent.value)
+			pnl.OnCursorMoved = (s, x, y) =>
+				stopif (s.frameNum == FrameNumber()) -- NOTE: Workaround to compensate that the cursor calc is off by 1 frame
+				parent.value = math.Clamp(s.startValue + (-(s.startX - x)), 0, 255)
+				funcChange(parent, key, parent.value)
+
+				local x, y = input.GetCursorPos()
+				local min = s.origCursorPos.x - s.startValue
+				local max = s.origCursorPos.x + (255 - s.startValue)
+
+				if (x < min) then
+					input.SetCursorPos(min, s.origCursorPos.y)
+				end
+
+				if (x > max) then
+					input.SetCursorPos(max, s.origCursorPos.y)
+				end
+			end
+
+			pnl.origCursorPos = {
+				x = select(1, input.GetCursorPos()),
+				y = select(2, input.GetCursorPos())
+			}
+			pnl.OnRemove = (s) =>
+				input.SetCursorPos(s.origCursorPos.x, s.origCursorPos.y)
 			end
 
 			parent.popup = pnl
 		end
 
-		local r = CCR:NewElement("Panel", self.container)
-		r:SetSize(45, 28)
-		r.value = self.color.r || 0
-		r.Paint = (s, w, h) =>
-			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Red)
-			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
-			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
+		local function createChooser(key, color)
+			local pnl = CCR:NewElement("Panel", self.container)
+			pnl:SetSize(45, 28)
+			pnl:SetCursor("hand")
+			pnl.value = self.color[key] || 0
+			pnl.Paint = (s, w, h) =>
+				CCR:RoundedBox(0, 0, w, h, color)
+				CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
+				CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
 
-			if (s.popup) then
-				local x, y = s:LocalToScreen(0, 0)
-				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+				if (s.popup) then
+					--local x, y = s:LocalToScreen(0, 0)
+					--s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
+				end
 			end
-		end
-		r.OnMousePressed = (s, key) =>
-			stopif (key != MOUSE_LEFT)
-			createPopup(s, "r", CCR:ThemeColors().Red)
-		end
-		r.OnMouseReleased = (s) =>
-			if (IsValid(s.popup)) then
-				s.popup:Remove()
-				s.popup = nil
+			pnl.OnMousePressed = (s, _key) =>
+				stopif (_key != MOUSE_LEFT)
+				createPopup(s, key, color)
 			end
-		end
-		r.Think = (s, b) =>
-			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
-				s:OnMouseReleased(MOUSE_LEFT)
+			pnl.OnMouseReleased = (s) =>
+				if (IsValid(s.popup)) then
+					s.popup:Remove()
+					s.popup = nil
+				end
+
+				s:SetCursor("hand")
 			end
+			pnl.Think = (s) =>
+				if (IsValid(s.popup)) then
+					if (!input.IsMouseDown(MOUSE_LEFT)) then
+						s:OnMouseReleased(MOUSE_LEFT)
+					end
+				end
+			end
+
+			return pnl
 		end
 
-
-		local g = CCR:NewElement("Panel", self.container)
-		g:SetSize(45, 28)
+		local r = createChooser("r", CCR:ThemeColors().Red)
+		local g = createChooser("g", CCR:ThemeColors().Green)
 		g:MoveRightOf(r, 4)
-		g.value = self.color.g || 0
-		g.Paint = (s, w, h) =>
-			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Green)
-			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
-			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
-
-			if (s.popup) then
-				local x, y = s:LocalToScreen(0, 0)
-				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
-			end
-		end
-		g.OnMousePressed = (s, key) =>
-			stopif (key != MOUSE_LEFT)
-			createPopup(s, "g", CCR:ThemeColors().Green)
-		end
-		g.OnMouseReleased = (s) =>
-			if (IsValid(s.popup)) then
-				s.popup:Remove()
-				s.popup = nil
-			end
-		end
-		g.Think = (s, b) =>
-			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
-				s:OnMouseReleased(MOUSE_LEFT)
-			end
-		end
-
-
-		local b = CCR:NewElement("Panel", self.container)
-		b:SetSize(45, 28)
+		local b = createChooser("b", CCR:ThemeColors().Blue)
 		b:MoveRightOf(g, 4)
-		b.value = self.color.b || 0
-		b.Paint = (s, w, h) =>
-			CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Blue)
-			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
-			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
-
-			if (s.popup) then
-				local x, y = s:LocalToScreen(0, 0)
-				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
-			end
-		end
-		b.OnMousePressed = (s, key) =>
-			stopif (key != MOUSE_LEFT)
-			createPopup(s, "b", CCR:ThemeColors().Blue)
-		end
-		b.OnMouseReleased = (s) =>
-			if (IsValid(s.popup)) then
-				s.popup:Remove()
-				s.popup = nil
-			end
-		end
-		b.Think = (s, b) =>
-			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
-				s:OnMouseReleased(MOUSE_LEFT)
-			end
-		end
-
-		local a = CCR:NewElement("Panel", self.container)
-		a:SetSize(45, 28)
+		local a = createChooser("a", color_white)
 		a:MoveRightOf(b, 4)
-		a.value = self.color.a || 0
-		a.Paint = (s, w, h) =>
-			CCR:RoundedBox(0, 0, w, h, color_white)
-			CCR:RoundedBox(1, 1, w - 2, h - 2, CCR:ThemeColors().PanelBackground)
-			CCR:DrawText(s.value, "CCR.ColorChooser.RGB", w / 2, h / 2, grey(200), "c", "c")
 
-			if (s.popup) then
-				local x, y = s:LocalToScreen(0, 0)
-				s.popup:PaintAt(x + w / 2 - s.popup:GetWide() / 2, y - s.popup:GetTall() - 4)
-			end
-		end
-		a.OnMousePressed = (s, key) =>
-			stopif (key != MOUSE_LEFT)
-			createPopup(s, "a", CCR:ThemeColors().Blue)
-		end
-		a.OnMouseReleased = (s) =>
-			if (IsValid(s.popup)) then
-				s.popup:Remove()
-				s.popup = nil
-			end
-		end
-		a.Think = (s, b) =>
-			if (IsValid(s.popup) && !input.IsMouseDown(MOUSE_LEFT)) then
-				s:OnMouseReleased(MOUSE_LEFT)
-			end
-		end
+	end
 
 	self.container.PerformLayout = (s, w, h) =>
 		s:SizeToChildren(true, true)
