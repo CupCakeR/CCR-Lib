@@ -88,3 +88,55 @@ function CCR:CallPostInitialize(func)
 
 	table.insert(self.InitCallQueue, func)
 end
+
+-- time parser
+local units = {
+	["years"] = 525600,
+	["months"] = 43800,
+	["weeks"] = 10080,
+	["days"] = 1440,
+	["hours"] = 60,
+	["minutes"] = 1,
+	["permanent"] = -1
+}
+
+local function findUnit(str)
+	local found
+	for unit, _ in pairs(units) do
+		if (unit == str || unit:StartWith(str)) then
+			if (found) then
+				return false
+			end
+			
+			found = unit
+		end
+	end
+
+	return found
+end
+
+function CCR.ParseStringToSeconds(str)
+	if (tonumber(str)) then
+		return tonumber(str)
+	end
+
+	-- remove unneeded shit
+	str = str:lower()
+	str = str:Replace(" ", "")
+
+	local mins = 0
+
+	for t, unit in str:gmatch("(%d+)(%a+)") do
+		unit = findUnit(unit)
+
+		if (unit == false) then
+			return false -- unit not found
+		end
+
+		mins += units[unit] * t
+	end
+
+	return math.Clamp(mins, 0, 31536000)
+end
+
+-- print("result:", CCR.TimeStringToSeconds("1d 12h"))
