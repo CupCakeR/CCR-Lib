@@ -54,6 +54,13 @@ public class CCR.ConsoleLogger
 		stopif (!self.config.debug)
 		self:print(CCR.ConsoleLogger["COLORS"].debug, "Debug: ", color_white, ...)
 	end
+
+	error = self.Error
+	warning = self.Warning
+	log = self.Log
+	debug = self.Debug
 end
 
 CCR.Logger = CCR.ConsoleLogger("CCR")
+
+CCR.Logger:debug("bruh")
