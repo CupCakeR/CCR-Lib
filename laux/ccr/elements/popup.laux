@@ -1,0 +1,50 @@
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "bg_width", "BackgroundWidth")
+CCR:AccessorFunc(PANEL, "bg_height", "BackgroundHeight")
+
+function PANEL:Init()
+	self.background = CCR:NewElement("Frame", self)
+	self.background.Paint = (s, w, h) =>
+		local x, y = s:LocalToScreen(0, 0)
+		
+		BSHADOWS.BeginShadow()
+			draw.RoundedBox(6, x, y, w, h, CCR:ThemeColors().Background)
+		BSHADOWS.EndShadow(1, 2, 2, 150, 0, 0)
+	end
+	self.background.close.DoClick = () =>
+		self:Remove()
+	end
+end
+
+function PANEL:Paint(w, h)
+	surface.SetDrawColor(20, 20, 20, 160)
+	surface.DrawRect(0, 0, w, h)
+end
+
+function PANEL:PerformLayout(w, h)
+	if (!IsValid(self.background)) then
+		self:Remove()
+		return
+	end
+
+	self.background:SetSize(
+		self:GetBackgroundWidth(),
+		self:GetBackgroundHeight()
+	)
+	self.background:Center()
+end
+
+function PANEL:SetTitle(str)
+	self.background:SetTitle(str)
+end
+
+CCR:RegisterElement("Popup", PANEL, "EditablePanel")
+
+function CCR:TestPopup()
+	local pnl = CCR:NewElement("Popup")
+	pnl:Dock(FILL)
+	pnl:SetBackgroundWidth(400)
+	pnl:SetBackgroundHeight(200)
+	pnl:MakePopup()
+end
