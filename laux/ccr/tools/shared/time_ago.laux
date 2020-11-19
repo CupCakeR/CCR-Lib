@@ -1,0 +1,56 @@
+
+local max, floor = math.max, math.floor
+local floorMax = (num) =>
+	return floor(max(1, num))
+end
+
+function CCR.TimeAgo(timestamp, nowOverride)
+	assert(isnumber(timestamp))
+
+	if (nowOverride != nil) then
+		assert(isnumber(nowOverride))
+	end
+
+	local now = nowOverride || os.time()
+	local diff = now - timestamp
+	diff = max(0, diff)
+
+	local interval
+
+	interval = diff
+	-- NOTE: I let the addon handle shortening
+	-- if (interval < 30) then
+	-- 	return interval, "few"
+	-- end
+
+	if (interval < 60) then
+		return floorMax(interval), "seconds"
+	end
+
+	interval = diff / 60
+	if (interval < 60) then
+		return floorMax(interval), "minutes"
+	end
+
+	interval = diff / 3600
+	if (interval < 24) then
+		return floorMax(interval), "hours"
+	end
+
+	interval = diff / 86400
+	if (interval < 7) then
+		return floorMax(interval), "days"
+	end
+
+	interval = diff / 604800
+	if (interval < 4) then
+		return floorMax(interval), "weeks"
+	end
+
+	interval = diff / 2.628e6
+	if (interval < 12) then
+		return floorMax(interval), "months"
+	end
+
+	return floorMax(diff / 3.154e7), "years"
+end
