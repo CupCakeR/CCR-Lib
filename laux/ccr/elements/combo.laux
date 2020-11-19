@@ -141,7 +141,7 @@ function PANEL:_RegisterChoice(choice)
 end
 
 function PANEL:SetActive(choice, preventCall)
-	if (isstring(choice)) then
+	if (isstring(choice) || self.choices[choice]) then
 		choice = self.choices[choice]
 	end
 
