@@ -73,7 +73,15 @@ class Timer
 			self:Remove()
 		end
 
-		self.func() -- NOTE: Call func() AFTER remove otherwise Remove() removes the same timer (id) if it gets re-created in the callback
+		local pass
+		if (self.identifier != nil) then
+			local meta = getmetatable(self.identifier)
+			if (istable(meta) && meta.IsValid) then
+				pass = IsValid(self.identifier) && self.identifier
+			end
+		end
+
+		self.func(pass) -- NOTE: Call func() AFTER remove otherwise Remove() removes the same timer (id) if it gets re-created in the callback
 
 		return self
 	end
