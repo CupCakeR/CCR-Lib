@@ -1,5 +1,6 @@
 
 --COPYRIGHT https://github.com/Threebow/tdlib/blob/master/tdlib.lua
+-- TODO: Clear poly on size change
 
 local PANEL = {}
 
