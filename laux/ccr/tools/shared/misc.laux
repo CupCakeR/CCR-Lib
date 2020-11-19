@@ -97,7 +97,7 @@ local units = {
 	["days"] = 1440,
 	["hours"] = 60,
 	["minutes"] = 1,
-	["permanent"] = -1
+	["permanent"] = 0
 }
 
 local function findUnit(str)
@@ -133,7 +133,12 @@ function CCR.ParseStringToSeconds(str)
 			return false -- unit not found
 		end
 
-		mins += units[unit] * t
+		local mul = units[unit]
+		if (mul == 0) then
+			return 0 -- permanent
+		end
+
+		mins += mul * t
 	end
 
 	return math.Clamp(mins, 0, 31536000)
