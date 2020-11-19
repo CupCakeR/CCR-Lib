@@ -74,6 +74,7 @@ CCR:AddPanelFunction("LerpPos", function(s, x, y, dur, callback)
 	return anim
 end)
 
+-- FIXME: Find a general fix, sometimes doesn't set to 0 properly, ffs
 -- NOTE: https://gitlab.com/sleeppyy/xeninui/-/blob/master/lua/xeninui/libs/essentials.lua#L250-266
 CCR:AddPanelFunction("LerpAlpha", function(s, alpha, time = .1, callback = function() end)
 	s.Alpha ||= 0
