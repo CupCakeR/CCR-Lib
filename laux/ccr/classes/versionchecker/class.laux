@@ -1,0 +1,81 @@
+
+public class CCR.VersionChecker
+	_get currentVersion
+	_get _set checkUrl
+	_get consoleLogger
+
+	lastChecked = 0 -- ct
+	lastVersion = nil -- the last version returned
+
+	constructor(version)
+		if (version) then
+			self:setCurrentVersion(version)
+		end
+	end
+
+	setCurrentVersion(...)
+		self.currentVersion = CCR.SemVer(tostring(...))
+		return self
+	end
+
+	setConsoleLogger(logger: CCR.ConsoleLogger)
+		self.consoleLogger = logger
+		return self
+	end
+
+	check()
+		assert(self.currentVersion, "no version set")
+		assert(self.checkUrl, "no url set to get the current version from")
+		assert(self.consoleLogger, "no console logger set")
+
+		self.lastChecked = SysTime()
+
+		http.Fetch(self.checkUrl,
+			(body, length, headers, code) =>
+				if (code != 200) then
+					return self.consoleLogger:error("Failed to fetch version from ", grey(200), self.checkUrl, color_white, " (", rgb(255, 0, 0), code, color_white, ")")
+				end
+
+				local semver
+				local success, err = pcall(() =>
+					semver = CCR.SemVer(body)
+				end)
+
+				if (!success) then
+					return self.consoleLogger:error("Version check failed, error: ", grey(200), err)
+				end
+
+				stopif (self.lastVersion == semver)
+
+				if (self.currentVersion < semver) then
+					self.consoleLogger:warning("The version you are running ", rgb(255, 0, 0), `(${self.currentVersion})`, color_white, " is out of date, please update to the latest version ", rgb(0, 255, 0), `(${semver})`)
+				elseif (self.currentVersion == semver) then
+					self.consoleLogger:success("You are running the latest version ", rgb(0, 255, 0), `(${self.currentVersion})`)
+				end
+
+				self.lastVersion = semver
+			end,
+			(str) =>
+				self.consoleLogger:error(str)
+			end
+		)
+
+		return self
+	end
+
+	__tostring()
+		return "CCR.VersionChecker"
+	end
+end
+
+hook.Add("CCR.PreLoadAddons", "CCR.VersionCheck", () =>
+	CCR.VersionCheckerObject = CCR.VersionChecker()
+		:setCurrentVersion(CCR.VERSION)
+		:setCheckUrl("https://raw.githubusercontent.com/cupcaker/ccr-versions/master/ccr-lib")
+		:setConsoleLogger(CCR.Logger)
+	:check()
+
+	CCR:CreateTimer("CCR.VersionCheck", 60 * 30, 0, () =>
+		CCR.VersionCheckerObject:check()
+	end)
+end)

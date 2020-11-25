@@ -7,6 +7,7 @@ CCR:IncludeFile("not_my_code/gradient", "cl")
 CCR:IncludeFile("not_my_code/hashids", "sh")
 CCR:IncludeFile("not_my_code/semver", "sh")
 
+CCR.VERSION = CCR.SemVer("1.0.0")
 
 CCR:IncludeFile("cl_panelfuncs")
 CCR:IncludeFile("cl_test")
