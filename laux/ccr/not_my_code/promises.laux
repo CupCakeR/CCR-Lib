@@ -354,6 +354,6 @@ end
 
 function CCR.PromiseError(msg = "Undefined error")
 	CCR.Logger:Error(`Promise failed: ${msg}`)
-	debug.Trace()
-	error("break, see above")
+	-- debug.Trace()
+	-- error("break, see above")
 end
