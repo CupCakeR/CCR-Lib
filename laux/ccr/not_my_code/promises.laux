@@ -187,6 +187,9 @@ function M.new(options)
 		queue = {},
 		success = options.success,
 		failure = options.failure,
+		__type = () =>
+			return "CCR.Promise"
+		end
 	}
 	d = setmetatable(d, deferred)
 	if isfunction(options.extend) then
