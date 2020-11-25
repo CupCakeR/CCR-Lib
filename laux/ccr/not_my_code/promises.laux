@@ -2,6 +2,8 @@
 -- https://promisesaplus.com/
 -- https://github.com/zserge/lua-promises/blob/master/deferred.lua
 
+local pcall = (func, ...) => return true, func(...) end -- thank you gmod
+
 local M = {}
 
 local deferred = {}
