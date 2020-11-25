@@ -134,7 +134,7 @@ class Panel extends CCR.Config.FieldValidator -- NOTE: why the fuck would we eve
 end
 validators["panel"] = Panel
 
-class Function extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+class Function extends CCR.Config.FieldValidator
 	__type() end
 
 	static id = "function"
@@ -147,7 +147,7 @@ validators["function"] = Function
 
 -- specials
 
-class DBConfig extends CCR.Config.FieldValidator -- NOTE: why the fuck would we ever need this
+class DBConfig extends CCR.Config.FieldValidator
 	__type() end
 
 	static id = "db_config"
