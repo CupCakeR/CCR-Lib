@@ -1,4 +1,6 @@
 
+-- TODO: Common Code Blocks https://www.w3schools.com/js/tryit.asp?filename=tryjs_switch3
+
 public class CCR.Switch
 	constructor(compare)
 		self.compare = compare
