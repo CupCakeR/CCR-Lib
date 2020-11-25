@@ -5,6 +5,7 @@ public class CCR.Switch
 	constructor(compare)
 		self.compare = compare
 		self.expressions = {}
+		self.default = nil
 
 		return self
 	end
@@ -29,10 +30,21 @@ public class CCR.Switch
 		return self
 	end
 
+	default(fn)
+		self.default = fn
+		return self
+	end
+
 	run()
+		local def = true
 		for i, tbl in ipairs(self.expressions) do
 			continueif (tbl.expr != self.compare)
-			breakif (tbl.func() == false)
+			def = false
+			stopif (tbl.func() == false)
+		end
+
+		if (def && self.default) then
+			self.default()
 		end
 	end
 end
