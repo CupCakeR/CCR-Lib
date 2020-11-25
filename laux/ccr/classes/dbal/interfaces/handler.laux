@@ -1,0 +1,8 @@
+
+public class CCR.DBAL.Handler
+	constructor(obj) end
+
+	getConnection() error("not implemented") end
+	close() error("not implemented") end
+	onReady() error("not implemented") end
+end

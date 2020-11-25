@@ -1,0 +1,29 @@
+
+public class CCR.DBAL.TransactionMySQLOO extends CCR.DBAL.QueryMySQLOO -- all functions are inherited but some dont have any effect
+	constructor(obj)
+		super(obj)
+	end
+
+	__tostring()
+		return "CCR.DBAL.Transaction[MySQLOO]"
+	end
+
+	-- binds
+	addQuery(query: CCR.DBAL.QueryMySQLOO|CCR.DBAL.PreparedQueryMySQLOO)
+		self.object:addQuery(query.object)
+		return self
+	end
+
+	getQueries()
+		local queries = {}
+		for i, query in ipairs(self.object:getQueries()) do
+			if (isfunction(query.clearParameters)) then
+				table.insert(queries, CCR.DBAL.PreparedQueryMySQLOO(query))
+			else
+				table.insert(queries, CCR.DBAL.QueryMySQLOO(query))
+			end
+		end
+
+		return queries
+	end
+end

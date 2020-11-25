@@ -1,0 +1,11 @@
+
+public class CCR.DBAL.Connection
+	constructor(obj) end
+
+	connect() error("not implemented") end
+	disconnect() error("not implemented") end
+	query() error("not implemented") end
+	prepare() error("not implemented") end
+	createTransaction() error("not implemented") end
+	escape() error("not implemented") end
+end

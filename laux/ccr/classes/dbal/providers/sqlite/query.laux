@@ -1,0 +1,65 @@
+
+public class CCR.DBAL.QuerySQLite extends CCR.DBAL.Query
+	_get object
+	object = nil
+
+	running = true
+
+	constructor(sql: string)
+		super()
+
+		self.object = {sql = sql}
+
+		self.object.onAborted = (obj, ...) => self:onAborted(...) end
+		self.object.onError = (obj, ...) => self:onError(...) end
+		self.object.onSuccess = (obj, ...) => self:onSuccess(...) end
+		self.object.onData = (obj, ...) => self:onData(...) end
+	end
+
+	__tostring()
+		return "CCR.DBAL.Query[SQLite]"
+	end
+
+	-- binds
+	start()
+		local data = sql.Query(self.object.sql)
+		if (data == false) then
+			self.object:onError(self:error(), self.object.sql)
+		else
+			self.object:onData(data)
+			self.object:onSuccess(data)
+		end
+
+		self.running = false
+
+		return self
+	end
+
+	isRunning()
+		return self.running
+	end
+
+	getData()
+		-- do nothing
+		-- TODO: Fake it by saving the result and hope it doesn't cause a memory leak
+	end
+
+	lastInsert()
+		return sql.QueryValue("SELECT last_insert_rowid();")
+	end
+
+	setOption(option)
+		-- do nothing
+		return self
+	end
+
+	error()
+		return sql.LastError()
+	end
+
+	-- overrides
+	onAborted() end
+	onError(err, sqlString) end
+	onSuccess(data) end
+	onData(data) end
+end

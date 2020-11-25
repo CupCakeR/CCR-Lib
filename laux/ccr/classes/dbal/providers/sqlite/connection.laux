@@ -1,0 +1,37 @@
+
+public class CCR.DBAL.ConnectionSQLite extends CCR.DBAL.Connection
+	constructor()
+		super()
+	end
+
+	__tostring()
+		return "CCR.DBAL.Connection[SQLite]"
+	end
+
+	-- binds
+	connect()
+		-- do nothing
+		return self
+	end
+
+	disconnect()
+		-- do nothing
+		return self
+	end
+
+	query(sql)
+		return CCR.DBAL.QuerySQLite(sql)
+	end
+
+	prepare(sql)
+		return CCR.DBAL.PreparedQuerySQLite(sql)
+	end
+
+	createTransaction()
+		return CCR.DBAL.TransactionSQLite()
+	end
+
+	escape(str)
+		return sql.SQLStr(str)
+	end
+end

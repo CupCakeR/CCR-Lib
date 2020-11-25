@@ -1,0 +1,42 @@
+
+public class CCR.DBAL.PreparedQueryMySQLOO extends CCR.DBAL.QueryMySQLOO -- all functions are inherited
+	constructor(obj)
+		super(obj)
+	end
+
+	__tostring()
+		return "CCR.DBAL.PreparedQuery[MySQLOO]"
+	end
+
+	-- binds
+	setNumber(index, number)
+		self.object:setNumber(index, number)
+		return self
+	end
+
+	setString(index, str)
+		self.object:setString(index, str)
+		return self
+	end
+
+	setBoolean(index, bool)
+		self.object:setBoolean(index, bol)
+		return self
+	end
+
+	setNull(index)
+		self.object:setNull(index)
+		return self
+	end
+
+	clearParmeters()
+		self.object:clearParmeters()
+		return self
+	end
+
+	-- "This shouldn't be used anymore, just start the same prepared multiple times with different parameters"
+	putNewParameters()
+		self.object:putNewParameters()
+		return self
+	end
+end

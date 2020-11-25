@@ -1,0 +1,10 @@
+
+public class CCR.DBAL.Transaction
+	constructor(obj) end
+
+	addQuery() error("not implemented") end
+	getQueries() error("not implemented") end
+	
+	onError() error("not implemented") end
+	onSuccess() error("not implemented") end
+end

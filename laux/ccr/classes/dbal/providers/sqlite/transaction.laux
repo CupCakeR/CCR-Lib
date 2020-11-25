@@ -1,0 +1,78 @@
+
+class FakeSQLiteTransaction
+	queries = {}
+
+	constructor()
+		self.queries = {}
+	end
+
+	addQuery(query)
+		table.insert(self.queries, query)
+	end
+
+	__type() end
+end
+
+public class CCR.DBAL.TransactionSQLite extends CCR.DBAL.QuerySQLite
+	_get object
+	object = nil
+
+	constructor()
+		super("TRANSACTION") -- transactions dont have sql itself, their fake transaction object holds their queries
+
+		self.object = {}
+		self.object.onError = (obj, ...) => self:onError(...) end
+		self.object.onSuccess = (obj, ...) => self:onSuccess(...) end
+
+		self.fakeTransaction = FakeSQLiteTransaction()
+	end
+
+	__tostring()
+		return "CCR.DBAL.TransactionSQLite[SQLite]"
+	end
+
+	-- binds
+	addQuery(query: CCR.DBAL.QuerySQLite|CCR.DBAL.PreparedQuerySQLite)
+		self.fakeTransaction:addQuery(query)
+		return self
+	end
+
+	getQueries()
+		return self.fakeTransaction.queries
+	end
+
+	start()
+		sql.Begin()
+
+		local err
+		for i, query in ipairs(self:getQueries()) do
+			breakif (err)
+			
+			-- I have no clue why I have to "disable" those callbacks. SELECTS should NOT work in transactions afaik. And again, thank you gmod
+			query.onSuccess = () => end
+			query.onData = () => end
+
+			query.onError = (query, error, sql) =>
+				err = {error, sql}
+			end
+
+			query:start()
+		end
+
+		sql.Commit()
+
+		-- dont call callbacks on the object itself, its a callback of our transaction
+		if (err != nil) then
+			self:onError(unpack(err))
+		else
+			-- self.object:onData() -- this is a transaction u dummy
+			self:onSuccess()
+		end
+
+		return self
+	end
+
+	-- overrides
+	onError(err, sqlString) end
+	onSuccess() end
+end

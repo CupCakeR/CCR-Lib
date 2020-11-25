@@ -1,0 +1,12 @@
+
+CCR:IncludeFile("mysqloo/handler", "sv")
+CCR:IncludeFile("mysqloo/connection", "sv")
+CCR:IncludeFile("mysqloo/query", "sv")
+CCR:IncludeFile("mysqloo/prepared_query", "sv")
+CCR:IncludeFile("mysqloo/transaction", "sv")
+
+CCR:IncludeFile("sqlite/handler", "sv")
+CCR:IncludeFile("sqlite/connection", "sv")
+CCR:IncludeFile("sqlite/query", "sv")
+CCR:IncludeFile("sqlite/prepared_query", "sv")
+CCR:IncludeFile("sqlite/transaction", "sv")
