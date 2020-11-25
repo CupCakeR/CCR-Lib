@@ -334,12 +334,12 @@ end
 --- @return rejected future result
 
 CCR.Promises = M
-function CCR:NewPromise()
-	return CCR.Promises.new()
+function CCR:NewPromise(...)
+	return CCR.Promises.new(...)
 end
 
-function CCR.Promise() -- new, no need for :
-	return CCR.Promises.new()
+function CCR.Promise(...) -- new, no need for :
+	return CCR.Promises.new(...)
 end
 
 function CCR:NewTimedPromise(t) -- TODO: Identifier
