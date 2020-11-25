@@ -5,6 +5,7 @@ public class CCR.ConsoleLogger
 		["warning"] =	rgb(241, 196, 15),
 		["log"] =		rgb(52, 152, 219),
 		["debug"] =		grey(200),
+		["success"] =	rgb(0, 255, 0),
 	}
 
 	constructor(prefix, config)
@@ -13,7 +14,8 @@ public class CCR.ConsoleLogger
 			log = true,
 			debug = true,
 			error = true,
-			warning = true
+			warning = true,
+			success = true,
 		})
 
 		self.prefix = prefix || self.prefix
@@ -55,12 +57,16 @@ public class CCR.ConsoleLogger
 		self:print(CCR.ConsoleLogger["COLORS"].debug, "Debug: ", color_white, ...)
 	end
 
+	Success(...)
+		stopif (!self.config.success)
+		self:print(CCR.ConsoleLogger["COLORS"].success, "Success: ", color_white, ...)
+	end
+
 	error = self.Error
 	warning = self.Warning
 	log = self.Log
 	debug = self.Debug
+	success = self.Success
 end
 
 CCR.Logger = CCR.ConsoleLogger("CCR")
-
-CCR.Logger:debug("bruh")
