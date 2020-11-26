@@ -15,7 +15,7 @@ public class CCR.DatabaseHelper
 	end
 
 	isMySQL()
-		return self:getDatabase():getMySQL()
+		return self.database:getMySQL()
 	end
 
 	escape(str)
