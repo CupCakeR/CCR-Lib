@@ -42,6 +42,8 @@ public class CCR.Database
 			return
 		end
 
+		local promise = CCR.Promise()
+
 		self.initialized = true
 
 		local config = self.configuration
@@ -73,7 +75,12 @@ public class CCR.Database
 		assert(self.handler, "handler not set")
 
 		self.helper = CCR.DatabaseHelper(self)
+		self.handler.onReady = () =>
+			promise:resolve(self)
 			hook.Run("CCR.DBAL.OnReady", self)
+		end
+
+		return promise
 	end
 
 	-- handler quick functions
