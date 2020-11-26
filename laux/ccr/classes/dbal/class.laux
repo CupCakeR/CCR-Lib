@@ -82,11 +82,6 @@ public class CCR.Database
 
 		return promise
 	end
-
-	-- handler quick functions
-	getConnection() assert(self.initialized) return self.handler:getConnection() end
-	close() assert(self.initialized) return self.handler:close() end
-
 	-- meta shit
 	__tostring()
 		if (self.handler) then

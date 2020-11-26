@@ -10,8 +10,12 @@ public class CCR.DatabaseHelper
 	_get _set database
 	database = nil
 
+	_get handler
+	handler = nil
+
 	constructor(database: CCR.Database)
 		self.database = database
+		self.handler = database:getHandler()
 	end
 
 	isMySQL()
@@ -19,11 +23,11 @@ public class CCR.DatabaseHelper
 	end
 
 	escape(str)
-		return self.database:escape(str)
+		return self.handler:getFirstConnection():escape(str)
 	end
 
 	query(sql, cbSuccessful, cbError)
-		local conn = self.database:getConnection()
+		local conn = self.handler:getConnection()
 		local query = conn:query(sql)
 
 		local promise = CCR.Promise()
@@ -64,7 +68,7 @@ public class CCR.DatabaseHelper
 	end
 
 	prepare(sql, cbSuccessful, cbError)
-		local conn = self.database:getConnection()
+		local conn = self.handler:getConnection()
 		local query = conn:prepare(sql)
 
 		local promise = CCR.Promise()
@@ -103,7 +107,7 @@ public class CCR.DatabaseHelper
 	end
 
 	transaction(cbSuccessful, cbError)
-		local conn = self.database:getConnection()
+		local conn = self.handler:getConnection()
 		local transaction = conn:createTransaction()
 
 		local promise = CCR.Promise()
