@@ -135,6 +135,8 @@ public class CCR.MigrationManager
 		return promise
 	end
 
+	-- TODO: resetMigration
+
 	run()
 		assert(self.databaseObject, "database object not set")
 		assert(self.directory, "directory not set")
