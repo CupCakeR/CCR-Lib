@@ -18,6 +18,10 @@ public class CCR.DatabaseHelper
 		return self:getDatabase():getMySQL()
 	end
 
+	escape(str)
+		return self.database:escape(str)
+	end
+
 	query(sql, cbSuccessful, cbError)
 		local conn = self.database:getConnection()
 		local query = conn:query(sql)
