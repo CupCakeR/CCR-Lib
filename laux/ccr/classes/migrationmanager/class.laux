@@ -93,7 +93,7 @@ public class CCR.MigrationManager
 	end
 
 	executePendingMigrations(after)
-		local conn = self.databaseObject:getConnection() -- get a single connection
+		local conn = self.databaseObject:getHandler():getConnection() -- get a single connection
 		local transaction = conn:createTransaction()
 		local files = self:findPendingMigrationFiles(after)
 
