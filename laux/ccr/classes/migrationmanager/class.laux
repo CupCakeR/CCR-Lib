@@ -112,7 +112,8 @@ public class CCR.MigrationManager
 			local prepared = conn:prepare([[
 				INSERT INTO
 					ccr_migrations (addon_id, migration, time_executed)
-				VALUES(?, ?, ?);
+				VALUES
+					(?, ?, ?);
 			]])
 			prepared:setString(1, self:getAddonId())
 			prepared:setNumber(2, migration)
