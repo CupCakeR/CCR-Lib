@@ -32,6 +32,6 @@ public class CCR.DBAL.ConnectionSQLite extends CCR.DBAL.Connection
 	end
 
 	escape(str)
-		return sql.SQLStr(str)
+		return sql.SQLStr(str, true)
 	end
 end
