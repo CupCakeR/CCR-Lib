@@ -87,6 +87,8 @@ public class CCR.DatabaseHelper
 			promise:reject(...)
 		end
 
+		-- dear myself, dont forget to start the query after setting the values
+
 		return query, promise -- NOTE: return args are flipped compared to query because query > promise in this case
 	end
 
