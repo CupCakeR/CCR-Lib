@@ -35,7 +35,7 @@ public class CCR.MigrationManager
 
 	--
 
-	createMigrationsTable()
+	prepareMigrationsTable()
 		return self.databaseObject:getHelper():query([[
 			CREATE TABLE IF NOT EXISTS ccr_migrations (
 				id INT AUTO_INCREMENT PRIMARY KEY,
@@ -147,7 +147,7 @@ public class CCR.MigrationManager
 		self._total = 0
 		self._st_start = 0
 
-		self:createMigrationsTable():next(() =>
+		self:prepareMigrationsTable():next(() =>
 			return self:getCurrentMigration()
 		end):next((tbl) =>
 			return tonumber(tbl[1].migration) -- return the actual migration number (date)
