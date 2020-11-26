@@ -12,7 +12,7 @@ class FakeSQLitePreparedQuery
 	end
 
 	setString(i, str)
-		self.data[i] = sql.SQLStr(str)
+		self.data[i] = sql.SQLStr(str) -- NOTE: Let it use quotes here!
 	end
 
 	setBoolean(i, b)
