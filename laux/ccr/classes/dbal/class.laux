@@ -20,9 +20,6 @@ public class CCR.Database
 	_get _set configuration
 	configuration = nil
 
-	_get helper
-	helper = nil
-
 	_get handler
 	handler = nil
 
@@ -74,7 +71,6 @@ public class CCR.Database
 
 		assert(self.handler, "handler not set")
 
-		self.helper = CCR.DatabaseHelper(self)
 		self.handler.onReady = () =>
 			promise:resolve(self)
 			hook.Run("CCR.DBAL.OnReady", self)
