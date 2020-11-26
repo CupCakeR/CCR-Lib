@@ -92,12 +92,9 @@ public class CCR.Database
 	getLogger()
 		return self.logger || CCR.Logger
 	end
-
-	-- overrides
-	onReady()
-		hook.Run("CCR.DBAL.OnReady", self)
-	end
 end
+
+stopif (true)
 
 if true then
 	if (CCR._DatabaseObject && false) then
