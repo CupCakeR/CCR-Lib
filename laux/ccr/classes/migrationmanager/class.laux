@@ -154,6 +154,8 @@ public class CCR.MigrationManager
 		end):next((currentMigration) =>
 			return self:executePendingMigrations(currentMigration)
 		end):next(() =>
+			promise:resolve()
+
 			if (self._total == 0) then
 				self.consoleLogger:success(`No pending migrations to execute`)
 				return
@@ -167,8 +169,6 @@ public class CCR.MigrationManager
 		end, (err = "unknown") =>
 			self.consoleLogger:error("Executing migration(s) failed, error: ", grey(200), err)
 		end)
-
-		-- promise:resolve()
 
 		return promise
 	end
