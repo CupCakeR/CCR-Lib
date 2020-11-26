@@ -78,6 +78,10 @@ public class CCR.DBAL.HandlerMySQLOO extends CCR.DBAL.Handler
 		return lowest
 	end
 
+	getFirstConnection()
+		return self.connectionPool[1]
+	end
+
 	close()
 		for i, conn in ipairs(self.connectionPool) do
 			conn:disconnect()

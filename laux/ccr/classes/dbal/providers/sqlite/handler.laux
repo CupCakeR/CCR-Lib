@@ -28,6 +28,10 @@ public class CCR.DBAL.HandlerSQLite extends CCR.DBAL.Handler
 		return self.object
 	end
 
+	getFirstConnection()
+		return self.object
+	end
+
 	close()
 		-- do nothing
 	end
