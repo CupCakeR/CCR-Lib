@@ -25,11 +25,12 @@ class FakeSQLitePreparedQuery
 
 	getSql()
 		local i = 0
-
-		return self.query:gsub("?", () =>
+		local str, _ = self.query:gsub("?", () =>
 			i++
 			return self.data[i]
 		end)
+
+		return str
 	end
 
 	clear()
