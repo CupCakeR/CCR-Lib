@@ -126,7 +126,8 @@ public class CCR.MigrationManager
 		transaction.onSuccess = (_, ...) => promise:resolve(...) end
 		transaction.onError = (_, ...) => promise:reject(...) end
 
-		self._total = total
+		self._total_migrations = #files
+		self._total_queries = total
 		self._newest = total
 		self._st_start = SysTime()
 
@@ -144,7 +145,7 @@ public class CCR.MigrationManager
 
 		local promise = CCR.Promise()
 
-		self._total = 0
+		self._total_queries = 0
 		self._st_start = 0
 
 		self:prepareMigrationsTable():next(() =>
@@ -156,16 +157,18 @@ public class CCR.MigrationManager
 		end):next(() =>
 			promise:resolve()
 
-			if (self._total == 0) then
+			if (self._total_migrations == 0) then
 				self.consoleLogger:success(`No pending migrations to execute`)
 				return
 			end
 
-			local str = self._total == 1 && "migration" || "migrations"
 			local took = SysTime() - self._st_start
 			took = math.Round(took * 1000, 3)
 
-			self.consoleLogger:success(`Successfully executed ${self._total} ${str} within ${took} ms`)
+			local strMigrations = self._total_migrations == 1 && "migration" || "migrations"
+			local strQueries = self._total_queries == 1 && "query" || "queries"
+
+			self.consoleLogger:success(`Successfully executed ${self._total_migrations} ${strMigrations} (${self._total_queries} ${strQueries}) within ${took} ms`)
 		end, (err = "unknown") =>
 			self.consoleLogger:error("Executing migration(s) failed, error: ", grey(200), err)
 		end)
