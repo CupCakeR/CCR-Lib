@@ -1,11 +1,11 @@
 
 public class CCR.ConsoleLogger
 	static COLORS = {
-		["error"] =		rgb(255, 0, 0),
-		["warning"] =	rgb(241, 196, 15),
-		["log"] =		rgb(52, 152, 219),
-		["debug"] =		grey(200),
-		["success"] =	rgb(0, 255, 0),
+		["error"] =		Color(255, 0, 0),
+		["warning"] =	Color(241, 196, 15),
+		["log"] =		Color(52, 152, 219),
+		["debug"] =		Color(200, 200, 200),
+		["success"] =	Color(0, 255, 0),
 	}
 
 	constructor(prefix, config)
