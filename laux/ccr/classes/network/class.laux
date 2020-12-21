@@ -22,7 +22,7 @@ public class CCR.Network
 		end)
 	end
 
-	send(name, target, func)
+	send(name, target, func = () => end)
 		net.Start(self:getPrefix() .. name)
 
 		if (CLIENT) then
