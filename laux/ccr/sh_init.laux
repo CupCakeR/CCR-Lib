@@ -1,7 +1,11 @@
 
--- yes, double include but /shrug
+-- TODO: tell the loader to ONLY AddCSLuaFile, so clients will be able to include it without the loader
+-- NOTE: including it twice (here + loader) will somehow break autorefresh
+if (SERVER) then
+	AddCSLuaFile("ccr/classes/fileloader/class.lua")
+end
+
 include("ccr/classes/fileloader/class.lua")
-include("ccr/classes/logger/class.lua")
 
 CCR.FileLoader()
 	:setDirectory("ccr")
@@ -23,7 +27,7 @@ CCR.FileLoader()
 	:addFolder("tools/client", CCR.FileLoader.REALM_CLIENT)
 	:addFolder("tools/shared", CCR.FileLoader.REALM_SHARED)
 	
-	:addFile("classes/fileloader/class",		CCR.FileLoader.REALM_SHARED)
+	-- :addFile("classes/fileloader/class",		CCR.FileLoader.REALM_SHARED)
 	:addFile("classes/config/class",			CCR.FileLoader.REALM_SHARED)
 	:addFile("classes/language/class",			CCR.FileLoader.REALM_SHARED)
 	:addFile("classes/logger/class",			CCR.FileLoader.REALM_SHARED)
