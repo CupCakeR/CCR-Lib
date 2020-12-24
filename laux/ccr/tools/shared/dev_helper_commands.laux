@@ -1,0 +1,33 @@
+
+stopif (SERVER)
+
+concommand.Add("ccr_print_pos", function(p, cmd, args)
+	local pos = p:GetPos()
+	local ang = p:GetAngles()
+
+	print(`Vector(${pos.x}, ${pos.y}, ${pos.z})`)
+	print(`Angle(${ang.pitch}, ${ang.yaw}, ${ang.roll})`)
+end)
+
+local whitelist = {
+	["DMenu"] = true,
+	["ContextMenu"] = true,
+	["ControlPanel"] = true,
+	["SpawnMenu"] = true,
+}
+concommand.Add("ccr_vgui_clearworldpanel", function(p, cmd, args)
+	stopif (!p:IsSuperAdmin())
+
+	for i, pnl in ipairs(vgui.GetWorldPanel():GetChildren()) do
+		continueif whitelist[pnl:GetName()]
+		pnl:Remove()
+	end
+end)
+
+concommand.Add("ccr_vgui_clearhudpanel", function(p, cmd, args)
+	stopif (!p:IsSuperAdmin())
+
+	for i, pnl in ipairs(GetHUDPanel():GetChildren()) do
+		pnl:Remove()
+	end
+end)
