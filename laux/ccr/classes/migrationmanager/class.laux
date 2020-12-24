@@ -1,6 +1,6 @@
 
 public class CCR.MigrationManager
-	_get addonId
+	_get _set addonId
 	addonId = nil
 
 	_get _set databaseObject
@@ -12,8 +12,8 @@ public class CCR.MigrationManager
 	_get directory
 	directory = nil
 
-	constructor(addonId: string)
-		self.addonId = addonId
+
+	constructor()
 	end
 
 	setConsoleLogger(logger: CCR.ConsoleLogger)
