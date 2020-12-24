@@ -3,8 +3,8 @@ public class CCR.MigrationManager
 	_get _set addonId
 	addonId = nil
 
-	_get _set databaseObject
-	databaseObject = nil
+	_get _set connection
+	connection = nil
 
 	_get consoleLogger
 	consoleLogger = nil
@@ -12,6 +12,8 @@ public class CCR.MigrationManager
 	_get directory
 	directory = nil
 
+	_get helper
+	helper = nil
 
 	constructor()
 	end
@@ -36,7 +38,7 @@ public class CCR.MigrationManager
 	--
 
 	prepareMigrationsTable()
-		return self.databaseObject:getHelper():query([[
+		return self:getHelper():query([[
 			CREATE TABLE IF NOT EXISTS ccr_migrations (
 				id INT AUTO_INCREMENT PRIMARY KEY,
 				addon_id VARCHAR(255) NOT NULL,
@@ -48,7 +50,7 @@ public class CCR.MigrationManager
 	end
 
 	getCurrentMigration()
-		local query, promise = self.databaseObject:getHelper():prepare([[
+		local query, promise = self:getHelper():prepare([[
 			SELECT
 				COALESCE(MAX(migration), 0) AS migration
 			FROM
@@ -93,15 +95,15 @@ public class CCR.MigrationManager
 	end
 
 	executePendingMigrations(after)
-		local conn = self.databaseObject:getHandler():getConnection() -- get a single connection
+		-- local conn = self.connection:getHandler():getConnection() -- get a single connection
+		local conn = self.connection
 		local transaction = conn:createTransaction()
 		local files = self:findPendingMigrationFiles(after)
 
-		local isMySQL = self.databaseObject:getHelper():isMySQL()
 		local total = 0
 		for i, migration in ipairs(files) do
 			local func = include(`${self:getDirectory()}/${migration}.lua`)
-			local queries = func(conn, isMySQL)
+			local queries = func(conn)
 			
 			for _i, query in ipairs(queries) do
 				transaction:addQuery(query)
@@ -139,9 +141,11 @@ public class CCR.MigrationManager
 	-- TODO: resetMigration
 
 	run()
-		assert(self.databaseObject, "database object not set")
+		assert(self.connection, "database object not set")
 		assert(self.directory, "directory not set")
 		assert(self.consoleLogger, "no console logger set / available")
+
+		self.helper = CCR.DBAL.ConnectionHelper(self:getConnection()) -- FIXME: This should not use the helper (?)
 
 		local promise = CCR.Promise()
 
