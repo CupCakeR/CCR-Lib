@@ -6,29 +6,20 @@ local getFirstValue = (tbl) =>
 	return value
 end
 
-public class CCR.DatabaseHelper
-	_get _set database
-	database = nil
+public class CCR.DBAL.ConnectionHelper
+	_get _set conn
+	conn = nil
 
-	_get handler
-	handler = nil
-
-	constructor(database: CCR.Database)
-		self.database = database
-		self.handler = database:getHandler()
-	end
-
-	isMySQL()
-		return self.database:getMySQL()
+	constructor(connection)
+		self.conn = connection
 	end
 
 	escape(str)
-		return self.handler:getFirstConnection():escape(str)
+		return self.conn:escape(str)
 	end
 
 	query(sql, cbSuccessful, cbError)
-		local conn = self.handler:getConnection()
-		local query = conn:query(sql)
+		local query = self.conn:query(sql)
 
 		local promise = CCR.Promise()
 		query.onSuccess = (_, ...) =>
@@ -68,8 +59,7 @@ public class CCR.DatabaseHelper
 	end
 
 	prepare(sql, cbSuccessful, cbError)
-		local conn = self.handler:getConnection()
-		local query = conn:prepare(sql)
+		local query = self.conn:prepare(sql)
 
 		local promise = CCR.Promise()
 		query.onSuccess = (_, ...) =>
@@ -109,8 +99,7 @@ public class CCR.DatabaseHelper
 	end
 
 	transaction(cbSuccessful, cbError)
-		local conn = self.handler:getConnection()
-		local transaction = conn:createTransaction()
+		local transaction = self.conn:createTransaction()
 
 		local promise = CCR.Promise()
 		transaction.onSuccess = (_, ...) =>
