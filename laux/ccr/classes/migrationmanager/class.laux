@@ -3,6 +3,9 @@ public class CCR.MigrationManager
 	_get _set addonId
 	addonId = nil
 
+	_get _set addonName
+	addonName = "undefined"
+
 	_get _set connection
 	connection = nil
 
