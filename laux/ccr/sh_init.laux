@@ -38,7 +38,7 @@ CCR.FileLoader()
 
 	:addFile("classes/mysqlite/class",			CCR.FileLoader.REALM_SERVER)
 	:addFile("classes/dbal/class",				CCR.FileLoader.REALM_SERVER)
-	:addFile("classes/migrationmanager/class", 	CCR.FileLoader.REALM_SERVER)
+	:addFile("classes/migrationmanager/class",	CCR.FileLoader.REALM_SERVER)
 	
 	:addFolder("themes",	CCR.FileLoader.REALM_SHARED) -- NOTE: Needs to be shared to be able to us this shit in configs
 	:addFolder("elements",	CCR.FileLoader.REALM_CLIENT, true)
