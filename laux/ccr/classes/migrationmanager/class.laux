@@ -43,7 +43,7 @@ public class CCR.MigrationManager
 	prepareMigrationsTable()
 		return self:getHelper():query([[
 			CREATE TABLE IF NOT EXISTS ccr_migrations (
-				id INT AUTO_INCREMENT PRIMARY KEY,
+				id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 				addon_id VARCHAR(255) NOT NULL,
 				migration INT UNSIGNED NOT NULL,
 				time_executed INT UNSIGNED NOT NULL,
