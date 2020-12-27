@@ -165,16 +165,16 @@ obj:Register()
 
 local obj = CCR.NewCurrency("helix")
 	obj.add = (p, amt) =>
-		p:GiveMoney(amt, false)
+		p:GetCharacter():GiveMoney(amt, false)
 	end
 	obj.get = (p) =>
-		return p:getDarkRPVar("money")
+		return p:GetCharacter():GetMoney()
 	end
 	obj.canAfford = (p, amt) =>
-		return p:HasMoney(amt)
+		return p:GetCharacter():HasMoney(amt)
 	end
 	obj.format = (amt) =>
-		return string.Comma(ix.currency.symbol .. amt)
+		return ix.currency.Get(amt)
 	end
 obj:Register()
 
