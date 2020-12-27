@@ -1,0 +1,40 @@
+
+public class CCR.DBAL.HandlerSQLite extends CCR.DBAL.Handler
+	_get object
+	object = nil
+
+	_get ready
+	ready = false -- are we ready to run queries
+
+	_get _set moduleName
+	moduleName = "unknown"
+
+	config = {}
+
+	constructor(config)
+		super()
+
+		self.config = config
+		self.object = CCR.DBAL.ConnectionSQLite()
+
+		timer.Simple(0, () =>
+			self.ready = true
+			self:onReady()
+		end)
+	end
+
+	-- actual funcs we HAVE to provide
+	getConnection()
+		return self.object
+	end
+
+	getFirstConnection()
+		return self.object
+	end
+
+	close()
+		-- do nothing
+	end
+	
+	onReady() end
+end

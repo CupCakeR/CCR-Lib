@@ -1,0 +1,16 @@
+
+public class CCR.DBAL.Query
+	constructor(obj) end
+
+	start() error("not implemented") end
+	isRunning() error("not implemented") end
+	getData() error("not implemented") end
+	lastInsert() error("not implemented") end
+	setOption(option) error("not implemented") end
+	error() error("not implemented") end
+
+	onAborted() error("not implemented") end
+	onError() error("not implemented") end
+	onSuccess() error("not implemented") end
+	onData() error("not implemented") end
+end

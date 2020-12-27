@@ -1,0 +1,102 @@
+
+public class CCR.FileLoader
+	static REALM_AUTO = 0
+	static REALM_SERVER = 1
+	static REALM_CLIENT = 2
+	static REALM_SHARED = 3
+
+	_get _set directory
+	directory = nil
+
+	_get _set consoleLogger
+	consoleLogger = nil
+
+	files = {}
+
+	constructor() end
+
+	addFile(file: string, realm = CCR.FileLoader.REALM_AUTO)
+		file = file:StripExtension()
+
+		if (realm == CCR.FileLoader.REALM_AUTO) then
+			local fileName = file:GetFileFromFilename()
+
+			if (fileName:StartWith("sv")) then
+				realm = CCR.FileLoader.REALM_SERVER
+			elseif (fileName:StartWith("cl")) then
+				realm = CCR.FileLoader.REALM_CLIENT
+			elseif (fileName:StartWith("sh")) then
+				realm = CCR.FileLoader.REALM_SHARED
+			else
+				error("no realm defined, could not determine realm from file name automatically")
+			end
+		end
+
+		table.insert(self.files, {
+			path = `${self:getDirectory()}/${file}.lua`,
+			realm = realm
+		})
+
+		return self
+	end
+
+	addFolder(folder, realm, recursive, options = {})
+		local files, directories = file.Find(self:getDirectory() .. "/" .. folder .. "/*", "LUA")
+		for i, fileName in ipairs(files) do
+			-- TODO: options, ignore files
+			self:addFile(`${folder}/${fileName:StripExtension()}`, realm)
+		end
+
+		if (recursive) then
+			for i, directory in ipairs(directories) do
+				-- TODO: options, ignore sub folders
+				self:addFolder(`${folder}/${directory}`, realm, recursive)
+			end
+		end
+
+		return self
+	end
+
+	run()
+		assert(self.directory, "no base directory defined")
+		assert(#self.files > 0, "no files to load")
+
+		local t = 0
+		local c = 0
+
+		for i, file in ipairs(self.files) do
+			local doInclude = false
+			local doAddCSLuaFile = false
+
+			if (file.realm == CCR.FileLoader.REALM_SERVER) then
+				doInclude = SERVER
+			elseif (file.realm == CCR.FileLoader.REALM_CLIENT) then
+				doInclude = CLIENT
+				doAddCSLuaFile = SERVER
+			elseif (file.realm == CCR.FileLoader.REALM_SHARED) then
+				doInclude = true
+				doAddCSLuaFile = true
+			end
+
+			if (doAddCSLuaFile) then
+				AddCSLuaFile(file.path)
+			end
+
+			if (doInclude) then
+				local st = SysTime()
+				include(file.path)
+				t += SysTime() - st
+
+				c++
+			end
+		end
+
+		if (self:getConsoleLogger()) then
+			local ms = math.Round(t * 1000, 3)
+			local str = "file" .. (c == 1 && "" || "s")
+			self:getConsoleLogger():log(`Included ${c} ${str}, took ${ms} ms.`)
+		end
+
+		return self
+	end
+end

@@ -2,6 +2,8 @@
 -- https://promisesaplus.com/
 -- https://github.com/zserge/lua-promises/blob/master/deferred.lua
 
+local pcall = (func, ...) => return true, func(...) end -- thank you gmod
+
 local M = {}
 
 local deferred = {}
@@ -185,6 +187,9 @@ function M.new(options)
 		queue = {},
 		success = options.success,
 		failure = options.failure,
+		__type = () =>
+			return "CCR.Promise"
+		end
 	}
 	d = setmetatable(d, deferred)
 	if isfunction(options.extend) then
@@ -332,12 +337,12 @@ end
 --- @return rejected future result
 
 CCR.Promises = M
-function CCR:NewPromise()
-	return CCR.Promises.new()
+function CCR:NewPromise(...)
+	return CCR.Promises.new(...)
 end
 
-function CCR.Promise() -- new, no need for :
-	return CCR.Promises.new()
+function CCR.Promise(...) -- new, no need for :
+	return CCR.Promises.new(...)
 end
 
 function CCR:NewTimedPromise(t) -- TODO: Identifier
@@ -352,6 +357,6 @@ end
 
 function CCR.PromiseError(msg = "Undefined error")
 	CCR.Logger:Error(`Promise failed: ${msg}`)
-	debug.Trace()
-	error("break, see above")
+	-- debug.Trace()
+	-- error("break, see above")
 end

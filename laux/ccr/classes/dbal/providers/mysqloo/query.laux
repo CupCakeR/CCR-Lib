@@ -1,0 +1,78 @@
+
+public class CCR.DBAL.QueryMySQLOO extends CCR.DBAL.Query
+	_get query
+	object = nil
+
+	constructor(obj)
+		super()
+
+		self.object = obj
+
+		obj.onAborted = (obj, ...) => self:onAborted(...) end
+		obj.onError = (obj, ...) => self:onError(...) end
+		obj.onSuccess = (obj, ...) => self:onSuccess(...) end
+		obj.onData = (obj, ...) => self:onData(...) end
+	end
+
+	__tostring()
+		return "CCR.DBAL.Query[MySQLOO]"
+	end
+
+	-- binds
+	start()
+		self.object:start()
+		return self
+	end
+
+	isRunning()
+		return self.object:isRunning()
+	end
+
+	getData()
+		return self.object:getData()
+	end
+
+	abort()
+		return self.object:abort()
+	end
+
+	lastInsert()
+		return self.object:lastInsert()
+	end
+
+	status()
+		return self.object:status()
+	end
+
+	affectedRows()
+		return self.object:affectedRows()
+	end
+
+	setOption(option)
+		self.object:setOption(option)
+		return self
+	end
+
+	wait(shouldSwap)
+		self.object:wait(shouldSwap)
+		return self
+	end
+
+	error()
+		return self.object:error()
+	end
+
+	hasMoreResults()
+		return self.object:hasMoreResults()
+	end
+
+	getNextResults()
+		return self.object:getNextResults()
+	end
+
+	-- overrides
+	onAborted() end
+	onError(err, sqlString) end
+	onSuccess(data) end
+	onData(data) end
+end

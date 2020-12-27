@@ -1,0 +1,40 @@
+
+CCR.CAMI ||= {}
+
+function CCR.CAMI.PlayerHasAccess(actor, privilege, target, extraInfo)
+	local promise = CCR.Promise()
+
+	CAMI.PlayerHasAccess(actor, privilege, (b, str) =>
+		if (b) then
+			promise:resolve(str)
+		else
+			promise:reject(str)
+		end
+	end, target, extraInfo)
+
+	return promise
+end
+
+function CCR.CAMI.GetPlayersWithAccess(privilege, target, extraInfo)
+	local promise = CCR.Promise()
+
+	CAMI.GetPlayersWithAccess(privilege, (tbl) =>
+		promise:resolve(tbl)
+	end, target, extraInfo)
+
+	return promise
+end
+
+function CCR.CAMI.SteamIDHasAccess(actor, privilege, target, extraInfo)
+	local promise = CCR.Promise()
+
+	CAMI.SteamIDHasAccess(actor, privilege, (tbl) =>
+		if (b) then
+			promise:resolve(str)
+		else
+			promise:reject(str)
+		end
+	end, target, extraInfo)
+
+	return promise
+end

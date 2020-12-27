@@ -1,0 +1,122 @@
+
+-- the helper stores nice little functions that make my life easier
+
+local getFirstValue = (tbl) =>
+	local key, value = next(tbl?[1] || {})
+	return value
+end
+
+public class CCR.DBAL.ConnectionHelper
+	_get _set conn
+	conn = nil
+
+	constructor(connection)
+		self.conn = connection
+	end
+
+	escape(str)
+		return self.conn:escape(str)
+	end
+
+	query(sql, cbSuccessful, cbError)
+		local query = self.conn:query(sql)
+
+		local promise = CCR.Promise()
+		query.onSuccess = (_, ...) =>
+			if (cbSuccessful) then
+				cbSuccessful(...)
+			end
+	
+			promise:resolve(...)
+		end
+		query.onError = (_, ...) =>
+			if (cbError) then
+				cbError(...)
+			end
+
+			promise:reject(...)
+		end
+
+		query:start()
+
+		return promise, query
+	end
+
+	queryValue(sql, cbSuccessful, cbError)
+		if (cbSuccessful) then
+			local old = cbSuccessful
+			cbSuccessful = (result) =>
+				old(getFirstValue(result))
+			end
+		end
+
+		local promise, query = self:query(sql, cbSuccessful, cbError)
+
+		local newPromise = CCR.Promise()
+		promise:next((result) => newPromise:resolve(getFirstValue(result)) end)
+
+		return newPromise, query
+	end
+
+	prepare(sql, cbSuccessful, cbError)
+		local query = self.conn:prepare(sql)
+
+		local promise = CCR.Promise()
+		query.onSuccess = (_, ...) =>
+			if (cbSuccessful) then
+				cbSuccessful(...)
+			end
+
+			promise:resolve(...)
+		end
+		query.onError = (_, ...) =>
+			if (cbError) then
+				cbError(...)
+			end
+
+			promise:reject(...)
+		end
+
+		-- dear myself, dont forget to start the query after setting the values
+
+		return query, promise -- NOTE: return args are flipped compared to query because query > promise in this case
+	end
+
+	prepareValue(sql, cbSuccessful, cbError)
+		if (cbSuccessful) then
+			local old = cbSuccessful
+			cbSuccessful = (result) =>
+				old(getFirstValue(result))
+			end
+		end
+
+		local query, promise = self:prepare(sql, cbSuccessful, cbError)
+
+		local newPromise = CCR.Promise()
+		promise:next((result) => newPromise:resolve(getFirstValue(result)) end)
+
+		return query, newPromise
+	end
+
+	transaction(cbSuccessful, cbError)
+		local transaction = self.conn:createTransaction()
+
+		local promise = CCR.Promise()
+		transaction.onSuccess = (_, ...) =>
+			if (cbSuccessful) then
+				cbSuccessful(...)
+			end
+
+			promise:resolve(...)
+		end
+		transaction.onError = (_, ...) =>
+			if (cbError) then
+				cbError(...)
+			end
+
+			promise:reject(...)
+		end
+
+		return transaction, promise -- NOTE: return args are flipped compared to query because query > promise in this case
+	end
+end

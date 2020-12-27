@@ -1,22 +1,50 @@
 
-CCR:IncludeFile("classes/base/!sh.lua", "sh") -- make sure base loads first
+-- TODO: tell the loader to ONLY AddCSLuaFile, so clients will be able to include it without the loader
+-- NOTE: including it twice (here + loader) will somehow break autorefresh
+if (SERVER) then
+	AddCSLuaFile("ccr/classes/fileloader/class.lua")
+end
 
-CCR:IncludeFile("not_my_code/promises", "sh")
-CCR:IncludeFile("not_my_code/bshadows", "cl")
-CCR:IncludeFile("not_my_code/gradient", "cl")
-CCR:IncludeFile("not_my_code/hashids", "sh")
+include("ccr/classes/fileloader/class.lua")
 
-CCR:IncludeFile("cl_panelfuncs")
-CCR:IncludeFile("cl_test")
-CCR:IncludeFile("sh_classmerges") -- NOTE: Deprecated
+CCR.FileLoader()
+	:setDirectory("ccr")
+	:setConsoleLogger(CCR.Logger)
 
-CCR:IncludeRecursive("tools/shared", "sh")
-CCR:IncludeRecursive("tools/server", "sv")
-CCR:IncludeRecursive("tools/client", "cl")
+	:addFile("not_my_code/promises",	CCR.FileLoader.REALM_SHARED)
+	:addFile("not_my_code/hashids",		CCR.FileLoader.REALM_SHARED)
+	:addFile("not_my_code/semver",		CCR.FileLoader.REALM_SHARED)
+	:addFile("not_my_code/bshadows",	CCR.FileLoader.REALM_CLIENT)
+	:addFile("not_my_code/gradient",	CCR.FileLoader.REALM_CLIENT)
 
-CCR:IncludeRecursive("classes", "sh")
-CCR:IncludeRecursive("themes", "sh") -- NOTE: Needs to be shared to be able to us this shit in configs
-CCR:IncludeRecursive("elements", "cl")
+	:addFile("classes/base/sh", CCR.FileLoader.REALM_SHARED) -- NOTE: Deprecated
+
+	:addFile("cl_panelfuncs")
+	:addFile("cl_test")
+	:addFile("sh_classmerges") -- NOTE: Deprecated
+
+	:addFolder("tools/server", CCR.FileLoader.REALM_SERVER)
+	:addFolder("tools/client", CCR.FileLoader.REALM_CLIENT)
+	:addFolder("tools/shared", CCR.FileLoader.REALM_SHARED)
+	
+	-- :addFile("classes/fileloader/class",		CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/config/class",			CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/language/class",			CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/logger/class",			CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/network/class",			CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/theme/class",				CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/config/class",			CCR.FileLoader.REALM_SHARED)
+	:addFile("classes/versionchecker/class",	CCR.FileLoader.REALM_SHARED)
+
+	:addFile("classes/mysqlite/class",			CCR.FileLoader.REALM_SERVER)
+	:addFile("classes/dbal/class",				CCR.FileLoader.REALM_SERVER)
+	:addFile("classes/migrationmanager/class",	CCR.FileLoader.REALM_SERVER)
+	
+	:addFolder("themes",	CCR.FileLoader.REALM_SHARED) -- NOTE: Needs to be shared to be able to us this shit in configs
+	:addFolder("elements",	CCR.FileLoader.REALM_CLIENT, true)
+:run()
+
+CCR.VERSION = CCR.SemVer("2.0.0")
 
 CCR.Logger:Log("Fully initialized library")
 

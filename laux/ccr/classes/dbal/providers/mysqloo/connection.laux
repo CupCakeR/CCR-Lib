@@ -1,0 +1,97 @@
+
+public class CCR.DBAL.ConnectionMySQLOO extends CCR.DBAL.Connection
+	_get object
+	object = nil
+
+	constructor(obj)
+		super()
+
+		self.object = obj
+
+		obj.onConnected = (obj, ...) => self:onConnected(...) end
+		obj.onConnectionFailed = (obj, ...) => self:onConnectionFailed(...) end
+	end
+
+	__tostring()
+		return "CCR.DBAL.Connection[MySQLOO]"
+	end
+
+	-- binds
+	connect()
+		self.object:connect()
+		return self
+	end
+
+	disconnect(shouldWait)
+		self.object:disconnect(shouldWait)
+		return self
+	end
+
+	query(sql)
+		return CCR.DBAL.QueryMySQLOO(self.object:query(sql))
+	end
+
+	prepare(sql)
+		return CCR.DBAL.PreparedQueryMySQLOO(self.object:prepare(sql))
+	end
+
+	createTransaction()
+		return CCR.DBAL.TransactionMySQLOO(self.object:createTransaction())
+	end
+
+	escape(str)
+		return self.object:escape(str)
+	end
+
+	abortAllQueries()
+		return self.object:abortAllQueries()
+	end
+
+	status()
+		return self.object:status()
+	end
+
+	setAutoReconnect(shouldReconnect)
+		self.object:setAutoReconnect(shouldReconnect)
+		return self
+	end
+
+	setMultiStatements(useMultiStatements)
+		self.object:setAutoReconnect(useMultiStatements)
+		return self
+	end
+
+	setCachePreparedStatements(cachePreparedStatements)
+		self.object:setCachePreparedStatements(useMultiStatements)
+		return self
+	end
+
+	wait()
+		self.object:wait()
+		return self
+	end
+
+	serverInfo()
+		return self.object:serverInfo()
+	end
+
+	hostInfo()
+		return self.object:hostInfo()
+	end
+
+	queueSize()
+		return self.object:queueSize()
+	end
+
+	ping()
+		return self.object:ping()
+	end
+
+	setCharacterSet(charSetName)
+		return self.object:setCharacterSet(charSetName)
+	end
+
+	-- overrides
+	onConnected(db) end
+	onConnectionFailed(db) end
+end

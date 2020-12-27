@@ -124,6 +124,8 @@ end
 function PANEL:OnValueChanged(val) end
 
 function PANEL:PerformLayout(w, h)
+	stopif (!self.slider) -- Dock calls this too early
+
 	self.slider:SetPos(w - self.slider:GetWide())
 	self.slider:CenterVertical()
 

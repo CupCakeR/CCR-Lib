@@ -1,0 +1,92 @@
+
+public class CCR.DBAL.HandlerMySQLOO extends CCR.DBAL.Handler
+	_get object
+	object = nil
+
+	_get ready
+	ready = false -- are we ready to run queries
+
+	_get _set moduleName
+	moduleName = "unknown"
+
+	_get connectionPool
+	connectionPool = {}
+
+	config = {}
+
+	constructor(config: table) -- TODO: CCR SQL Config table class
+		super()
+
+		require("mysqloo")
+
+		self.config = config
+		self:buildConnectionPool()
+	end
+
+	__tostring()
+		return "CCR.DBAL.Handler[MySQLOO]"
+	end
+
+	createConnection()
+		assert(#self.connectionPool < 10, "connection pool reached the maximum of allowed connections")
+		assert(self.config != nil, "no config set")
+
+		local promise = CCR.Promise()
+
+		local config = self.config
+		local object = CCR.DBAL.ConnectionMySQLOO(mysqloo.connect(config.host, config.username, config.password, config.databaseName, config.databasePort))
+		
+		object.onConnectionFailed = (err) ->
+			-- TODO: Auto-reconnect maybe
+			promise:reject(err)
+			error(`Connection failed, error: ${err}`)
+		end
+		object.onConnected = () -> promise:resolve(self) end
+		object:connect()
+
+		table.insert(self.connectionPool, object)
+
+		return promise
+	end
+
+	buildConnectionPool(amount = 10)
+		local promises = {}
+		for i = 1, amount do
+			promises[i] = self:createConnection()
+		end
+
+		CCR.Promises.all(promises):next((connections) =>
+			self.ready = true
+			self:onReady()
+		end)
+	end
+
+	getConnection()
+		local lowest
+		local lowestSize = 0
+
+		for i, conn in ipairs(self.connectionPool) do
+			local size = conn:queueSize()
+			if (!lowest || size < lowestSize) then
+				lowest = conn
+				lowestSize = size
+			end
+		end
+
+		assert(lowest, "failed to get connection from pool")
+
+		return lowest
+	end
+
+	getFirstConnection()
+		return self.connectionPool[1]
+	end
+
+	close()
+		for i, conn in ipairs(self.connectionPool) do
+			conn:disconnect()
+		end
+	end
+
+	onReady() end
+end

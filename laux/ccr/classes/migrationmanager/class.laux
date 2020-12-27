@@ -1,0 +1,185 @@
+
+public class CCR.MigrationManager
+	_get _set addonId
+	addonId = nil
+
+	_get _set addonName
+	addonName = "undefined"
+
+	_get _set connection
+	connection = nil
+
+	_get consoleLogger
+	consoleLogger = nil
+
+	_get directory
+	directory = nil
+
+	_get helper
+	helper = nil
+
+	constructor()
+	end
+
+	setConsoleLogger(logger: CCR.ConsoleLogger)
+		self.consoleLogger = logger
+		return self
+	end
+
+	--
+
+	setDirectory(directory: string)
+		if (!directory:EndsWith("/")) then
+			directory ..= "/"
+		end
+
+		self.directory = directory
+
+		return self
+	end
+
+	--
+
+	prepareMigrationsTable()
+		return self:getHelper():query([[
+			CREATE TABLE IF NOT EXISTS ccr_migrations (
+				id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+				addon_id VARCHAR(255) NOT NULL,
+				migration INT UNSIGNED NOT NULL,
+				time_executed INT UNSIGNED NOT NULL,
+				CONSTRAINT uc_migration UNIQUE (addon_id, migration)
+			)
+		]])
+	end
+
+	getCurrentMigration()
+		local query, promise = self:getHelper():prepare([[
+			SELECT
+				COALESCE(MAX(migration), 0) AS migration
+			FROM
+				ccr_migrations
+			WHERE
+				addon_id = ?
+		]])
+
+		query:setString(1, self:getAddonId())
+		
+		timer.Simple(1, () =>
+			query:start()
+		end)
+
+		return promise
+	end
+
+	findPendingMigrationFiles(after = 0)
+		local files, _ = file.Find(`${self.directory}*`, "LUA")
+
+		for i, file in ipairs(files) do
+			files[i] = file:StripExtension()
+			files[i] = tonumber(files[i])
+		end
+
+		if (#files == 0) then
+			return files
+		end
+
+		table.sort(files, (a, b) => return a > b end) -- new ones to check are at the top of the table
+
+		for i = 1, #files do
+			local migration = files[i]
+			if (migration <= after) then
+				files[i] = nil
+			end
+		end
+
+		table.sort(files, (a, b) => return a < b end)
+
+		return files
+	end
+
+	executePendingMigrations(after)
+		-- local conn = self.connection:getHandler():getConnection() -- get a single connection
+		local conn = self.connection
+		local transaction = conn:createTransaction()
+		local files = self:findPendingMigrationFiles(after)
+
+		local total = 0
+		for i, migration in ipairs(files) do
+			local func = include(`${self:getDirectory()}/${migration}.lua`)
+			local queries = func(conn)
+			
+			for _i, query in ipairs(queries) do
+				transaction:addQuery(query)
+				total++
+			end
+
+			-- one manual query to insert our new migration entry
+			local prepared = conn:prepare([[
+				INSERT INTO
+					ccr_migrations (addon_id, migration, time_executed)
+				VALUES
+					(?, ?, ?);
+			]])
+			prepared:setString(1, self:getAddonId())
+			prepared:setNumber(2, migration)
+			prepared:setNumber(3, os.time())
+
+			transaction:addQuery(prepared)
+		end
+
+		local promise = CCR.Promise()
+		transaction.onSuccess = (_, ...) => promise:resolve(...) end
+		transaction.onError = (_, ...) => promise:reject(...) end
+
+		self._total_migrations = #files
+		self._total_queries = total
+		self._newest = total
+		self._st_start = SysTime()
+
+		transaction:start()
+
+		return promise
+	end
+
+	-- TODO: resetMigration
+
+	run()
+		assert(self.connection, "database object not set")
+		assert(self.directory, "directory not set")
+		assert(self.consoleLogger, "no console logger set / available")
+
+		self.helper = CCR.DBAL.ConnectionHelper(self:getConnection()) -- FIXME: This should not use the helper (?)
+
+		local promise = CCR.Promise()
+
+		self._total_queries = 0
+		self._st_start = 0
+
+		self:prepareMigrationsTable():next(() =>
+			return self:getCurrentMigration()
+		end):next((tbl) =>
+			return tonumber(tbl[1].migration) -- return the actual migration number (date)
+		end):next((currentMigration) =>
+			return self:executePendingMigrations(currentMigration)
+		end):next(() =>
+			promise:resolve()
+
+			if (self._total_migrations == 0) then
+				self.consoleLogger:success(`No pending migrations to execute`)
+				return
+			end
+
+			local took = SysTime() - self._st_start
+			took = math.Round(took * 1000, 3)
+
+			local strMigrations = self._total_migrations == 1 && "migration" || "migrations"
+			local strQueries = self._total_queries == 1 && "query" || "queries"
+
+			self.consoleLogger:success(`Successfully executed ${self._total_migrations} ${strMigrations} (${self._total_queries} ${strQueries}) within ${took} ms`)
+		end, (err = "unknown") =>
+			self.consoleLogger:error("Executing migration(s) failed, error: ", grey(200), err)
+		end)
+
+		return promise
+	end
+end

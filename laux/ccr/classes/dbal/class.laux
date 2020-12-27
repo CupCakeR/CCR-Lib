@@ -1,0 +1,96 @@
+
+CCR.DBAL = {}
+
+CCR:IncludeRecursive("interfaces", "sv")
+
+CCR:IncludeFile("providers/include", "sv")
+CCR:IncludeFile("helper", "sv")
+
+public class CCR.Database
+	static MODULE_SQLITE = "sqlite"
+	static MODULE_MYSQLOO = "mysqloo"
+	static MODULE_TMYSQL = "tmysql"
+
+	_get id
+	id = "undefined"
+
+	_set logger
+	logger = nil
+
+	_get _set configuration
+	configuration = nil
+
+	_get handler
+	handler = nil
+
+	_get mySQL
+	mySQL = nil
+
+	_get initialized
+	initialized = false
+
+	constructor(id: string)
+		self.id = id
+	end
+
+	initialize()
+		if (self.initialized) then
+			self:getLogger():error("Tried to initialize database again")
+			return
+		end
+
+		local promise = CCR.Promise()
+
+		self.initialized = true
+
+		local config = self.configuration
+		assert(config, "no configuration set")
+
+		CCR.Switch(config.module)
+			:case({CCR.Database.MODULE_MYSQLOO, CCR.Database.MODULE_TMYSQL}, () =>
+				local moo, tmysql = file.Exists("bin/gmsv_mysqloo_*.dll", "LUA"), file.Exists("bin/gmsv_tmysql4_*.dll", "LUA")
+				assert(moo || tmysql, "no supported mysql module found")
+
+				self.mySQL = true
+			end)
+			:case(CCR.Database.MODULE_MYSQLOO, () =>
+				self.handler = CCR.DBAL.HandlerMySQLOO(config)
+				self.handler:setModuleName(CCR.Database.MODULE_MYSQLOO)
+			end)
+			:case(CCR.Database.MODULE_TMYSQL, () =>
+				print("TMYSQL TO BE IMPLEMENTED")
+			end)
+			:case(CCR.Database.MODULE_SQLITE, () =>
+				self.handler = CCR.DBAL.HandlerSQLite(config)
+				self.handler:setModuleName(CCR.Database.MODULE_SQLITE)
+				
+				self.mySQL = false
+			end)
+			:default(() =>
+				error(`unknown database module specified (${config.module})`)
+			end)
+		:run()
+
+		assert(self.handler, "handler not set")
+
+		self.handler.onReady = () =>
+			promise:resolve(self)
+			hook.Run("CCR.DBAL.OnReady", self)
+		end
+
+		return promise
+	end
+
+	-- meta shit
+	__tostring()
+		if (self.handler) then
+			return `CCR.Database[${self.id}][${self.handler:getModuleName()}]`
+		end
+
+		return `CCR.Database[${self.id}][Unknown driver]`
+	end
+
+	getLogger()
+		return self.logger || CCR.Logger
+	end
+end

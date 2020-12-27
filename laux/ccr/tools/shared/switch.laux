@@ -1,8 +1,11 @@
 
+-- TODO: Common Code Blocks https://www.w3schools.com/js/tryit.asp?filename=tryjs_switch3
+
 public class CCR.Switch
 	constructor(compare)
 		self.compare = compare
 		self.expressions = {}
+		self.defaultFunc = nil
 
 		return self
 	end
@@ -27,10 +30,21 @@ public class CCR.Switch
 		return self
 	end
 
+	default(fn)
+		self.defaultFunc = fn
+		return self
+	end
+
 	run()
+		local def = true
 		for i, tbl in ipairs(self.expressions) do
 			continueif (tbl.expr != self.compare)
-			breakif (tbl.func() == false)
+			def = false
+			stopif (tbl.func() == false)
+		end
+
+		if (def && self.defaultFunc) then
+			self.defaultFunc()
 		end
 	end
 end

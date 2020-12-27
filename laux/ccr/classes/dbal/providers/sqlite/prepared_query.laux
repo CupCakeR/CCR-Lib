@@ -1,0 +1,110 @@
+
+class FakeSQLitePreparedQuery
+	data = {}
+	query = ""
+
+	constructor(sql: string)
+		self.query = sql
+	end
+
+	setNumber(i, n)
+		self.data[i] = tonumber(n)
+	end
+
+	setString(i, str)
+		self.data[i] = sql.SQLStr(str) -- NOTE: Let it use quotes here!
+	end
+
+	setBoolean(i, b)
+		self.data[i] = b && 1 || 0
+	end
+
+	setNull(i)
+		self.data[i] = "NULL"
+	end
+
+	getSql()
+		local i = 0
+		local str, _ = self.query:gsub("?", () =>
+			i++
+			return self.data[i]
+		end)
+
+		return str
+	end
+
+	clear()
+		self.data = {}
+	end
+
+	__type() end
+end
+
+public class CCR.DBAL.PreparedQuerySQLite extends CCR.DBAL.QuerySQLite
+	_get object
+	object = nil
+
+	fakePrepared = nil
+
+	constructor(sql)
+		super(sql)
+
+		self.fakePrepared = FakeSQLitePreparedQuery(sql)
+		
+		self.object = {sql = sql}
+		self.object.onError = (obj, ...) => self:onError(...) end
+		self.object.onSuccess = (obj, ...) => self:onSuccess(...) end
+	end
+
+	__tostring()
+		return "CCR.DBAL.PreparedQuery[SQLite]"
+	end
+
+	-- binds
+	setNumber(index, number)
+		self.fakePrepared:setNumber(index, number)
+		return self
+	end
+
+	setString(index, str)
+		self.fakePrepared:setString(index, str)
+		return self
+	end
+
+	setBoolean(index, bool)
+		self.fakePrepared:setBoolean(index, bool)
+		return self
+	end
+
+	setNull(index)
+		self.fakePrepared:setNull(index)
+		return self
+	end
+
+	clearParmeters()
+		self.fakePrepared:clear()
+		return self
+	end
+
+	-- "This shouldn't be used anymore, just start the same prepared multiple times with different parameters"
+	putNewParameters()
+		--self.preparedQuery:putNewParameters()
+		--return self
+	end
+
+	start()
+		local data = sql.Query(self.fakePrepared:getSql())
+		if (data == false) then
+			self.object:onError(self:error())
+		else
+			-- self.object:onData(data)
+			self.object:onSuccess(data)
+		end
+
+		return self
+	end
+
+	-- overrides
+	onError(err, sqlString) end
+	onSuccess(data) end
+end

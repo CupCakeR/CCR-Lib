@@ -1,0 +1,14 @@
+
+public class CCR.DBAL.PreparedQuery
+	constructor(obj) end
+
+	setNumber() error("not implemented") end
+	setString() error("not implemented") end
+	setBoolean() error("not implemented") end
+	setNull() error("not implemented") end
+	clearParmeters() error("not implemented") end
+	putNewParameters() error("not implemented") end
+	
+	onError() error("not implemented") end
+	onSuccess() error("not implemented") end
+end
