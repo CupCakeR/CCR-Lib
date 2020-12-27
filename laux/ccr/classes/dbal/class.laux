@@ -94,38 +94,3 @@ public class CCR.Database
 		return self.logger || CCR.Logger
 	end
 end
-
-stopif (true)
-
-if true then
-	if (CCR._DatabaseObject && false) then
-		-- CCR._DatabaseObject:close()
-		-- CCR._DatabaseObject:onReady()
-	else
-		if (CCR._DatabaseObject && CCR._DatabaseObject:getInitialized()) then
-			-- CCR._DatabaseObject:close()
-			-- CCR._DatabaseObject = nil
-		end
-
-		CCR._DatabaseObject = CCR.Database("CCR")
-		CCR._DatabaseObject:setConfiguration({
-			module = CCR.Database.MODULE_MYSQLOO,
-			host = "localhost",
-			username = "root",
-			password = "",
-			databaseName = "gmod_dev",
-			databasePort = 3306,
-		})
-		CCR._DatabaseObject:initialize()
-
-		hook.Add("CCR.DBAL.OnReady", "CCR", (database) =>
-			local promise, query = database:getHelper():queryValue("SELECT * FROM betterwarns_player LIMIT 1")
-			-- query:setNumber(1, 1)
-			-- query:start()
-
-			promise:next((result) =>
-				print(result, "?")
-			end)
-		end)
-	end
-end
