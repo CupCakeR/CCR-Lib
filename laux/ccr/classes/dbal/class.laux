@@ -63,6 +63,8 @@ public class CCR.Database
 			:case(CCR.Database.MODULE_SQLITE, () =>
 				self.handler = CCR.DBAL.HandlerSQLite(config)
 				self.handler:setModuleName(CCR.Database.MODULE_SQLITE)
+				
+				self.mySQL = false
 			end)
 			:default(() =>
 				error(`unknown database module specified (${config.module})`)
