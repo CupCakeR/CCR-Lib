@@ -80,6 +80,7 @@ public class CCR.Database
 
 		return promise
 	end
+
 	-- meta shit
 	__tostring()
 		if (self.handler) then
