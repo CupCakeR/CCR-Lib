@@ -5,7 +5,7 @@ public class CCR.Switch
 	constructor(compare)
 		self.compare = compare
 		self.expressions = {}
-		self.default = nil
+		self.defaultFunc = nil
 
 		return self
 	end
@@ -31,7 +31,7 @@ public class CCR.Switch
 	end
 
 	default(fn)
-		self.default = fn
+		self.defaultFunc = fn
 		return self
 	end
 
@@ -43,8 +43,8 @@ public class CCR.Switch
 			stopif (tbl.func() == false)
 		end
 
-		if (def && self.default) then
-			self.default()
+		if (def && self.defaultFunc) then
+			self.defaultFunc()
 		end
 	end
 end
