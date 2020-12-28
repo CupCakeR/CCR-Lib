@@ -63,6 +63,7 @@ function CCR:UniqueRandomIntegers(amt, from, to)
 	return toReturn
 end
 
+-- TODO: Clean this trash up
 CCR.InitCallQueue ||= {}
 CCR.GamemodeInitialized ||= false
 hook.Add("Initialize", "CCR.CallPostInitialize", () =>
