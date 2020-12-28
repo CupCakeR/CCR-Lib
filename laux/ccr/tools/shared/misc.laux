@@ -89,6 +89,24 @@ function CCR:CallPostInitialize(func)
 	table.insert(self.InitCallQueue, func)
 end
 
+CCR.InitPostEntityQueue ||= {}
+CCR.CalledInitPostEntity ||= false
+function CCR:CallPostInitPostEntity(func)
+	if (self.CalledInitPostEntity) then
+		return func()
+	end
+
+	table.insert(self.InitPostEntityQueue, func)
+end
+
+hook.Add("InitPostEntity", "CCR.CallInitPostEntity", () =>
+	for i, func in ipairs(CCR.InitPostEntityQueue) do
+		func()
+	end
+
+	CCR.InitPostEntityQueue = {}
+end)
+
 -- time parser
 local units = {
 	["years"] = 525600,
