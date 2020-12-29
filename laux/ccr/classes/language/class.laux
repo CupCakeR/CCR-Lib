@@ -1,91 +1,29 @@
-public class CCR.Language extends CCR.Base
-	constructor(addonId, languageId)
-		super()
 
-		CCR:AccessorFunc(self, "addonId", "AddonID", "String")
-		CCR:AccessorFunc(self, "languageId", "LanguageID", "String")
-		CCR:AccessorFunc(self, "url", "URL", "String")
-		CCR:AccessorFunc(self, "raw", "Raw", "Table")
-		CCR:AccessorFunc(self, "phrases", "Phrases", "Table")
-		CCR:AccessorFunc(self, "initialized", "Initialized", "Boolean")
+-- TODO: Note the follwing things in git
+-- http://www.jsondiff.com/ - tool to compare missing keys
 
-		self.addonId = addonId
-		self.languageId = languageId
-		self.raw = {}
-		self.phrases = {}
-		self.initialized = false
+public class CCR.Language
+	_get _set url -- direct url to json file
+	_get _set logger
 
-		return self
+	_get rawJson
+	_get raw -- contains the raw json returned (as table)
+	_get phrases -- contains the flattened strings
+
+	--
+	
+	getLogger()
+		return self.logger || CCR.Logger
 	end
 
-	__tostring()
-		return `CCR.Language[${self.addonId}][${self.languageId}]`
+	--
+
+	isReady()
+		return self.phrases != nil
 	end
 
-	IsValid()
-		return CCR.AddonLanguages?[self.addonId]?[self.languageId] == self
-	end
-
-	Download()
-		assert(self.addonId, "No addon id set")
-		assert(self.languageId, "No language id set")
-
-		local url = self.url
-		url = url || `https://gitlab.com/CupCakeR/ccr-languages/raw/master/${self.addonId}/${self.languageId}.json`
-
-		local promise = CCR.NewPromise()
-
-		http.Fetch(url, (body, size, headers, code) =>
-			if (body:sub(1, 15) == "<!DOCTYPE html>") then
-				return promise:reject("Invalid response (body)")
-			end
-
-			local tbl = util.JSONToTable(body)
-			if (!tbl) then
-				return promise:reject("Invalid json")
-			end
-
-			promise:resolve(tbl)
-		end)
-
-		return promise
-	end
-
-	Queue()
-		self:AddHook("CCR.DoInitializeLanguage", () ->
-			self:Initialize()
-		end)
-	end
-
-	Initialize(force = false)
-		if (!force) then
-			assert(!self.initialized, "Tried to initialize language object but it was already initialized.")
-		end
-
-		if (!CCR.CanInitializeLanguage) then
-			return self:Queue()
-		end
-
-		self:Download():next((tbl) =>
-			self:SetRaw(tbl)
-			self:PreparePhrases()
-			self:SetInitialized(true)
-
-			hook.Run("CCR.OnLanguageInitialized", self, tbl)
-		end, CCR.PromiseError)
-	end
-
-	PreparePhrases()
-		assert(self:GetRaw(), "No phrases to prepare")
-
-		local copy = table.Copy(self:GetRaw()["phrases"])
-		local new = CCR.FlattenTable(copy, ".", true)
-
-		self:SetPhrases(new)
-	end
-
-	GetPhrase(phrase, replacements, pluralizationValue)
-		assert(phrase, "No phrase to translate")
+	getPhrase(phrase, replacements, pluralizationValue)
+		assert(phrase, "no phrase to translate")
 
 		if (pluralizationValue) then
 			local singular
@@ -94,18 +32,14 @@ public class CCR.Language extends CCR.Base
 			elseif (pluralizationValue == true) then
 				singular = select(2, next(replacements)) == 1
 			else
-				error("Invalid pluralizationValue")
+				error("invalid pluralization value")
 			end
 
 			phrase ..= "."
 			phrase ..= (singular && "singular" || "plural")
 		end
 
-		local str = self:GetPhrases()[phrase]
-		if (!str && self:GetLanguageID() != "english") then
-			-- TODO: Get english language and fallback
-		end
-
+		local str = self.phrases[phrase]
 		if (!str) then
 			return `UNKNOWN: ${phrase}`
 		end
@@ -119,9 +53,106 @@ public class CCR.Language extends CCR.Base
 		return str
 	end
 
-	Register() end
+	--
+
+	download()
+		local promise = CCR.Promise()
+
+		http.Fetch(self.url, (body, size, headers, code) =>
+			if (code != 200) then
+				self:getLogger():error(`i18n: http.Fetch failed with code ${code} - url: ${self.url}`)
+				return promise:resolve()
+			end
+
+			local tbl = util.JSONToTable(body)
+			if (!tbl) then
+				self:getLogger():error(`i18n: invalid response body (not valid json)`)
+				return promise:resolve()
+			end
+
+			self.rawJson = body
+
+			promise:resolve(tbl)
+		end)
+
+		return promise
+	end
+
+	loadFromCache()
+		local promise = CCR.Promise()
+
+		local crc = util.CRC(self.url)
+		local cached = file.Read(`ccr/languages/${crc}.txt`, "DATA")
+
+		if (cached) then
+			local str = util.Base64Decode(cached) -- i really dont want anyone to play around with shit in /data
+			local tbl = util.JSONToTable(str)
+
+			if (tbl) then
+				promise:resolve(tbl)
+			else
+				self:getLogger():error(`i18n: cached language file contains invalid json`)
+				promise:reject()
+			end
+		else
+			promise:reject()
+		end
+
+		return promise
+	end
+
+	updateCache()
+		local crc = util.CRC(self.url)
+		local content = util.Base64Encode(self:getRawJson())
+
+		file.Write(`ccr/languages/${crc}.txt`, content)
+	end
+
+	buildPhrases(tbl)
+		local raw = self:getRaw()
+		assert(raw, "no raw table to build phrases from")
+
+		local copy = table.Copy(raw["phrases"])
+		local flattened = CCR.FlattenTable(copy, ".", true)
+
+		self.phrases = flattened
+	end
+
+	load()
+		assert(self:getUrl(), "no url set")
+		assert(self:getLogger(), "no console logger set")
+
+		file.CreateDir(`ccr/languages`)
+
+		self:download():next((tbl) =>
+			if (!tbl) then
+				self:getLogger():warning(`i18n: checking for a cached version`)
+				return self:loadFromCache()
+			end
+
+			self.raw = tbl
+		end):next(() =>
+			self:buildPhrases()
+			self:updateCache()
+
+			local total = table.Count(self.phrases)
+			self:getLogger():success(`i18n: successfully loaded ${total} translated phrase(s)`)
+
+			hook.Run("CCR.OnLanguageLoaded", self)
+		end, () =>
+			self:getLogger():error(`i18n: failed to load language.`)
+		end)
+	end
+
+	__tostring() return `CCR.Language` end
 end
 
-function CCR:NewAddonLanguage(addonId, languageId)
-	return CCR.Language(addonId, languageId)
-end
+-- FIXME: maybe use this instead: https://github.com/Facepunch/garrysmod-requests/issues/1670#issuecomment-667499932
+
+CCR.CanInitializeLanguage ||= false
+hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function() -- NOTE: Dont call http shit too early?
+	timer.Simple(3, function()
+		CCR.CanInitializeLanguage = true
+		hook.Run("CCR.DoInitializeLanguage")
+	end)
+end)
