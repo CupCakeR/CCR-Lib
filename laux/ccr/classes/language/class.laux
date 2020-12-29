@@ -154,6 +154,3 @@ public class CCR.Language
 
 	__tostring() return `CCR.Language` end
 end
-function CCR:NewAddonLanguage(addonId, languageId)
-	return CCR.Language(addonId, languageId)
-end
