@@ -68,14 +68,16 @@ public class CCR.VersionChecker
 	end
 end
 
-hook.Add("CCR.PreLoadAddons", "CCR.VersionCheck", () =>
-	CCR.VersionCheckerObject = CCR.VersionChecker()
-		:setCurrentVersion(CCR.VERSION)
-		:setCheckUrl("https://raw.githubusercontent.com/cupcaker/ccr-versions/master/ccr-lib")
-		:setConsoleLogger(CCR.Logger)
-	:check()
+hook.Add("InitPostEntity", "CCR.VersionCheck", () =>
+	timer.Simple(3, () =>
+		CCR.VersionCheckerObject = CCR.VersionChecker()
+			:setCurrentVersion(CCR.VERSION)
+			:setCheckUrl("https://raw.githubusercontent.com/cupcaker/ccr-versions/master/ccr-lib")
+			:setConsoleLogger(CCR.Logger)
+		:check()
 
-	CCR:CreateTimer("CCR.VersionCheck", 60 * 30, 0, () =>
-		CCR.VersionCheckerObject:check()
+		CCR:CreateTimer("CCR.VersionCheck", 60 * 30, 0, () =>
+			CCR.VersionCheckerObject:check()
+		end)
 	end)
 end)
