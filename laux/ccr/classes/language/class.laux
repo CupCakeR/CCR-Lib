@@ -2,13 +2,7 @@
 -- TODO: Note the follwing things in git
 -- http://www.jsondiff.com/ - tool to compare missing keys
 
--- NOTE: Plans & design
--- data/${addonId}/${urlHash}.txt
--- save / load cached file based on the url hash
-
-
 public class CCR.Language
-	-- _get addonId -- needed? probably not.
 	_get _set url -- direct url to json file
 	_get _set logger
 
