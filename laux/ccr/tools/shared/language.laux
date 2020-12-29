@@ -1,22 +1,6 @@
--- NOTE https://gitlab.com/sleeppyy/xeninui/blob/master/lua/xeninui/libs/languages.lua
 
-CCR.AddonLanguages ||= {}
-
-function CCR:GetAddonLanguage(addonId, languageId)
-	self.AddonLanguages[addonId] ||= {}
-
-	local addonTbl = self.AddonLanguages[addonId]
-	if (addonTbl?[languageId]) then
-		return addonTbl[languageId]
-	end
-
-	local object = self:NewAddonLanguage(addonId, languageId)
-	object:Initialize()
-
-	self.AddonLanguages[addonId][languageId] = object
-
-	return object
-end
+-- FIXME: Get rid of this file
+-- FIXME: maybe use this instead: https://github.com/Facepunch/garrysmod-requests/issues/1670#issuecomment-667499932
 
 CCR.CanInitializeLanguage ||= false
 hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function() -- NOTE: Dont call http shit too early?
