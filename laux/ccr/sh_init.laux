@@ -44,7 +44,7 @@ CCR.FileLoader()
 	:addFolder("elements",	CCR.FileLoader.REALM_CLIENT, true)
 :run()
 
-CCR.VERSION = CCR.SemVer("2.0.0")
+CCR.VERSION = CCR.SemVer("3.0.0")
 
 CCR.Logger:Log("Fully initialized library")
 
