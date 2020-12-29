@@ -23,6 +23,7 @@ public class CCR.Language
 	end
 
 	getPhrase(phrase, replacements, pluralizationValue)
+		assert(self:isReady(), "called too early, not ready")
 		assert(phrase, "no phrase to translate")
 
 		if (pluralizationValue) then
