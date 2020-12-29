@@ -59,8 +59,6 @@ public class CCR.Language
 		return str
 	end
 
-	GetPhrase = self.getPhrase -- backwards compatibility
-
 	--
 
 	download()
