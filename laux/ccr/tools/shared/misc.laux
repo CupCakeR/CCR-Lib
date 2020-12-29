@@ -106,6 +106,7 @@ hook.Add("InitPostEntity", "CCR.CallInitPostEntity", () =>
 	end
 
 	CCR.InitPostEntityQueue = {}
+	CCR.CalledInitPostEntity = true
 end)
 
 -- time parser
