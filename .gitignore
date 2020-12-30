@@ -3,5 +3,7 @@
 .gitignore
 .vscode/settings.json
 .out/
+.git-hooks/
+git-conventional-commits.json
 lua/
 transpile.bat
