@@ -5,3 +5,6 @@
 .out/
 lua/
 transpile.bat
+
+.git-hooks/
+git-conventional-commits.json
