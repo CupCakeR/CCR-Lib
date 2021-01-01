@@ -17,16 +17,8 @@ public class CCR.Currency
 	canAfford(p, amt) error("not implemented") end
 	format(amt) error("not implemented") end
 
-	register()
-		CCR:RegisterCurrency(self)
-		return self
-	end
-
-	-- backward compatibility
-
-	setId(id)
-		ErrorNoHaltTrace("CCR.Currency.setId is deprecated, use the first constructor argument")
-		self.id = id
+	register(override)
+		CCR:RegisterCurrency(self, override)
 		return self
 	end
 
