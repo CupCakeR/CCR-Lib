@@ -38,7 +38,7 @@ end
 
 function CCR.NewCurrency(id)
 	ErrorNoHaltTrace("CCR.NewCurrency is deprecated, use CCR.Currency(...)")
-	return Currency(id)
+	return CCR.Currency(id)
 end
 
 --
