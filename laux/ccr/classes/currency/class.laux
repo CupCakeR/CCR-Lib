@@ -21,16 +21,6 @@ public class CCR.Currency
 		CCR:RegisterCurrency(self, override)
 		return self
 	end
-
-	Register()
-		ErrorNoHaltTrace("CCR.Currency.Register is deprecated, use CCR.Currency.register")
-		return self:register()
-	end
-end
-
-function CCR.NewCurrency(id)
-	ErrorNoHaltTrace("CCR.NewCurrency is deprecated, use CCR.Currency(...)")
-	return CCR.Currency(id)
 end
 
 --
