@@ -24,8 +24,9 @@ public class CCR.Currency
 
 	-- backward compatibility
 
-	setId()
+	setId(id)
 		ErrorNoHaltTrace("CCR.Currency.setId is deprecated, use the first constructor argument")
+		self.id = id
 		return self
 	end
 
