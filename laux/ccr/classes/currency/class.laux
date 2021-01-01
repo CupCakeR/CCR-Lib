@@ -1,0 +1,60 @@
+
+public class CCR.Currency
+	_get id
+
+	constructor(id)
+		assert(id)
+		self.id = id
+		return self
+	end
+
+	__tostring()
+		return `CCR.Currency[${self.id}]`
+	end
+
+	add(p, amt) error("not implemented") end
+	get(p) error("not implemented") end
+	canAfford(p, amt) error("not implemented") end
+	format(amt) error("not implemented") end
+
+	register()
+		CCR:RegisterCurrency(self)
+		return self
+	end
+
+	-- backward compatibility
+
+	setId()
+		ErrorNoHaltTrace("CCR.Currency.setId is deprecated, use the first constructor argument")
+		return self
+	end
+
+	Register()
+		ErrorNoHaltTrace("CCR.Currency.Register is deprecated, use CCR.Currency.register")
+		return self:register()
+	end
+end
+
+function CCR.NewCurrency(id)
+	ErrorNoHaltTrace("CCR.NewCurrency is deprecated, use CCR.Currency(...)")
+	return Currency(id)
+end
+
+--
+
+CCR.Currencies ||= {}
+
+function CCR:GetCurrency(id)
+	return self.Currencies[id]
+end
+
+function CCR:RegisterCurrency(currency, override)
+	assert(currency.id, "Currency has no ID")
+
+	if (!override && self.Currencies[currency.id]) then
+		self.Logger:Warning(`Currency with ID ${currency.id} does already exist, skipping...`)
+		return
+	end
+
+	self.Currencies[currency.id] = currency
+end
