@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("mtoken")
+	end
+
+	set(p, amount)
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		mTokens.AddPlayerTokens(p, amount)
+	end
+
+	get(p)
+		return mTokens.GetPlayerTokens(p)
+	end
+
+	canAfford(p, amount)
+		return mTokens.CanPlayerAfford(p, amount)
+	end
+
+	format(amount)
+		return amount .. (" Token" .. (amount == 1 && "s" || ""))
+	end
+end
+
+Currency():register(true)

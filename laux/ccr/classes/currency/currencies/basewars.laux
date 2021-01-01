@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("basewars")
+	end
+
+	set(p, amount)
+		p:SetMoney(amount)
+	end
+
+	add(p, amount)
+		p:GiveMoney(amount)
+	end
+
+	get(p)
+		return p:GetMoney()
+	end
+
+	canAfford(p, amount)
+		return p:get(p) >= amount
+	end
+
+	format(amount)
+		return DarkRP.formatMoney(amount)
+	end
+end
+
+Currency():register(true)

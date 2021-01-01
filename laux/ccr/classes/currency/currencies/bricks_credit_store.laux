@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("bricks_credit_store")
+	end
+
+	set(p, amount)
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		p:AddBRCS_Credits(amount)
+	end
+
+	get(p)
+		return p:GetBRCS_Credits()
+	end
+
+	canAfford(p, amount)
+		return self:get() >= amount
+	end
+
+	format(amount)
+		return BRICKSCREDITSTORE.FormatCredits(amount, true)
+	end
+end
+
+Currency():register(true)

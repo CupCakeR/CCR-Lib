@@ -5,7 +5,6 @@ public class CCR.Currency
 	constructor(id)
 		assert(id)
 		self.id = id
-		return self
 	end
 
 	__tostring()

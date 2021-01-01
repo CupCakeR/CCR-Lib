@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("helix")
+	end
+
+	set(p, amount)
+		p:GetCharacter():SetMoney(amount)
+	end
+
+	add(p, amount)
+		p:GetCharacter():GiveMoney(amount)
+	end
+
+	get(p)
+		return p:GetCharacter():GetMoney()
+	end
+
+	canAfford(p, amount)
+		return p:GetCharacter():HasMoney(amount)
+	end
+
+	format(amount)
+		return ix.currency.Get(amount)
+	end
+end
+
+Currency():register(true)
