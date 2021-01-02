@@ -5,11 +5,11 @@ class Currency extends CCR.Currency
 	end
 
 	set(p, amount)
-		CCR.Logger:Log(`Debug curreny -> Set ${amt} - ${p:Nick()}`)
+		CCR.Logger:Log(`Debug currency -> Set ${amt} - ${p:Nick()}`)
 	end
 
 	add(p, amount)
-		CCR.Logger:Log(`Debug curreny -> Add ${amt} - ${p:Nick()}`)
+		CCR.Logger:Log(`Debug currency -> Add ${amt} - ${p:Nick()}`)
 	end
 
 	get(p)

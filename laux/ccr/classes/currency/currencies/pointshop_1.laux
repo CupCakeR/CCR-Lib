@@ -9,7 +9,7 @@ class Currency extends CCR.Currency
 	end
 
 	add(p, amount)
-		p:GiveMoney(amount)
+		p:PS_GivePoints(amount)
 	end
 
 	get(p)
