@@ -1,0 +1,43 @@
+
+public class CCR.Currency
+	_get id
+
+	constructor(id)
+		assert(id)
+		self.id = id
+	end
+
+	__tostring()
+		return `CCR.Currency[${self.id}]`
+	end
+
+	set(p, amt) error("not implemented") end
+	add(p, amt) error("not implemented") end
+	get(p) error("not implemented") end
+	canAfford(p, amt) error("not implemented") end
+	format(amt) error("not implemented") end
+
+	register(override)
+		CCR:RegisterCurrency(self, override)
+		return self
+	end
+end
+
+--
+
+CCR.Currencies ||= {}
+
+function CCR:GetCurrency(id)
+	return self.Currencies[id]
+end
+
+function CCR:RegisterCurrency(currency, override)
+	assert(currency.id, "Currency has no ID")
+
+	if (!override && self.Currencies[currency.id]) then
+		self.Logger:Warning(`Currency with ID ${currency.id} already exists, skipping...`)
+		return
+	end
+
+	self.Currencies[currency.id] = currency
+end

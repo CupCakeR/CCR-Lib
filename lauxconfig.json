@@ -1,0 +1,12 @@
+{
+	"path": {
+		"input": "./laux",
+		"output": "./lua"
+	},
+	"merges": [
+		{
+			"filesGlob": ["ccr/classes/currency/currencies/*.laux"],
+			"output": "ccr/classes/currency/list_merged"
+		}
+	]
+}

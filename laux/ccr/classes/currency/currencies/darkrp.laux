@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("darkrp")
+	end
+
+	set(p, amount)
+		p:setDarkRPVar("money", amount)
+	end
+
+	add(p, amount)
+		p:addMoney(amount)
+	end
+
+	get(p)
+		return p:getDarkRPVar("money")
+	end
+
+	canAfford(p, amount, override)
+		return p:canAfford(amt)
+	end
+
+	format(amount)
+		return DarkRP.formatMoney(amount)
+	end
+end
+
+Currency():register(true)

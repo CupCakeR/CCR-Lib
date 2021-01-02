@@ -1,0 +1,32 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("underdone")
+	end
+
+	set(p, amount)
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		if amt < 0 then
+			p:RemoveItem("money", -amount)
+		else
+			p:AddItem("money", amount)
+		end
+	end
+
+	get(p)
+		return p.Data.Inventory["money"] || 0
+	end
+
+	canAfford(p, amount)
+		return self:get(p) >= amount
+	end
+
+	format(amount)
+		return '$' .. string.Comma(amount)
+	end
+end
+
+Currency():register(true)

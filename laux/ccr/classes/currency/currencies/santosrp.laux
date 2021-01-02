@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("santosrp")
+	end
+
+	set(p, amount)
+		p:SetMoney(amount)
+	end
+
+	add(p, amount)
+		p:AddMoney(amount)
+	end
+
+	get(p)
+		return p:GetMoney()
+	end
+
+	canAfford(p, amount)
+		return p:CanAfford(amount)
+	end
+
+	format(amount)
+		return "$" .. string.Comma(amount)
+	end
+end
+
+Currency():register(true)

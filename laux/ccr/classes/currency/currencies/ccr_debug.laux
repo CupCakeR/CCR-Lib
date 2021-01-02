@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("ccr_debug")
+	end
+
+	set(p, amount)
+		CCR.Logger:Log(`Debug curreny -> Set ${amt} - ${p:Nick()}`)
+	end
+
+	add(p, amount)
+		CCR.Logger:Log(`Debug curreny -> Add ${amt} - ${p:Nick()}`)
+	end
+
+	get(p)
+		return override || 0
+	end
+
+	canAfford(p, amount, override)
+		return tobool(override)
+	end
+
+	format(amount)
+		return `$${amt}`
+	end
+end
+
+Currency():register(true)

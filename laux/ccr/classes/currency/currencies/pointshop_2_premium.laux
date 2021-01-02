@@ -1,0 +1,28 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("pointshop_2_premium")
+	end
+
+	set(p, amount)
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		p:PS2_AddPremiumPoints(amount)
+	end
+
+	get(p)
+		return p.PS2_Wallet.premiumPoints
+	end
+
+	canAfford(p, amount)
+		return self:get(p) >= amount
+	end
+
+	format(amount)
+		return string.Comma(amount) .. " points"
+	end
+end
+
+Currency():register(true)
