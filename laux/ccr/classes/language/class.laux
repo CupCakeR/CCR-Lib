@@ -87,6 +87,9 @@ public class CCR.Language
 			local tbl = util.JSONToTable(str)
 
 			if (tbl) then
+				self.rawJson = str
+				self.raw = tbl
+
 				promise:resolve(tbl)
 			else
 				self:getLogger():error(`i18n: cached language file contains invalid json`)
