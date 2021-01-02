@@ -305,3 +305,4 @@ function CCR.NewHashId(...)
 end
 
 CCR.HashIds = module
+CCR.HashId = module.new
