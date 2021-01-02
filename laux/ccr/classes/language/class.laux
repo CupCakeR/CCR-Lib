@@ -150,10 +150,13 @@ for id, _ in pairs(hook.GetTable()["CCR.OnLanguageLoaded"] || {}) do
 	hook.Remove("CCR.OnLanguageLoaded", id)
 end
 
+-- auto refresh
 CCR.CanInitializeLanguage ||= false
-hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function() -- NOTE: Dont call http shit too early?
-	timer.Simple(3, function()
+if (!CCR.CanInitializeLanguage) then
+	hook.Add("Think", "CCR.DoInitializeLanguage", () =>
 		CCR.CanInitializeLanguage = true
+
 		hook.Run("CCR.DoInitializeLanguage")
+		hook.Remove("Think", "CCR.DoInitializeLanguage")
 	end)
-end)
+end
