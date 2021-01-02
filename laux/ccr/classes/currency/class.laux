@@ -35,7 +35,7 @@ function CCR:RegisterCurrency(currency, override)
 	assert(currency.id, "Currency has no ID")
 
 	if (!override && self.Currencies[currency.id]) then
-		self.Logger:Warning(`Currency with ID ${currency.id} does already exist, skipping...`)
+		self.Logger:Warning(`Currency with ID ${currency.id} already exists, skipping...`)
 		return
 	end
 
