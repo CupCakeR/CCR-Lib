@@ -1,7 +1,4 @@
 
--- TODO: Note the follwing things in git
--- http://www.jsondiff.com/ - tool to compare missing keys
-
 public class CCR.Language
 	_get _set url -- direct url to json file
 	_get _set logger
