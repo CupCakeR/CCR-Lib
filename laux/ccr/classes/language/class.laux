@@ -96,6 +96,7 @@ public class CCR.Language
 				promise:reject()
 			end
 		else
+			self:getLogger():warning(`i18n: no cached version found`)
 			promise:reject()
 		end
 
