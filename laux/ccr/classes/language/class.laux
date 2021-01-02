@@ -145,7 +145,10 @@ public class CCR.Language
 	__tostring() return `CCR.Language` end
 end
 
--- FIXME: maybe use this instead: https://github.com/Facepunch/garrysmod-requests/issues/1670#issuecomment-667499932
+-- auto refresh
+for id, _ in pairs(hook.GetTable()["CCR.OnLanguageLoaded"] || {}) do
+	hook.Remove("CCR.OnLanguageLoaded", id)
+end
 
 CCR.CanInitializeLanguage ||= false
 hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function() -- NOTE: Dont call http shit too early?
