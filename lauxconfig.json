@@ -6,7 +6,7 @@
 	"merges": [
 		{
 			"filesGlob": ["ccr/classes/currency/currencies/*.laux"],
-			"output": "ccr/currency/list_merged"
+			"output": "ccr/classes/currency/list_merged"
 		}
 	]
 }

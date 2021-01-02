@@ -1,4 +1,13 @@
 
+
+concommand.Add("ccr_info", function(p, cmd, args)
+	print("--- CCR DEBUG INFO ---")
+	local info = debug.getinfo(() => end, "S")
+	print("", "call source:", info.source)
+	print("", "version:", CCR.VERSION)
+	print("---")
+end)
+
 stopif (SERVER)
 
 concommand.Add("ccr_print_pos", function(p, cmd, args)

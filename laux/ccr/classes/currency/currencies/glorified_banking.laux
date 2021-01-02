@@ -1,0 +1,30 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("glorified_banking")
+	end
+
+	set(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		GlorifiedBanking.SetPlayerBalance(p, amount)
+	end
+
+	add(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		GlorifiedBanking.AddPlayerBalance(p, amount)
+	end
+
+	get(p)
+		return GlorifiedBanking.GetPlayerBalance(p)
+	end
+
+	canAfford(p, amount)
+		return GlorifiedBanking.CanPlayerAfford(p, amount)
+	end
+
+	format(amount)
+		return '$' .. string.Comma(amt)
+	end
+end
+
+Currency():register(true)

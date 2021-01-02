@@ -15,7 +15,7 @@ public class CCR.FileLoader
 
 	constructor() end
 
-	addFile(file: string, realm = CCR.FileLoader.REALM_AUTO)
+	addFile(file: string, realm = CCR.FileLoader.REALM_AUTO, options = {})
 		file = file:StripExtension()
 
 		if (realm == CCR.FileLoader.REALM_AUTO) then
@@ -34,7 +34,10 @@ public class CCR.FileLoader
 
 		table.insert(self.files, {
 			path = `${self:getDirectory()}/${file}.lua`,
-			realm = realm
+			realm = realm,
+			options = {
+				callback = options?.callback || () => end
+			}
 		})
 
 		return self
@@ -84,7 +87,7 @@ public class CCR.FileLoader
 
 			if (doInclude) then
 				local st = SysTime()
-				include(file.path)
+				file.options.callback(include(file.path))
 				t += SysTime() - st
 
 				c++

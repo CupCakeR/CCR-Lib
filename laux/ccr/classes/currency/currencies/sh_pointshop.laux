@@ -1,0 +1,30 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("sh_pointshop")
+	end
+
+	set(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		p:SH_AddStandardPoints(amount, nil, nil, nil)
+	end
+
+	get(p)
+		return p:SH_GetStandardPoints()
+	end
+
+	canAfford(p, amount)
+		return p:SH_CanAffordStandard(amount)
+	end
+
+	format(amount)
+		return string.Comma(amount) .. " point" .. (amount == 1 && "s" || "")
+	end
+end
+
+Currency():register(true)

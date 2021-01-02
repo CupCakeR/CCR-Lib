@@ -7,3 +7,6 @@
 git-conventional-commits.json
 lua/
 transpile.bat
+
+.git-hooks/
+git-conventional-commits.json

@@ -1,0 +1,30 @@
+
+class Currency extends CCR.Currency
+	constructor()
+		super("sh_pointshop_premium")
+	end
+
+	set(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		self:add(p, -self:get() + amount)
+	end
+
+	add(p, amount)
+		stopif (CLIENT) -- smh, not shared
+		p:SH_AddPremiumPoints(amount, nil, nil, nil)
+	end
+
+	get(p)
+		return p:SH_GetPremiumPoints()
+	end
+
+	canAfford(p, amount)
+		return p:SH_CanAffordPremium(amount)
+	end
+
+	format(amount)
+		return string.Comma(amount) .. " premium point" .. (amount == 1 && "s" || "")
+	end
+end
+
+Currency():register(true)
