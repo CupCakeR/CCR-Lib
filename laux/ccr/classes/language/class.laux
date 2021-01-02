@@ -1,16 +1,24 @@
 
--- TODO: Note the follwing things in git
--- http://www.jsondiff.com/ - tool to compare missing keys
-
 public class CCR.Language
 	_get _set url -- direct url to json file
+	_get _set baseUrl -- direct url to base json file
 	_get _set logger
 
 	_get rawJson
 	_get raw -- contains the raw json returned (as table)
 	_get phrases -- contains the flattened strings
 
+	_get base
+
 	--
+
+	IsValid()
+		if (self._parent) then
+			return IsValid(self._parent)
+		end
+
+		return true
+	end
 	
 	getLogger()
 		return self.logger || CCR.Logger
@@ -67,7 +75,7 @@ public class CCR.Language
 
 			local tbl = util.JSONToTable(body)
 			if (!tbl) then
-				self:getLogger():error(`i18n: invalid response body (not valid json)`)
+				self:getLogger():error(`i18n: invalid response body (not valid json) returned - url: ${self.url}`)
 				return promise:resolve()
 			end
 
@@ -90,12 +98,21 @@ public class CCR.Language
 			local tbl = util.JSONToTable(str)
 
 			if (tbl) then
+				self.rawJson = str
+				self.raw = tbl
+
 				promise:resolve(tbl)
 			else
-				self:getLogger():error(`i18n: cached language file contains invalid json`)
+				if (self._parent) then
+					self:getLogger():error(`i18n: cached fallback language file contains invalid json`)
+				else
+					self:getLogger():error(`i18n: cached language file contains invalid json`)
+				end
+
 				promise:reject()
 			end
 		else
+			self:getLogger():warning(`i18n: no cached version found`)
 			promise:reject()
 		end
 
@@ -125,7 +142,29 @@ public class CCR.Language
 
 		file.CreateDir(`ccr/languages`)
 
-		self:download():next((tbl) =>
+		local chainPromise = CCR.Promise()
+
+		if (self:getBaseUrl()) then -- has fallback
+			self.base = CCR.Language()
+				:setUrl(self:getBaseUrl())
+				:setLogger(self:getLogger())
+			
+			self.base._parent = self -- shithole way to check internally if this language object is a base of another object
+
+			hook.Add("CCR.OnLanguageLoaded", self, (lang) ->
+				if (lang == self.base) then
+					chainPromise:resolve()
+				end
+			end)
+
+			self.base:load()
+		else
+			chainPromise:resolve()
+		end
+
+		chainPromise:next(() =>
+			return self:download()
+		end):next((tbl) =>
 			if (!tbl) then
 				self:getLogger():warning(`i18n: checking for a cached version`)
 				return self:loadFromCache()
@@ -136,24 +175,59 @@ public class CCR.Language
 			self:buildPhrases()
 			self:updateCache()
 
+			local name = self.raw.info?.name
 			local total = table.Count(self.phrases)
-			self:getLogger():success(`i18n: successfully loaded ${total} translated phrase(s)`)
+			if (self._parent) then
+				self:getLogger():success(`i18n: loaded fallback translation (${name:lower()})`)
+			else
+				self:getLogger():success(`i18n: loaded ${total} translated phrase (${name:lower()})`)
+
+				if (self.base) then
+					-- count missing phrases & merge
+					local c = 0
+					for phraseId, str in pairs(self.base:getPhrases()) do
+						local phrase = self.phrases[phraseId]
+						if (!phrase || phrase == "") then
+							self.phrases[phraseId] = str
+							c++
+						end
+					end
+
+					if (c > 0) then
+						self:getLogger():warning(`i18n: ${c} phrase(s) are not translated`, "\n", " ",
+							`> Feel free to contribute here: `, Color(200, 220, 200), "https://github.com/cupcaker/ccr-languages"
+						)
+					end
+				end
+			end
 
 			hook.Run("CCR.OnLanguageLoaded", self)
 		end, () =>
-			self:getLogger():error(`i18n: failed to load language.`)
+			if (self._parent) then
+				self:getLogger():error(`i18n: failed to load fallback translation, continuing...`)
+				hook.Run("CCR.OnLanguageLoaded", self)
+				self._parent.base = nil -- magic, remove ourself from our parent, prevent it from using us in a loop, brainfuck
+			else
+				self:getLogger():error(`i18n: failed to load translation`)
+			end
 		end)
 	end
 
 	__tostring() return `CCR.Language` end
 end
 
--- FIXME: maybe use this instead: https://github.com/Facepunch/garrysmod-requests/issues/1670#issuecomment-667499932
+-- auto refresh
+for id, _ in pairs(hook.GetTable()["CCR.OnLanguageLoaded"] || {}) do
+	hook.Remove("CCR.OnLanguageLoaded", id)
+end
 
+-- auto refresh
 CCR.CanInitializeLanguage ||= false
-hook.Add("InitPostEntity", "CCR.DoInitializeLanguage", function() -- NOTE: Dont call http shit too early?
-	timer.Simple(3, function()
+if (!CCR.CanInitializeLanguage) then
+	hook.Add("Think", "CCR.DoInitializeLanguage", () =>
 		CCR.CanInitializeLanguage = true
+
 		hook.Run("CCR.DoInitializeLanguage")
+		hook.Remove("Think", "CCR.DoInitializeLanguage")
 	end)
-end)
+end
