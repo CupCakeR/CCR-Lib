@@ -28,7 +28,7 @@ end
 function CCR.CAMI.SteamIDHasAccess(actor, privilege, target, extraInfo)
 	local promise = CCR.Promise()
 
-	CAMI.SteamIDHasAccess(actor, privilege, (tbl) =>
+	CAMI.SteamIDHasAccess(actor, privilege, (b, str) =>
 		if (b) then
 			promise:resolve(str)
 		else
