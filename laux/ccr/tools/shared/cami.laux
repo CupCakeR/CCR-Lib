@@ -15,6 +15,20 @@ function CCR.CAMI.PlayerHasAccess(actor, privilege, target, extraInfo)
 	return promise
 end
 
+function CCR.CAMI.PlayerHasAccessInstant(actor, privilege, target, extraInfo)
+	local promise = CCR.Promise()
+
+	-- by not passing a callback, we are forcing the CAMI implementation to instantly return
+	local b, reason = CAMI.PlayerHasAccess(actor, privilege, nil, target, extraInfo)
+	if (b) then
+		promise:resolve()
+	else
+		promise:reject(reason)
+	end
+
+	return promise
+end
+
 function CCR.CAMI.GetPlayersWithAccess(privilege, target, extraInfo)
 	local promise = CCR.Promise()
 
