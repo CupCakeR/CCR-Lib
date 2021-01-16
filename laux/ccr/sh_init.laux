@@ -14,6 +14,7 @@ CCR.FileLoader()
 	:addFile("not_my_code/promises",	CCR.FileLoader.REALM_SHARED)
 	:addFile("not_my_code/hashids",		CCR.FileLoader.REALM_SHARED)
 	:addFile("not_my_code/semver",		CCR.FileLoader.REALM_SHARED)
+	:addFile("not_my_code/ease",		CCR.FileLoader.REALM_SHARED)
 	:addFile("not_my_code/bshadows",	CCR.FileLoader.REALM_CLIENT)
 	:addFile("not_my_code/gradient",	CCR.FileLoader.REALM_CLIENT)
 
