@@ -184,6 +184,3 @@ function math.ease.InOutBounce( x )
 		&& ( 1 - math.ease.OutBounce( 1 - 2 * x ) ) / 2
 		|| ( 1 + math.ease.OutBounce( 2 * x - 1 ) ) / 2
 end
-
-
-print("??")
