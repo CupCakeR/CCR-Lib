@@ -17,7 +17,7 @@ class Currency extends CCR.Currency
 	end
 
 	canAfford(p, amount, override)
-		return p:canAfford(amt)
+		return p:canAfford(amount)
 	end
 
 	format(amount)
