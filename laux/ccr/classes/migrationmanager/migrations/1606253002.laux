@@ -1,9 +1,0 @@
-
-return (conn, isMySQL) =>
-	return {
-		conn:query([[
-			ALTER TABLE ccr_migrations
-			MODIFY COLUMN id INT UNSIGNED
-		]])
-	}
-end

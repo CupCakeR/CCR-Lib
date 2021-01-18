@@ -1,5 +1,0 @@
-
-return (conn, isMySQL) =>
-	return {
-	}
-end
