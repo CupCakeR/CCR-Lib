@@ -41,15 +41,37 @@ public class CCR.MigrationManager
 	--
 
 	prepareMigrationsTable()
-		return self:getHelper():query([[
-			CREATE TABLE IF NOT EXISTS ccr_migrations (
-				id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-				addon_id VARCHAR(255) NOT NULL,
-				migration INT UNSIGNED NOT NULL,
-				time_executed INT UNSIGNED NOT NULL,
-				CONSTRAINT uc_migration UNIQUE (addon_id, migration)
-			)
-		]])
+		--[[
+			NOTE: added correct sqlite structure, changing the table names or adding migrations for the migration manager itself
+				is not required, because no server could have ran this as none of my
+				public addons use this feature yet. Only I am (locally) affected.
+
+				This is dirty and I am not proud of it. I should definitely consider adding migrations for the migration manager!
+
+				May god be with me and my customers.
+		]]
+
+		if (self.database:getMySQL()) then
+			return self:getHelper():query([[
+				CREATE TABLE IF NOT EXISTS ccr_migrations (
+					id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+					addon_id VARCHAR(255) NOT NULL,
+					migration INT UNSIGNED NOT NULL,
+					time_executed INT UNSIGNED NOT NULL,
+					CONSTRAINT uc_migration UNIQUE (addon_id, migration)
+				)
+			]])
+		else
+			return self:getHelper():query([[
+				CREATE TABLE IF NOT EXISTS ccr_migrations (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					addon_id TEXT NOT NULL,
+					migration INTEGER NOT NULL,
+					time_executed INTEGER NOT NULL,
+					CONSTRAINT uc_migration UNIQUE (addon_id, migration)
+				)
+			]])
+		end
 	end
 
 	getCurrentMigration()
