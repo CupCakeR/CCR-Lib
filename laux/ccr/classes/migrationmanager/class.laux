@@ -6,8 +6,8 @@ public class CCR.MigrationManager
 	_get _set addonName
 	addonName = "undefined"
 
-	_get _set connection
-	connection = nil
+	_get _set database
+	database = nil
 
 	_get consoleLogger
 	consoleLogger = nil
@@ -98,8 +98,7 @@ public class CCR.MigrationManager
 	end
 
 	executePendingMigrations(after)
-		-- local conn = self.connection:getHandler():getConnection() -- get a single connection
-		local conn = self.connection
+		local conn = self.helper.conn
 		local transaction = conn:createTransaction()
 		local files = self:findPendingMigrationFiles(after)
 
@@ -144,11 +143,11 @@ public class CCR.MigrationManager
 	-- TODO: resetMigration
 
 	run()
-		assert(self.connection, "database object not set")
+		assert(self.database, "database object not set")
 		assert(self.directory, "directory not set")
 		assert(self.consoleLogger, "no console logger set / available")
 
-		self.helper = CCR.DBAL.ConnectionHelper(self:getConnection()) -- FIXME: This should not use the helper (?)
+		self.helper = CCR.DBAL.ConnectionHelper(self:getDatabase():getHandler():getConnection())
 
 		local promise = CCR.Promise()
 
