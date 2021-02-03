@@ -11,7 +11,7 @@ AccessorFunc(PANEL, "clr_bg", "BackgroundColor")
 
 function PANEL:Init()
 	self:SetTextColor(rgb(200, 200, 200))
-	self:SetPlaceholder("?")
+	self:SetPlaceholder("undefined")
 	self:SetPlaceholderColor(Color(125, 125, 125))
 	self:SetBackgroundColor(self:GetThemeColors().Primary)
 	self:SetFont("CCR.TextEntry.Label")
