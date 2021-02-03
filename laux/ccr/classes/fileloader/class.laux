@@ -60,6 +60,10 @@ public class CCR.FileLoader
 		return self
 	end
 
+	addFunction(func)
+		table.insert(self.files, func)
+	end
+
 	run()
 		assert(self.directory, "no base directory defined")
 		assert(#self.files > 0, "no files to load")
@@ -68,6 +72,11 @@ public class CCR.FileLoader
 		local c = 0
 
 		for i, file in ipairs(self.files) do
+			if (isfunction(file)) then
+				file()
+				continue
+			end
+
 			local doInclude = false
 			local doAddCSLuaFile = false
 
