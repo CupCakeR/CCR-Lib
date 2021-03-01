@@ -91,3 +91,22 @@ CCR:AddPanelFunction("LerpAlpha", function(s, alpha, time = .1, callback = funct
 		callback(s)
 	end)
 end)
+
+-- FIXME: Move, only here because of a race condition
+CCR:AddPanelFunction("SetTooltip", (tooltip) ->
+	if (isstring(tooltip)) then
+		tooltip = CCR.Tooltip()
+			:setTarget(self)
+			:setText(tooltip)
+			:detour()
+		:build()
+	end
+
+	self.ccr_tooltip = tooltip
+
+	return tooltip
+end)
+
+CCR:AddPanelFunction("GetTooltip", () ->
+	return self.ccr_tooltip
+end)
