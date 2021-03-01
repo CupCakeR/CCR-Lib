@@ -295,6 +295,12 @@ function PANEL:SetValue(value, call)
 
 	self.m_fValue = value
 
+	local tooltip = self:GetTooltip()
+	if (tooltip) then
+		tooltip:setText(self:GetTooltipText())
+		tooltip:update()
+	end
+
 	if (call) then
 		if (self.m_cvar) then
 			self.m_cvar:SetFloat(value)
