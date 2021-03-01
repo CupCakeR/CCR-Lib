@@ -357,10 +357,10 @@ function PANEL:Paint(w, h)
 	-- surface.DrawOutlinedRect(0, 0, w, h)
 end
 
-function PANEL:GenerateMarks(step)
+function PANEL:GenerateMarks(step, min = self.m_fMin, max = self.m_fMax)
 	self.m_tMarks = {}
 
-	for num in range(self.m_fMin, self.m_fMax, step) do
+	for num in range(min, max, step) do
 		num = math.Round(num, self.m_iDecimals) -- prevent float comparison errors
 		table.insert(self.m_tMarks, num)
 	end
