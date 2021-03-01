@@ -18,10 +18,6 @@ function CCR:PreparePanelFunctions(pnl)
 			pnl["old_" .. name] = old -- save to allow detour
 		end
 
-		if (name == "LerpAlpha") then
-			print("IN PREPARE DETOUR")
-		end
-
 		pnl[name] = func
 	end
 end
