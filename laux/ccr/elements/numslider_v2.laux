@@ -71,15 +71,11 @@ function PANEL:Init()
 end
 
 function PANEL:ComputeMarkText(num)
-	return `${num}%`
-	-- return "shat myself"
-	-- return num
+	return num
 end
 
 function PANEL:GetTooltipText()
-	return `${self.m_fValue}%`
-	-- return "shat myself"
-	-- return num
+	return self.m_fValue
 end
 
 function PANEL:CalculateMarkPosition(index)
