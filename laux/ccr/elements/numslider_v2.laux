@@ -1,0 +1,461 @@
+
+CCR:GenerateFont("CCR.NumSliderV2.Marks", "SemiBold", 13)
+
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "m_fValue", "Value")
+CCR:AccessorFunc(PANEL, "m_tMarks", "Marks")
+
+CCR:AccessorFunc(PANEL, "m_fMin", "Min")
+CCR:AccessorFunc(PANEL, "m_fMax", "Max")
+CCR:AccessorFunc(PANEL, "m_iDecimals", "Decimals")
+CCR:AccessorFunc(PANEL, "m_bShowMarkerLabels", "ShowMarkerLabels")
+CCR:AccessorFunc(PANEL, "m_bForceNearestMarkerValue", "ForceNearestMarkerValue")
+CCR:AccessorFunc(PANEL, "m_colSlider", "SliderColor")
+CCR:AccessorFunc(PANEL, "m_colMarkerLabelOnColor", "MarkerLabelOnColor")
+CCR:AccessorFunc(PANEL, "m_colMarkerLabelOffColor", "MarkerLabelOffColor")
+CCR:AccessorFunc(PANEL, "m_colBarOnColor", "BarOnColor")
+CCR:AccessorFunc(PANEL, "m_colBarOffColor", "BarOffColor")
+CCR:AccessorFunc(PANEL, "m_cvar", "ConVar")
+
+local function range(a, b, step)
+	if not b then
+		b = a
+		a = 1
+	end
+	step = step or 1
+	local f =
+		step > 0 and
+		function(_, lastvalue)
+			local nextvalue = lastvalue + step
+			if nextvalue <= b then return nextvalue end
+		end or
+		step < 0 and
+		function(_, lastvalue)
+			local nextvalue = lastvalue + step
+			if nextvalue >= b then return nextvalue end
+		end or
+		function(_, lastvalue) return lastvalue end
+	return f, nil, a - step
+end
+
+local function NearestValueIndex(tbl, n)
+	local smallestSoFar, smallestIndex
+	for i, y in ipairs(tbl) do
+		if !smallestSoFar || (math.abs(n - y) < smallestSoFar) then
+			smallestSoFar = math.abs(n - y)
+			smallestIndex = i
+		end
+	end
+	return smallestIndex
+end
+
+function PANEL:Init()
+	self.m_fMin = 0
+	self.m_fMax = 1
+	self.m_iDecimals = 0
+
+	self.m_fValue = 0
+
+	self.m_bShowMarkerLabels = false
+	self.m_bForceNearestMarkerValue = false
+	self.m_colSlider = color_white
+	self.m_colMarkerLabelOnColor = CCR:ThemeColors().Blue
+	self.m_colMarkerLabelOffColor = CCR:ThemeColors().Secondary
+	self.m_colBarOnColor = CCR:ThemeColors().Blue
+	self.m_colBarOffColor = CCR:ThemeColors().Secondary
+
+	self.m_tMarks = {}
+
+	-- self:SetTall(32)
+end
+
+function PANEL:ComputeMarkText(num)
+	return `${num}%`
+	-- return "shat myself"
+	-- return num
+end
+
+function PANEL:GetTooltipText()
+	return `${self.m_fValue}%`
+	-- return "shat myself"
+	-- return num
+end
+
+function PANEL:CalculateMarkPosition(index)
+	local value = self.m_tMarks[index]
+
+	assert(value, "no value / invalid index")
+
+	local frac = (value - self.m_fMin) / (self.m_fMax - self.m_fMin)
+	local sliderWidth = self.slider.width / 2
+	local x = self.bar:GetWide()
+	x -= sliderWidth * 2
+	x = sliderWidth + (x * frac)
+
+	-- TODO: x += x_bar_pos -> if needs to be smaller to make the mark text fit
+
+	return x
+end
+
+function PANEL:PostInit()
+	self.canvasMarks = CCR:NewElement("Panel", self)
+	self.canvasMarks:Dock(TOP)
+	self.canvasMarks:SetTall(self.m_bShowMarkerLabels && (14 + 4) || 0)
+	self.canvasMarks.Paint = (s, w, h) =>
+		surface.SetDrawColor(255, 0, 0, 20)
+		-- surface.DrawOutlinedRect(0, 0, w, h)
+	end
+
+	self.canvasMarks.panels = {}
+	
+	local callCount = 0
+	self.canvasMarks.Build = (s) =>
+		callCount++
+		if (callCount > 50) then
+			error("overflow, prevented crash, wtf")
+		end
+
+		s:Clear()
+		s.panels = {}
+
+		stopif (!self.m_bShowMarkerLabels)
+
+		local min, max = 0, 0
+		for i, value in ipairs(self.m_tMarks) do
+			local label = CCR:NewElement("DLabel", self.canvasMarks)
+			label:SetText(self:ComputeMarkText(value))
+			label:SetFont("CCR.NumSliderV2.Marks")
+			label:SizeToContents()
+			label:SetMouseInputEnabled(true)
+			label:SetCursor("hand")
+			label.DoClick = (s, key) =>
+				self:HandleValueChange(value)
+			end
+			label.Think = (s) =>
+				s:SetTextColor((self.m_fValue == value) && self.m_colMarkerLabelOnColor || self.m_colMarkerLabelOffColor)
+			end
+
+			local w = label:GetWide()
+			local x = self:CalculateMarkPosition(i) - w / 2
+			x += self.bar:GetDockMargin() -- add left margin, we are dealing with a relative position here
+			label:SetPos(x, 0)
+			label:InvalidateLayout(true)
+
+			table.insert(s.panels, label)
+
+			if (min > x) then
+				min = x
+			end
+
+			if (max < (x + w)) then
+				max = x + w
+			end
+		end
+
+		local marginLeft, _, marginRight, _ = self.bar:GetDockMargin()
+		if (min < 0 && marginLeft < math.abs(min)) then
+			self.bar:DockMargin(math.abs(min), 0, marginRight, 0)
+			-- return s:Build() -- run again
+		end
+
+		local curBarWidth = self.bar:GetPos() + self.bar:GetWide()
+		local marginLeft, _, marginRight, _ = self.bar:GetDockMargin()
+		local requiredMarginRight = math.ceil(max - curBarWidth)
+		if (max > curBarWidth && marginRight != requiredMarginRight) then -- FIXME: Why !=?
+			self.bar:DockMargin(marginLeft, 0, requiredMarginRight, 0)
+			-- return s:Build() -- run again
+		end
+
+		s:InvalidateLayout(true)
+	end
+
+	self.canvasSlider = CCR:NewElement("Panel", self)
+	self.canvasSlider:Dock(TOP)
+
+	self.bar = CCR:NewElement("Panel", self.canvasSlider)
+	self.bar:Dock(TOP)
+	self.bar.Paint = (s, w, h) =>
+		surface.SetDrawColor(self.m_colMarkerLabelOffColor)
+		for i, value in ipairs(self.m_tMarks) do
+			surface.DrawRect(self:CalculateMarkPosition(i) - 1, 0, 2, h)
+		end
+
+
+		local height = 10
+		local x, y = s:LocalToScreen(0, 0)
+		render.SetScissorRect(x, y, x + self.slider:GetPos(), y + h, true)
+			CCR:CustomRoundedBox(height / 2, 0, h / 2 - height / 2, w, height, self.m_colBarOnColor, true, true, true, true)
+		render.SetScissorRect(0, 0, 0, 0, false)
+
+		render.SetScissorRect(x + self.slider:GetPos(), y, x + w, y + h, true)
+			CCR:CustomRoundedBox(height / 2, 0, h / 2 - height / 2, w, height, self.m_colBarOffColor, true, true, true, true)
+		render.SetScissorRect(0, 0, 0, 0, false)
+	end
+	self.bar.OnMousePressed = (s, key) =>
+		-- fake drag for one frame
+
+		stopif (key != MOUSE_LEFT)
+
+		self.slider.dragging = {
+			cursorStart = self.slider:LocalToScreen(self.slider:GetWide() / 2, 0),
+			x = self.slider:GetPos()
+		}
+
+		timer.Simple(0, () =>
+			if (IsValid(self.slider)) then
+				self.slider.dragging = false
+			end
+		end)
+	end
+
+	self.slider = CCR:NewElement("Panel", self.bar)
+	self.slider.width = 10
+	self.slider:SetCursor("sizewe")
+	self.slider.dragging = false
+	self.slider.OnMousePressed = (s, key) =>
+		s.dragging = {
+			cursorStart = input.GetCursorPos(),
+			x = s:GetPos(),
+		}
+	end
+	self.slider.Paint = (s, w, h) =>
+		CCR:CustomRoundedBox(2, 0, 0, w, h, self.m_colSlider, true, true, true, true)
+
+		if (s.dragging) then
+			if (!input.IsButtonDown(MOUSE_LEFT)) then
+				s.dragging = false
+				return
+			end
+
+			local x = input.GetCursorPos()
+			local diff = -(s.dragging.cursorStart - x)
+			local final = s.dragging.x + diff
+			final = math.Clamp(final, 0, self.bar:GetWide() - s:GetWide())
+
+			local frac = final / (self.bar:GetWide() - s:GetWide())
+
+			local value = Lerp(frac, self.m_fMin, self.m_fMax)
+			local nearestIndex = NearestValueIndex(self.m_tMarks, value)
+
+			if (self.m_bForceNearestMarkerValue) then
+				value = self.m_tMarks[nearestIndex]
+			end
+
+			self:HandleValueChange(value)
+		end
+	end
+	self.slider.PerformLayout = (s, w, h) =>
+		s:SetSize(s.width, s:GetParent():GetTall())
+	end
+	self.slider.UpdatePosition = (s) =>
+		local frac = self:GetFraction()
+		local sliderWidth = self.slider.width / 2
+		local x = self.bar:GetWide() - (sliderWidth * 2)
+		x = (x * frac)
+		-- x -= 1
+
+		s:SetPos(x, 0)
+	end
+
+	self:SetTooltip(CCR.Tooltip()
+		:setTarget(self)
+		:setPositionTarget(self.slider)
+		:setText(self:GetTooltipText())
+		-- :setFont("ChatFont")
+		:detour()
+	:build())
+
+	self:InvalidateLayout(true)
+end
+
+function PANEL:GetFraction()
+	return (self.m_fValue - self.m_fMin) / (self.m_fMax - self.m_fMin)
+end
+
+function PANEL:ShouldShowTooltip()
+	return self.bar:IsHovered() || self.slider:IsHovered()
+end
+
+function PANEL:HandleValueChange(value, call = true)
+	self:SetValue(value, call)
+	self.slider:UpdatePosition()
+
+	self:GetTooltip():setText(self:GetTooltipText())
+	self:GetTooltip():update()
+end
+
+function PANEL:SetValue(value, call)
+	assert(tonumber(value), "value must be a number")
+
+	value = math.Round(value, self.m_iDecimals)
+	value = math.Clamp(value, self.m_fMin, self.m_fMax)
+
+	stopif (value == self.m_fValue)
+
+	self.m_fValue = value
+
+	if (call) then
+		if (self.m_cvar) then
+			self.m_cvar:SetFloat(value)
+		end
+
+		self:OnValueChanged(value)
+	end
+end
+
+function PANEL:SetConVar(cvar)
+	assert(cvar)
+
+	if (isstring(cvar)) then
+		cvar = GetConVar(cvar)
+	end
+
+	assert(type(cvar) == "ConVar", "invalid convar")
+
+	self.m_cvar = cvar
+
+	local min = cvar:GetMin()
+	if (min) then
+		self.m_fMin = min
+	end
+
+	local max = cvar:GetMax()
+	if (max) then
+		self.m_fMax = max
+	end
+
+	self:SetValue(cvar:GetFloat(), nil)
+
+	local name = cvar:GetName()
+	cvars.AddChangeCallback(name, (name, old, new) =>
+		if (IsValid(self)) then
+			self:HandleValueChange(new, false)
+		end
+	end, `ccr_numslider_${name}`)
+end
+
+function PANEL:PerformLayout(w, h)
+	-- self.canvasMarks:InvalidateLayout(true)
+	self.canvasSlider:InvalidateLayout(true)
+
+	self.slider:UpdatePosition()
+	self.canvasMarks:Build()
+	
+	self:SizeToChildren(false, true)
+end
+
+function PANEL:OnRemove()
+	if (self.m_cvar) then
+		local name = self.m_cvar:GetName()
+		cvars.RemoveChangeCallback(name, `ccr_numslider_${name}`)
+	end
+end
+
+function PANEL:Paint(w, h)
+	surface.SetDrawColor(255, 0, 0, 20)
+	-- surface.DrawOutlinedRect(0, 0, w, h)
+end
+
+function PANEL:GenerateMarks(step)
+	self.m_tMarks = {}
+
+	for num in range(self.m_fMin, self.m_fMax, step) do
+		num = math.Round(num, self.m_iDecimals) -- prevent float comparison errors
+		table.insert(self.m_tMarks, num)
+	end
+end
+
+function PANEL:OnValueChanged(val) end -- override
+
+CCR:RegisterElement("NumSliderV2", PANEL, "Panel")
+
+
+
+
+
+function CCR:TestNumSliderV2()
+	CreateClientConVar("ccr_numslider_test", "0", false, false, "test lol", 0, 100)
+
+	local frame = CCR:NewElement("Frame")
+	frame:SetTitle("CCR NumSlider V2 Test")
+	frame:SetTitle("nigga numslider test")
+	frame:SetSize(400, 400)
+	frame:Center()
+	frame:MakePopup()
+
+	local canvas = CCR:NewElement("Panel", frame)
+	canvas:Dock(FILL)
+	canvas:DockMargin(16, 16, 16, 16)
+	canvas:DockPadding(8, 8, 8, 8)
+	canvas.Paint = (s, w, h) =>
+		CCR:RoundedBox(0, 0, w, h, CCR:GetThemeColors().PanelBackground)
+	end
+
+	local slider = CCR:NewElement("NumSliderV2", canvas)
+	slider:Dock(TOP)
+	-- slider:DockMargin(0, 0, 0, 0)
+	-- slider:GenerateMarks(10)
+	slider:SetMin(0)
+	slider:SetMax(100)
+	slider:SetDecimals(0)
+	slider:SetShowMarkerLabels(true)
+	slider:SetForceNearestMarkerValue(false)
+	slider:SetMarks({
+		0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+	})
+	slider:PostInit()
+
+	local slider = CCR:NewElement("NumSliderV2", canvas)
+	slider:Dock(TOP)
+	slider:DockMargin(0, 16, 0, 0)
+	slider:SetMin(0)
+	slider:SetMax(1)
+	slider:SetDecimals(1)
+	slider:GenerateMarks(.1)
+	slider:SetShowMarkerLabels(false)
+	slider:SetForceNearestMarkerValue(true)
+	slider:PostInit()
+
+	local slider = CCR:NewElement("NumSliderV2", canvas)
+	slider:Dock(TOP)
+	slider:DockMargin(0, 16, 0, 0)
+	slider:SetMin(0)
+	slider:SetMax(100)
+	slider:SetDecimals(1)
+	slider:SetMarks({
+		0, 10, 20, 40, 50, 80, 90, 100
+	})
+	slider:SetShowMarkerLabels(true)
+	slider:SetForceNearestMarkerValue(true)
+	slider:SetConVar("ccr_numslider_test")
+	slider:PostInit()
+
+	slider.OnValueChanged = (s, value) =>
+		print("value", value)
+	end
+
+	local slider = CCR:NewElement("NumSliderV2", canvas)
+	slider:Dock(TOP)
+	slider:DockMargin(0, 16, 0, 0)
+	slider:SetMin(0)
+	slider:SetMax(100)
+	slider:SetDecimals(2)
+	slider:GenerateMarks(10)
+	slider:SetShowMarkerLabels(false)
+	slider:SetForceNearestMarkerValue(false)
+	slider:SetMarkerLabelOnColor(grey(200))
+	slider:SetConVar("ccr_numslider_test")
+	slider:PostInit()
+
+	local old_Think = slider.Think
+	slider.Think = (s) =>
+		-- :GetFraction()
+		s.m_colBarOnColor = CCR:LerpColor(s:GetFraction(), CCR:ThemeColors().Red, CCR:ThemeColors().Green)
+		return old_Think(s)
+	end
+
+	slider.OnValueChanged = (s, value) =>
+		print("value", value)
+	end
+end

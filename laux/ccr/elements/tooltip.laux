@@ -1,0 +1,156 @@
+
+CCR:GenerateFont("CCR.Tooltip", "ExtraBold", 15)
+
+public class CCR.Tooltip
+	_get _set target
+	target = nil
+
+	_get _set positionTarget
+	positionTarget = nil
+
+	_get popup
+	popup = nil
+
+	_get _set text
+	text = "undefined"
+
+	_get _set font
+	font = "CCR.Tooltip"
+
+	_get _set textColor
+	textColor = color_white
+
+	_get _set show
+	show = false
+
+	lastState = false
+
+	-- fade time
+	-- stay time on cursor exit
+	-- ...
+
+	constructor(targetPanel)
+		self.target = targetPanel
+	end
+
+	IsValid()
+		return IsValid(self.target) && self.target:GetTooltip() == self
+	end
+
+	update(invalidate = true)
+		self.popup.label:SetText(self.text)
+		self.popup.label:SetFont(self.font)
+		self.popup.label:SetTextColor(self.textColor)
+
+		if (invalidate) then
+			self.popup:InvalidateLayout(true)
+		end
+	end
+
+	handle()
+		stopif (!IsValid(self.popup))
+		stopif (self.lastState == self.show)
+
+		if (self.show) then
+			self.popup:DoShow()
+		else
+			self.popup:DoHide()
+		end
+
+		self.lastState = self.show
+	end
+
+	buildPopup()
+		if (IsValid(self.popup)) then
+			self.popup:Remove()
+		end
+
+		local tooltipPanel = CCR:NewElement("Tooltip")
+		tooltipPanel:SetTooltipObject(self)
+		tooltipPanel:PostInit()
+
+		self.popup = tooltipPanel
+	end
+
+	build()
+		self:buildPopup()
+		-- self:detour()
+
+		return self
+	end
+
+	detour()
+		local oldThink = self.target.Think
+		self.target.Think = (s) =>
+			if (!s.ShouldShowTooltip) then
+				self.show = s:IsHovered()
+			else
+				self.show = s:ShouldShowTooltip()
+			end
+
+			self:handle()
+
+			if (oldThink) then
+				return oldThink(s)
+			end
+		end
+
+		return self
+	end
+end
+
+
+-- PANEL
+
+local PANEL = {}
+
+CCR:AccessorFunc(PANEL, "m_tTooltipObject", "TooltipObject")
+
+function PANEL:Init()
+	self.Alpha = 0
+	self:SetAlpha(0)
+	self:SetDrawOnTop(true)
+	self:DockPadding(8, 8, 8, 8)
+end
+
+function PANEL:PostInit()
+	self.label = CCR:NewElement("DLabel", self)
+	self.label:SetText(self.m_tTooltipObject:getText())
+	self.label:SetFont(self.m_tTooltipObject:getFont())
+end
+
+function PANEL:DoShow()
+	self:InvalidateLayout(true)
+	self:LerpAlpha(255)
+end
+
+function PANEL:DoHide()
+	self:LerpAlpha(0)
+end
+
+function PANEL:PerformLayout(w, h)
+	self.label:SizeToContents()
+	self.label:Center()
+
+	self:SizeToChildren(true, true)
+
+	local obj = self.m_tTooltipObject
+	local panel = IsValid(obj.positionTarget) && obj.positionTarget || obj.target
+	local x, y = panel:LocalToScreen(panel:GetWide() / 2, 0)
+	x -= w / 2
+	y -= h + 4
+
+	self:SetPos(x, y)
+end
+
+function PANEL:Think()
+	if (!self.m_tTooltipObject || !IsValid(self.m_tTooltipObject)) then
+		self:Remove()
+	end
+end
+
+function PANEL:Paint(w, h)
+	CCR:RoundedBox(0, 0, w, h, CCR:ThemeColors().Primary)
+end
+
+CCR:RegisterElement("Tooltip", PANEL, "DPanel")

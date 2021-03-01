@@ -1,5 +1,5 @@
 
-CCR.PanelFuncs = {}
+CCR.PanelFuncs ||= {}
 CCR_PANEL_ID = CCR_PANEL_ID or 1
 
 function CCR:AddPanelID(pnl)
@@ -16,6 +16,10 @@ function CCR:PreparePanelFunctions(pnl)
 		local old = FindMetaTable("Panel")[name] or pnl[name]
 		if old then
 			pnl["old_" .. name] = old -- save to allow detour
+		end
+
+		if (name == "LerpAlpha") then
+			print("IN PREPARE DETOUR")
 		end
 
 		pnl[name] = func
