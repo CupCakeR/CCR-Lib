@@ -1,5 +1,5 @@
 
-CCR.PanelFuncs = {}
+CCR.PanelFuncs ||= {}
 CCR_PANEL_ID = CCR_PANEL_ID or 1
 
 function CCR:AddPanelID(pnl)
