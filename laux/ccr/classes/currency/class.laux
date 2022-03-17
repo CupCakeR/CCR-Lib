@@ -41,3 +41,31 @@ function CCR:RegisterCurrency(currency, override)
 
 	self.Currencies[currency.id] = currency
 end
+
+-- 
+
+function CCR:LoadCustomCurrencies()
+	local path = "ccr/custom/currencies/"
+	local files = file.Find(path .. "*.lua", "LUA")
+
+	for i, file in ipairs(files) do
+		if (SERVER) then
+			AddCSLuaFile(path .. file)
+		end
+
+		local obj = include(path .. file)
+		
+		if (!obj) then
+			self.Logger:Error(`Custom currency file "${file}" did not return a valid currency object`)
+			continue
+		end
+
+		if (CCR:GetCurrency(obj:getId())) then
+			self.Logger:Warning(`Custom currency "${obj.id}" was already registered, overwriting..`)
+		end
+
+		self:RegisterCurrency(obj, true)
+		
+		self.Logger:Log(`Custom currency "${obj.id}" loaded and registered`)
+	end
+end

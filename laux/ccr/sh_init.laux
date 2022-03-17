@@ -37,11 +37,7 @@ CCR.FileLoader()
 	:addFile("classes/config/class",			CCR.FileLoader.REALM_SHARED)
 	:addFile("classes/versionchecker/class",	CCR.FileLoader.REALM_SHARED)
 	:addFile("classes/currency/class",			CCR.FileLoader.REALM_SHARED)
-	:addFile("classes/currency/list_merged",	CCR.FileLoader.REALM_SHARED, {
-		callback = () =>
-			hook.Run("CCR.PostCurrenciesLoaded")
-		end
-	})
+	:addFile("classes/currency/list_merged",	CCR.FileLoader.REALM_SHARED, {callback = () => CCR:LoadCustomCurrencies() end })
 
 	:addFile("classes/mysqlite/class",			CCR.FileLoader.REALM_SERVER)
 	:addFile("classes/dbal/class",				CCR.FileLoader.REALM_SERVER)
