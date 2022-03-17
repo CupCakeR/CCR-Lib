@@ -103,10 +103,6 @@ public class CCR.NetReceiver -- NOTE: We cant extend base due to load order, fix
 		self.players = {}
 		self.errors = {}
 
-		hook.Add("Tick", self, (s) =>
-			s.players = {}
-		end)
-
 		return self
 	end
 
@@ -176,6 +172,10 @@ public class CCR.NetReceiver -- NOTE: We cant extend base due to load order, fix
 
 	Register()
 		CCR.NetReceivers[self.id] = self
+
+		hook.Add("Tick", self, (s) =>
+			s.players = {}
+		end)
 
 		net.Receive(self.id, (len, p) =>
 			stopif !IsValid(self)
