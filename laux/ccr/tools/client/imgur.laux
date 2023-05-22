@@ -22,8 +22,11 @@ local function dl(imageData)
 		return p
 	end
 
-	local url = "https://proxy.duckduckgo.com/iu/?u="
-	url ..= "https://i.imgur.com/" .. imageData.id .. "." .. imageData.type
+	-- TODO: Find different proxy, duckduckgo proxy seems dead
+	-- local url = "https://proxy.duckduckgo.com/iu/?u="
+	-- url ..= "https://i.imgur.com/" .. imageData.id .. "." .. imageData.type
+
+	local url = "https://i.imgur.com/" .. imageData.id .. "." .. imageData.type
 
 	http.Fetch(url, function(body)
 		file.CreateDir(path)
